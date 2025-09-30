@@ -33,7 +33,7 @@ jobs:
           echo "✅ Download complete. First 10 lines:"
           head -n 10 constitution/constitution-v1.txt
 
-      - name: Commit and push changes (force)
+      - name: Force stage and commit changes
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -43,10 +43,19 @@ jobs:
           echo "📂 Status BEFORE staging:"
           git status
 
+          # Make sure git knows about any new files
           git add -A
+          git update-index --refresh
 
           echo "📂 Status AFTER staging:"
           git status
 
-          git commit -m "Sync: Update constitution from official source [auto]" || echo "✅ No changes to commit"
+          # Force a dummy change if nothing is detected (ensures commit runs)
+          if git diff --cached --quiet; then
+            echo "No changes detected – forcing a dummy commit to ensure sync."
+            date > constitution/.last-sync
+            git add constitution/.last-sync
+          fi
+
+          git commit -m "Sync: Update constitution from official source [auto]" || echo "✅ Nothing new to commit"
           git push origin main || echo "⚠️ Push skipped or failed"
