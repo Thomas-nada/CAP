@@ -2,15 +2,15 @@ name: Sync Official Cardano Constitution
 
 on:
   schedule:
-    - cron: "0 * * * *"   # every hour
-  workflow_dispatch:
+    - cron: "0 * * * *"   # 🔁 Runs every hour
+  workflow_dispatch:      # 📥 Manual trigger support
 
 jobs:
   sync:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repo with full history
+      - name: Checkout repository with full history
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
