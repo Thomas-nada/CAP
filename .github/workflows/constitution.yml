@@ -2,7 +2,7 @@ name: Sync Official Cardano Constitution
 
 on:
   schedule:
-    - cron: "0 * * * *"   # 🔁 Runs every hour
+    - cron: "0 * * * *"   # every hour
   workflow_dispatch:
 
 jobs:
@@ -16,6 +16,14 @@ jobs:
           ref: main
           fetch-depth: 0
 
+      - name: Ensure we are on main
+        run: |
+          echo "📍 Current branch before switching:"
+          git branch -a
+          git checkout main || echo "⚠️ main branch already checked out or missing"
+          echo "📍 Current branch after switching:"
+          git branch -a
+
       - name: Download latest official constitution
         run: |
           mkdir -p constitution
@@ -25,11 +33,6 @@ jobs:
           echo "✅ Download complete. First 10 lines:"
           head -n 10 constitution/constitution-v1.txt
 
-      - name: Verify current branch
-        run: |
-          echo "📍 Current branch:"
-          git branch
-
       - name: Commit and push changes (force)
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -37,18 +40,13 @@ jobs:
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
 
-          echo "📂 Git status before adding:"
+          echo "📂 Status BEFORE staging:"
           git status
 
-          # Force add all new/changed files
           git add -A
 
-          echo "📂 Git status after adding:"
+          echo "📂 Status AFTER staging:"
           git status
 
-          # Ensure we're on main
-          git checkout main
-
-          # Force commit if anything staged
           git commit -m "Sync: Update constitution from official source [auto]" || echo "✅ No changes to commit"
-          git push origin main
+          git push origin main || echo "⚠️ Push skipped or failed"
