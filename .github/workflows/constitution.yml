@@ -25,6 +25,11 @@ jobs:
           echo "✅ Download complete. First 10 lines:"
           head -n 10 constitution/constitution-v1.txt
 
+      - name: Verify current branch
+        run: |
+          echo "📍 Current branch:"
+          git branch
+
       - name: Commit and push changes (force)
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -35,10 +40,15 @@ jobs:
           echo "📂 Git status before adding:"
           git status
 
+          # Force add all new/changed files
           git add -A
 
           echo "📂 Git status after adding:"
           git status
 
+          # Ensure we're on main
+          git checkout main
+
+          # Force commit if anything staged
           git commit -m "Sync: Update constitution from official source [auto]" || echo "✅ No changes to commit"
-          git push origin main || echo "⚠️ Push skipped or failed (check branch protection)"
+          git push origin main
