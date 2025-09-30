@@ -1,0 +1,28 @@
+name: Sync Official Cardano Constitution
+
+on:
+  schedule:
+    - cron: "0 * * * *"   # 🔁 Runs every hour on the hour
+  workflow_dispatch:      # Allows you to trigger it manually too
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout your CAP repo
+        uses: actions/checkout@v3
+
+      - name: Download latest official constitution
+        run: |
+          mkdir -p constitution
+          curl -L https://raw.githubusercontent.com/IntersectMBO/cardano-constitution/main/cardano-constitution-1/cardano-constitution-1.txt \
+          -o constitution/constitution-v1.txt
+
+      - name: Commit and push changes if updated
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add constitution/constitution-v1.txt
+          git diff --quiet && echo "No changes detected." || (git commit -m "Sync: Update constitution from official source" && git push)
