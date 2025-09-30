@@ -3,11 +3,12 @@ name: Sync Official Cardano Constitution
 on:
   schedule:
     - cron: "0 * * * *"   # 🔁 Runs every hour on the hour
-  workflow_dispatch:      # Optional: allows manual runs from Actions tab
+  workflow_dispatch:      # Allows manual runs from the Actions tab
 
 jobs:
   sync:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout your CAP repo
         uses: actions/checkout@v3
@@ -16,14 +17,27 @@ jobs:
         run: |
           mkdir -p constitution
           curl -L https://raw.githubusercontent.com/IntersectMBO/cardano-constitution/main/cardano-constitution-1/cardano-constitution-1.txt \
-          -o constitution/constitution-v1.txt
+            -o constitution/constitution-v1.txt
 
-      - name: Commit and push changes if updated
+          echo "✅ Download complete. Preview of the file content:"
+          head -n 10 constitution/constitution-v1.txt
+
+      - name: Commit and push changes (force)
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git add constitution/constitution-v1.txt
-          git diff --quiet && echo "No changes detected." || (git commit -m "Sync: Update constitution from official source" && git push)
 
+          echo "📂 Git status before adding changes:"
+          git status
+
+          # Add all changes (including new files)
+          git add -A
+
+          echo "📂 Git status after adding changes:"
+          git status
+
+          # Commit and push if there are any changes
+          git commit -m "Sync: Update constitution from official source [auto]" || echo "✅ No changes to commit"
+          git push || echo "⚠️ Push skipped or failed (check permissions)"
