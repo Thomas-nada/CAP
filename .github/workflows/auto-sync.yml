@@ -1,0 +1,30 @@
+name: Auto-sync Cardano Constitution
+
+on:
+  schedule:
+    - cron: "0 * * * *"   # every hour
+  workflow_dispatch:
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout main branch
+        uses: actions/checkout@v3
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Download constitution text
+        run: |
+          mkdir -p constitution
+          curl -L https://raw.githubusercontent.com/IntersectMBO/cardano-constitution/main/cardano-constitution-1/cardano-constitution-1.txt \
+            -o constitution/constitution-v1.txt
+
+      - name: Commit back to repository
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "🔄 Sync: Update constitution from official source"
+          branch: main
+          file_pattern: constitution/constitution-v1.txt
