@@ -1,9 +1,9 @@
-name: Sync Official Cardano Constitution
+name: Sync and Commit Cardano Constitution  # <-- CHANGED NAME
 
 on:
   schedule:
     - cron: "0 * * * *"   # 🔁 Runs every hour
-  workflow_dispatch:      # 📥 Manual trigger support
+  workflow_dispatch:
 
 jobs:
   sync:
