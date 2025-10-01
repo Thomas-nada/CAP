@@ -80,23 +80,4 @@ Proposals deemed ready for review but requiring further author updates or confir
 |------|---------|
 | Your Name | [@yourhandle](https://github.com/yourhandle) |
 
-## 📚 Index
-
-### Constitutional Amendment Proposals (CAPs)
-- [CAP-0001](./CAP-0001/README.md) – CAP Process
-- [CAP-0003](./CAP-0003/README.md) – Example Amendment Proposal
-- [CAP-9999](./CAP-9999/README.md) – Reserved (Meta/Test)
-
-### Governance Problem Statements (GPS)
-- [GPS-0001](./GPS-0001/README.md) – Example Governance Problem Statement
-
-### Constitution
-- [constitution](./constitution/README.md) – Current Cardano Constitution
-
-### CAPS LOCK Meetings
-- [CAPS LOCK](./CAPS%20LOCK) – Governance meeting records
-
-### Repository Infrastructure
-- [.github](./.github) – Templates, workflows, and automation
-
 ---
