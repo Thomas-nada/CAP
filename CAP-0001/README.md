@@ -4,10 +4,10 @@ Title: CAP Process
 Category: Meta
 Status: Active
 Authors:
-    - [Your Name] <your.email@domain>
+  - Your Name <your.email@domain>
 Implementors: N/A
 Discussions:
-    - https://github.com/[your-org]/CAPs/pull/1
+  - https://github.com/[your-org]/CAPs/pull/1
 Created: 2025-10-01
 License: CC-BY-4.0
 ---
