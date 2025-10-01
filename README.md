@@ -19,7 +19,8 @@ GPSs highlight governance gaps, ambiguities, or problems that may lead to one or
 They are meant to live side-by-side with CAPs as first-class citizens in this repository.
 
 > [!TIP]  
-> For new GPSs, a reference template is available in [.github/workflows/GPS-TEMPLATE.md](.github/workflows/GPS-TEMPLATE.md)
+> For new GPSs, a reference template is available in [.github/GPS-TEMPLATE.md](.github/GPS-TEMPLATE.md)
+
 
 ---
 
