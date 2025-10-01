@@ -8,7 +8,7 @@ The intention is for CAPs to be the primary mechanism for proposing constitution
 Because CAPs are text files in a versioned repository, their revision history becomes the historical record of constitutional change.
 
 > [!TIP]  
-> For new CAPs, a reference template is available in [.github/workflows/CAP-TEMPLATE.md](.github/workflows/CAP-TEMPLATE.md)
+> For new CAPs, a reference template is available in [.github/CAP-TEMPLATE.md](.github/CAP-TEMPLATE.md)
 
 ---
 
