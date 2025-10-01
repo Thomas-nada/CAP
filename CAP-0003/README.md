@@ -1,5 +1,5 @@
 ---
-CAP: 0002
+CAP: 0003
 Title: Amendment to Clarify the Constitutional Committee Accountability Mechanism
 Category: Governance
 Status: Draft
