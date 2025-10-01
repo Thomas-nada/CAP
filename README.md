@@ -43,8 +43,7 @@ CAP editors facilitate discussions and progress submissions on GitHub, reviewing
 | #     | Title | Status |
 |-------|----------------------------|----------|
 | 0001  | [CAP Process](./CAP-0001)  | Active |
-| 0003  | [Amendment to Clarify the Constitutional Committee Accountability Mechanism
-](./CAP-0003)  | Draft |
+| 0003  | [Amendment to Clarify the Constitutional Committee Accountability Mechanism](./CAP-0003)  | Draft |
 | 9999  | [Governance Problem Statements](./CAP-9999) | Active |
 
 <p align="right"><i>Last updated on 2025-10-01</i></p>
