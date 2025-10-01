@@ -14,7 +14,7 @@ Because CAPs are text files in a versioned repository, their revision history be
 
 # Governance Problem Statements (GPS)
 
-A [Governance Problem Statement (GPS)](./GPS-0001) is a formalized governance issue documented for the Cardano ecosystem and the name of the process by which such documents are produced and listed.  
+A [Governance Problem Statement (GPS)](./CAP-9999) is a formalized governance issue documented for the Cardano ecosystem and the name of the process by which such documents are produced and listed.  
 GPSs highlight governance gaps, ambiguities, or problems that may lead to one or more CAPs.  
 They are meant to live side-by-side with CAPs as first-class citizens in this repository.
 
