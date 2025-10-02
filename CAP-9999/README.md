@@ -54,10 +54,11 @@ GPSs are documents that capture governance problems, their context, and associat
 A GPS must be stored in a folder named after its number and in a file called `README.md`. Before a number is assigned, use `????` as a placeholder name (e.g., `GPS-????`). After assignment, rename the folder.
 
 Example:
-
+```
 GPS-0001
 ├── README.md
 └── background-notes.md
+```
 
 ## Rationale: How does this CAP achieve its goals?
 
