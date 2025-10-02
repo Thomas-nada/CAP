@@ -16,13 +16,6 @@ body:
         - Each CAP will be placed in its own folder `CAP-XXXX/` with a `README.md`.
         - Link relevant Governance Problem Statements (GPS) where applicable.
 
-  - type: input
-    id: cap_title
-    attributes:
-      label: "Title"
-      description: "A short, descriptive title for the amendment."
-      placeholder: "Amendment to Clarify Constitutional Committee Accountability"
-
   - type: dropdown
     id: category
     attributes:
