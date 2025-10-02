@@ -15,7 +15,9 @@ jobs:
       - name: Generate CAP folder and README
         env:
           ISSUE_BODY: ${{ github.event.issue.body }}
+          ISSUE_TITLE: ${{ github.event.issue.title }}
         run: |
+          # Format CAP number with leading zeros
           CAP_NUMBER=$(printf "%04d" ${{ github.event.issue.number }})
           FOLDER="CAP-${CAP_NUMBER}"
           FILE_PATH="${FOLDER}/README.md"
@@ -23,7 +25,13 @@ jobs:
 
           mkdir -p "$FOLDER"
 
-          TITLE=$(echo "$ISSUE_BODY" | awk -F': ' '/### Title/{getline; print}' | xargs)
+          # ✅ Title comes directly from issue metadata
+          TITLE="$ISSUE_TITLE"
+
+          # Strip optional leading "CAP:" if included
+          TITLE=$(echo "$TITLE" | sed -E 's/^CAP[: ]*//')
+
+          # Extract other fields from the issue body
           CATEGORY=$(echo "$ISSUE_BODY" | awk -F': ' '/### Category/{getline; print}' | xargs)
           IMPLEMENTORS=$(echo "$ISSUE_BODY" | awk -F': ' '/### Implementors/{getline; print}' | xargs)
           SOLUTION_TO=$(echo "$ISSUE_BODY" | awk -F': ' '/### Solution-To/{getline; print}' | xargs)
@@ -37,6 +45,7 @@ jobs:
           VERSIONING=$(echo "$ISSUE_BODY" | awk -F': ' '/### Versioning/{getline; print}' | xargs)
           REFERENCES=$(echo "$ISSUE_BODY" | awk -F': ' '/### References/{getline; print}' | xargs)
 
+          # Set defaults for empty values
           [ -z "$CATEGORY" ] && CATEGORY="Governance"
           [ -z "$IMPLEMENTORS" ] && IMPLEMENTORS="N/A"
           [ -z "$SOLUTION_TO" ] && SOLUTION_TO="N/A"
@@ -50,6 +59,10 @@ jobs:
           [ -z "$VERSIONING" ] && VERSIONING="N/A"
           [ -z "$REFERENCES" ] && REFERENCES="N/A"
 
+          # Debug log (optional - helps confirm title parsing)
+          echo "📌 CAP-${CAP_NUMBER} Title: $TITLE"
+
+          # Write CAP README.md
           echo "---" > "$FILE_PATH"
           echo "CAP: ${CAP_NUMBER}" >> "$FILE_PATH"
           echo "Title: \"${TITLE}\"" >> "$FILE_PATH"
@@ -116,5 +129,5 @@ jobs:
       - name: Commit and push CAP folder
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
-          commit_message: "Add CAP-${{ github.event.issue.number }} - ${TITLE}"
+          commit_message: "Add CAP-${{ github.event.issue.number }} - ${{ github.event.issue.title }}"
           file_pattern: "CAP-*/*"
