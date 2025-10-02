@@ -32,6 +32,7 @@ Because CAPs are text files in a versioned repository, their revision history be
 |-------|-----------------------------|----------|-----------------------------|
 | 0001  | [Low Participation and Representation in On-Chain Governance](./GPS-0001) | Open | – |
 | 0002  | [The Great Governance Burnout Problem ☕🔥](./GPS-0002) | Open | – |
+| 0003  | [Ambiguities in Constitutional Committee Accountability](./GPS-0003) | Open | [CAP-0003](./CAP-0003) |
 
 <p align="right"><i>Last updated on 2025-10-02</i></p>
 <!-- END_GPS_INDEX -->
