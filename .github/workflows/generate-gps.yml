@@ -12,10 +12,10 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Find next GPS number
+      - name: Find next GPS number (ignore 9999)
         id: gps_number
         run: |
-          LAST=$(ls -d GPS-* 2>/dev/null | grep -o '[0-9]\+' | sort -n | tail -1)
+          LAST=$(ls -d GPS-* 2>/dev/null | grep -v 'GPS-9999' | grep -o '[0-9]\+' | sort -n | tail -1)
           if [ -z "$LAST" ]; then
             NEXT=1
           else
