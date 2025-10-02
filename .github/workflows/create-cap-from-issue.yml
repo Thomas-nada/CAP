@@ -25,27 +25,34 @@ jobs:
 
           mkdir -p "$FOLDER"
 
-          # ✅ Title from GitHub issue metadata
+          # ✅ Title directly from GitHub metadata
           TITLE="$ISSUE_TITLE"
           TITLE=$(echo "$TITLE" | sed -E 's/^CAP[: ]*//')
 
-          echo "====== ISSUE BODY ======"
+          echo "====== RAW ISSUE BODY ======"
           echo "$ISSUE_BODY"
-          echo "========================"
+          echo "============================"
 
-          # ✅ Robust field extraction (handles ###, parentheses, etc.)
-          CATEGORY=$(echo "$ISSUE_BODY" | grep -A1 -E "Category" | tail -n1 | tr -d '\r' | xargs)
-          IMPLEMENTORS=$(echo "$ISSUE_BODY" | grep -A1 -E "Implementors" | tail -n1 | tr -d '\r' | xargs)
-          SOLUTION_TO=$(echo "$ISSUE_BODY" | grep -A1 -E "Solution-To" | tail -n1 | tr -d '\r' | xargs)
-          DISCUSSIONS=$(echo "$ISSUE_BODY" | grep -A1 -E "Discussions" | tail -n1 | tr -d '\r' | xargs)
-          ABSTRACT=$(echo "$ISSUE_BODY" | grep -A1 -E "Abstract" | tail -n1 | tr -d '\r' | xargs)
-          MOTIVATION=$(echo "$ISSUE_BODY" | grep -A1 -E "Motivation" | tail -n1 | tr -d '\r' | xargs)
-          SPECIFICATION=$(echo "$ISSUE_BODY" | grep -A1 -E "Amendment Specification" | tail -n1 | tr -d '\r' | xargs)
-          RATIONALE=$(echo "$ISSUE_BODY" | grep -A1 -E "Rationale" | tail -n1 | tr -d '\r' | xargs)
-          ACCEPTANCE=$(echo "$ISSUE_BODY" | grep -A1 -E "Acceptance Criteria" | tail -n1 | tr -d '\r' | xargs)
-          IMPLEMENTATION=$(echo "$ISSUE_BODY" | grep -A1 -E "Implementation Plan" | tail -n1 | tr -d '\r' | xargs)
-          VERSIONING=$(echo "$ISSUE_BODY" | grep -A1 -E "Versioning" | tail -n1 | tr -d '\r' | xargs)
-          REFERENCES=$(echo "$ISSUE_BODY" | grep -A1 -E "References" | tail -n1 | tr -d '\r' | xargs)
+          # ✅ Normalize body to remove hidden characters
+          NORMALIZED_BODY=$(echo "$ISSUE_BODY" | tr -d '\r')
+
+          echo "====== NORMALIZED BODY ======"
+          echo "$NORMALIZED_BODY"
+          echo "============================="
+
+          # ✅ Robust field parsing using normalized body
+          CATEGORY=$(echo "$NORMALIZED_BODY" | grep -A1 -E "Category" | tail -n1 | xargs)
+          IMPLEMENTORS=$(echo "$NORMALIZED_BODY" | grep -A1 -E "Implementors" | tail -n1 | xargs)
+          SOLUTION_TO=$(echo "$NORMALIZED_BODY" | grep -A1 -E "Solution-To" | tail -n1 | xargs)
+          DISCUSSIONS=$(echo "$NORMALIZED_BODY" | grep -A1 -E "Discussions" | tail -n1 | xargs)
+          ABSTRACT=$(echo "$NORMALIZED_BODY" | grep -A1 -E "Abstract" | tail -n1 | xargs)
+          MOTIVATION=$(echo "$NORMALIZED_BODY" | grep -A1 -E "Motivation" | tail -n1 | xargs)
+          SPECIFICATION=$(echo "$NORMALIZED_BODY" | grep -A1 -E "Amendment Specification" | tail -n1 | xargs)
+          RATIONALE=$(echo "$NORMALIZED_BODY" | grep -A1 -E "Rationale" | tail -n1 | xargs)
+          ACCEPTANCE=$(echo "$NORMALIZED_BODY" | grep -A1 -E "Acceptance Criteria" | tail -n1 | xargs)
+          IMPLEMENTATION=$(echo "$NORMALIZED_BODY" | grep -A1 -E "Implementation Plan" | tail -n1 | xargs)
+          VERSIONING=$(echo "$NORMALIZED_BODY" | grep -A1 -E "Versioning" | tail -n1 | xargs)
+          REFERENCES=$(echo "$NORMALIZED_BODY" | grep -A1 -E "References" | tail -n1 | xargs)
 
           # ✅ Fallback defaults
           [ -z "$CATEGORY" ] && CATEGORY="Governance"
