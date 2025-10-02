@@ -1,45 +1,50 @@
-name: Generate GPS
+name: generate-gps
 
 on:
   issues:
-    types: [opened]
+    types: [opened, edited, labeled]
 
 jobs:
   generate-gps:
     if: contains(github.event.issue.labels.*.name, 'gps')
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Find next GPS number (ignore 9999)
+      - name: Set GPS number (ignore GPS-9999)
         id: gps_number
         run: |
-          LAST=$(ls -d GPS-* 2>/dev/null | grep -v 'GPS-9999' | grep -o '[0-9]\+' | sort -n | tail -1)
-          if [ -z "$LAST" ]; then
-            NEXT=1
+          LAST_GPS=$(find . -maxdepth 1 -type d -name 'GPS-*' \
+            | grep -v 'GPS-9999' \
+            | sed -E 's/.*GPS-0*([0-9]+)/\1/' \
+            | sort -n | tail -n 1)
+          if [ -z "$LAST_GPS" ]; then
+            NEXT_GPS=1
           else
-            NEXT=$((LAST + 1))
+            NEXT_GPS=$((LAST_GPS + 1))
           fi
-          printf -v PADDED "%04d" $NEXT
-          echo "GPS_NUMBER=$PADDED" >> $GITHUB_ENV
+          GPS_PADDED=$(printf "%04d" $NEXT_GPS)
+          echo "GPS_NUMBER=$GPS_PADDED" >> $GITHUB_ENV
+          echo "📍 Next GPS: $GPS_PADDED"
 
-      - name: Create GPS directory and README
+      - name: Create GPS folder and README
         run: |
-          mkdir -p GPS-${GPS_NUMBER}
-          cat <<EOF > GPS-${GPS_NUMBER}/README.md
+          mkdir -p GPS-${{ env.GPS_NUMBER }}
+          cat <<EOF > GPS-${{ env.GPS_NUMBER }}/README.md
 ---
-GPS: ${GPS_NUMBER}
+GPS: ${{ env.GPS_NUMBER }}
 Title: "${{ github.event.issue.title }}"
-Category: "${{ github.event.issue.body.category || 'N/A' }}"
-Status: Open
+Category: "${{ github.event.issue.body.category || 'None' }}"
+Status: Draft
 Authors:
   - "${{ github.event.issue.body.authors || 'TBD' }}"
 Proposed Solutions:
   - "${{ github.event.issue.body.proposed_solutions || '_No response_' }}"
 Discussions:
   - "${{ github.event.issue.body.discussions || '_No response_' }}"
-Created: $(date +%Y-%m-%d)
+Created: $(date +'%Y-%m-%d')
 License: CC-BY-4.0
 ---
 
@@ -55,29 +60,41 @@ ${{ github.event.issue.body.background || '_No response_' }}
 
 ${{ github.event.issue.body.problem || '_No response_' }}
 
+## Use Cases
+
+${{ github.event.issue.body.use_cases || '_No response_' }}
+
 ## Governance Goals
 
-${{ github.event.issue.body.goals || '_No response_' }}
+${{ github.event.issue.body.governance_goals || '_No response_' }}
 
 ## Open Questions
 
 ${{ github.event.issue.body.open_questions || '_No response_' }}
 
-## Proposed Next Steps
+## Proposed Next Steps (Optional)
 
 ${{ github.event.issue.body.next_steps || '_No response_' }}
 
-## References
+## Status
+
+Draft
+
+## References (Optional)
 
 ${{ github.event.issue.body.references || '_No response_' }}
+
+## Acknowledgements (Optional)
+
+${{ github.event.issue.body.acknowledgements || '_No response_' }}
 
 ## Copyright
 
 This GPS is licensed under [CC-BY-4.0](https://creativecommons.org/licenses/by/4.0/legalcode).
 EOF
 
-      - name: Commit and push changes
+      - name: Commit and push GPS
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
-          commit_message: "Add GPS-${GPS_NUMBER} - ${{ github.event.issue.title }}"
-          file_pattern: "GPS-${GPS_NUMBER}/README.md"
+          commit_message: "Add GPS-${{ env.GPS_NUMBER }} - ${{ github.event.issue.title }}"
+          file_pattern: GPS-${{ env.GPS_NUMBER }}/*
