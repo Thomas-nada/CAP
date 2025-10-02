@@ -13,64 +13,104 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Generate CAP folder and README
+        env:
+          ISSUE_BODY: ${{ github.event.issue.body }}
         run: |
           CAP_NUMBER=$(printf "%04d" ${{ github.event.issue.number }})
-          CAP_TITLE="${{ github.event.issue.title }}"
-          SAFE_TITLE=$(echo "$CAP_TITLE" | tr ' ' '-' | tr -dc '[:alnum:]-')
           FOLDER="CAP-${CAP_NUMBER}"
           FILE_PATH="${FOLDER}/README.md"
+          DATE=$(date +%Y-%m-%d)
 
           mkdir -p "$FOLDER"
 
-          echo "---" > "$FILE_PATH"
-          echo "CAP: $CAP_NUMBER" >> "$FILE_PATH"
-          echo "Title: \"$CAP_TITLE\"" >> "$FILE_PATH"
-          echo "Category: Governance" >> "$FILE_PATH"
-          echo "Status: Draft" >> "$FILE_PATH"
-          echo "Authors:" >> "$FILE_PATH"
-          echo "  - TBD" >> "$FILE_PATH"
-          echo "Implementors: []" >> "$FILE_PATH"
-          echo "Linked GPS: []" >> "$FILE_PATH"
-          echo "Discussions: []" >> "$FILE_PATH"
-          echo "Created: $(date +%Y-%m-%d)" >> "$FILE_PATH"
-          echo "License: CC-BY-4.0" >> "$FILE_PATH"
-          echo "---" >> "$FILE_PATH"
-          echo "" >> "$FILE_PATH"
-          echo "## Abstract" >> "$FILE_PATH"
-          echo "" >> "$FILE_PATH"
-          echo "${{ github.event.issue.body }}" >> "$FILE_PATH"
-          echo "" >> "$FILE_PATH"
-          echo "## Motivation: Why is this CAP necessary?" >> "$FILE_PATH"
-          echo "" >> "$FILE_PATH"
-          echo "_TBD – describe the motivation here._" >> "$FILE_PATH"
-          echo "" >> "$FILE_PATH"
-          echo "## Proposed Amendment (Specification)" >> "$FILE_PATH"
-          echo "" >> "$FILE_PATH"
-          echo "_TBD – write the proposed changes here._" >> "$FILE_PATH"
-          echo "" >> "$FILE_PATH"
-          echo "## Rationale: How does this CAP achieve its goals?" >> "$FILE_PATH"
-          echo "" >> "$FILE_PATH"
-          echo "_TBD – explain why this design was chosen._" >> "$FILE_PATH"
-          echo "" >> "$FILE_PATH"
-          echo "## Path to Ratification" >> "$FILE_PATH"
-          echo "" >> "$FILE_PATH"
-          echo "### Acceptance Criteria" >> "$FILE_PATH"
-          echo "" >> "$FILE_PATH"
-          echo "_TBD – describe how this proposal will be ratified._" >> "$FILE_PATH"
-          echo "" >> "$FILE_PATH"
-          echo "### Implementation Plan" >> "$FILE_PATH"
-          echo "" >> "$FILE_PATH"
-          echo "- [ ] Publish for public comment" >> "$FILE_PATH"
-          echo "- [ ] Integrate approved text into constitution" >> "$FILE_PATH"
-          echo "- [ ] Implement governance tooling (if needed)" >> "$FILE_PATH"
-          echo "- [ ] Establish petition registry" >> "$FILE_PATH"
-          echo "" >> "$FILE_PATH"
-          echo "## Copyright" >> "$FILE_PATH"
-          echo "" >> "$FILE_PATH"
-          echo "This CAP is licensed under [CC-BY-4.0](https://creativecommons.org/licenses/by/4.0/legalcode)." >> "$FILE_PATH"
+          # Extract key fields from the issue body
+          TITLE=$(echo "$ISSUE_BODY" | awk -F': ' '/### Title/{getline; print}' | xargs)
+          CATEGORY=$(echo "$ISSUE_BODY" | awk -F': ' '/### Category/{getline; print}' | xargs)
+          IMPLEMENTORS=$(echo "$ISSUE_BODY" | awk -F': ' '/### Implementors/{getline; print}' | xargs)
+          SOLUTION_TO=$(echo "$ISSUE_BODY" | awk -F': ' '/### Solution-To/{getline; print}' | xargs)
+          DISCUSSIONS=$(echo "$ISSUE_BODY" | awk -F': ' '/### Discussions/{getline; print}' | xargs)
+          ABSTRACT=$(echo "$ISSUE_BODY" | awk -F': ' '/### Abstract/{getline; print}' | xargs)
+          MOTIVATION=$(echo "$ISSUE_BODY" | awk -F': ' '/### Motivation/{getline; print}' | xargs)
+          SPECIFICATION=$(echo "$ISSUE_BODY" | awk -F': ' '/### Amendment Specification/{getline; print}' | xargs)
+          RATIONALE=$(echo "$ISSUE_BODY" | awk -F': ' '/### Rationale/{getline; print}' | xargs)
+          ACCEPTANCE=$(echo "$ISSUE_BODY" | awk -F': ' '/### Path to Ratification/{getline; print}' | xargs)
+          IMPLEMENTATION=$(echo "$ISSUE_BODY" | awk -F': ' '/### Implementation Plan/{getline; print}' | xargs)
+          VERSIONING=$(echo "$ISSUE_BODY" | awk -F': ' '/### Versioning/{getline; print}' | xargs)
+          REFERENCES=$(echo "$ISSUE_BODY" | awk -F': ' '/### References/{getline; print}' | xargs)
+
+          # Default empty fields to "N/A" where appropriate
+          [ -z "$CATEGORY" ] && CATEGORY="Governance"
+          [ -z "$IMPLEMENTORS" ] && IMPLEMENTORS="N/A"
+          [ -z "$SOLUTION_TO" ] && SOLUTION_TO="N/A"
+          [ -z "$DISCUSSIONS" ] && DISCUSSIONS="N/A"
+          [ -z "$ABSTRACT" ] && ABSTRACT="N/A"
+          [ -z "$MOTIVATION" ] && MOTIVATION="N/A"
+          [ -z "$SPECIFICATION" ] && SPECIFICATION="N/A"
+          [ -z "$RATIONALE" ] && RATIONALE="N/A"
+          [ -z "$ACCEPTANCE" ] && ACCEPTANCE="N/A"
+          [ -z "$IMPLEMENTATION" ] && IMPLEMENTATION="N/A"
+          [ -z "$VERSIONING" ] && VERSIONING="N/A"
+          [ -z "$REFERENCES" ] && REFERENCES="N/A"
+
+          # Write CAP file
+          cat > "$FILE_PATH" <<EOF
+---
+CAP: ${CAP_NUMBER}
+Title: "${TITLE}"
+Category: ${CATEGORY}
+Status: Draft
+Authors:
+  - TBD
+Implementors: ${IMPLEMENTORS}
+Solution-To:
+  - ${SOLUTION_TO}
+Discussions:
+  - ${DISCUSSIONS}
+Created: ${DATE}
+License: CC-BY-4.0
+---
+
+## Abstract
+
+${ABSTRACT}
+
+## Motivation: Why is this CAP necessary?
+
+${MOTIVATION}
+
+## Amendment Specification
+
+${SPECIFICATION}
+
+## Rationale: How does this CAP achieve its goals?
+
+${RATIONALE}
+
+## Path to Ratification
+
+### Acceptance Criteria
+
+${ACCEPTANCE}
+
+### Implementation Plan
+
+${IMPLEMENTATION}
+
+## Versioning (Optional)
+
+${VERSIONING}
+
+## References (Optional)
+
+${REFERENCES}
+
+## Copyright
+
+This CAP is licensed under [CC-BY-4.0](https://creativecommons.org/licenses/by/4.0/legalcode).
+EOF
 
       - name: Commit and push CAP folder
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
-          commit_message: "Add CAP-${{ github.event.issue.number }} - ${{ github.event.issue.title }}"
+          commit_message: "Add CAP-${{ github.event.issue.number }} - ${TITLE}"
           file_pattern: "CAP-*/*"
