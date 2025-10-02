@@ -1,4 +1,4 @@
-name: Create CAP Markdown from Issue
+name: Create CAP folder and README from Issue
 
 on:
   issues:
@@ -12,14 +12,15 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Generate CAP markdown file safely
+      - name: Generate CAP folder and README
         run: |
-          mkdir -p CAPs
-
-          CAP_NUMBER=${{ github.event.issue.number }}
+          CAP_NUMBER=$(printf "%04d" ${{ github.event.issue.number }})
           CAP_TITLE="${{ github.event.issue.title }}"
           SAFE_TITLE=$(echo "$CAP_TITLE" | tr ' ' '-' | tr -dc '[:alnum:]-')
-          FILE_PATH="CAPs/CAP-${CAP_NUMBER}-${SAFE_TITLE}.md"
+          FOLDER="CAP-${CAP_NUMBER}"
+          FILE_PATH="${FOLDER}/README.md"
+
+          mkdir -p "$FOLDER"
 
           echo "---" > "$FILE_PATH"
           echo "CAP: $CAP_NUMBER" >> "$FILE_PATH"
@@ -68,8 +69,8 @@ jobs:
           echo "" >> "$FILE_PATH"
           echo "This CAP is licensed under [CC-BY-4.0](https://creativecommons.org/licenses/by/4.0/legalcode)." >> "$FILE_PATH"
 
-      - name: Commit and push CAP file
+      - name: Commit and push CAP folder
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
-          commit_message: "Add CAP ${{ github.event.issue.number }} - ${{ github.event.issue.title }}"
-          file_pattern: "CAPs/*.md"
+          commit_message: "Add CAP-${{ github.event.issue.number }} - ${{ github.event.issue.title }}"
+          file_pattern: "CAP-*/*"
