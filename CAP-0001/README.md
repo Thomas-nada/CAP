@@ -18,7 +18,7 @@ A **Cardano Amendment Proposal (CAP)** is a formalised governance document for t
 
 In this CAP, we explain what a CAP is, how the CAP process functions, the role of the CAP Editors, and how users should propose, discuss, and structure a CAP.
 
-The Cardano Foundation and governance community intend CAPs to be the primary mechanism for proposing constitutional changes, collecting community input on governance issues, and documenting key decisions that shape Cardano’s on-chain governance. Because CAPs are text files in a versioned repository, their revision history becomes the authoritative historical record of constitutional and governance evolution on Cardano.
+We intend CAPs to be the primary mechanism for proposing constitutional changes, collecting community input on governance issues, and documenting key decisions that shape Cardano’s on-chain governance. Because CAPs are text files in a versioned repository, their revision history becomes the authoritative historical record of constitutional and governance evolution on Cardano.
 
 ## Motivation: why is this CAP necessary?
 
@@ -115,10 +115,10 @@ Title: CAP Process
 Category: Meta
 Status: Active
 Authors:
-    - Jane Doe <jane.doe@cardano.org>
+    - Jane Doe <jane.doe@cardano.com>
 Implementors: N/A
 Discussions:
-    - https://github.com/cardano-foundation/CAPs/pull/1
+    - https://github.com/xxxxx/CAPs/pull/1
 Created: 2025-10-01
 License: CC-BY-4.0
 ---
