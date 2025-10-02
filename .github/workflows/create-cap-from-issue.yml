@@ -22,7 +22,7 @@ jobs:
 
           FILE_PATH="CAPs/CAP-${CAP_NUMBER}-${SAFE_TITLE}.md"
 
-          cat > "$FILE_PATH" <<EOF
+          cat << 'EOF' > "$FILE_PATH"
 ---
 CAP: $CAP_NUMBER
 Title: "$CAP_TITLE"
