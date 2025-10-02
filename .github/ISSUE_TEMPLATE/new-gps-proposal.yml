@@ -1,0 +1,118 @@
+name: "🧭 New Governance Problem Statement (GPS)"
+description: "Propose a new Governance Problem Statement (GPS) to identify and document a governance challenge in Cardano."
+title: "GPS: [Short Title]"
+labels: ["gps", "proposal"]
+body:
+  - type: input
+    id: title
+    attributes:
+      label: "Title"
+      description: "A short, descriptive title for this Governance Problem Statement."
+      placeholder: "Low Participation in Governance"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: category
+    attributes:
+      label: "Category"
+      description: "Select the main governance area this problem relates to."
+      options:
+        - Constitution
+        - Governance
+        - Delegation
+        - Treasury
+        - Voting
+        - Meta
+    validations:
+      required: true
+
+  - type: textarea
+    id: authors
+    attributes:
+      label: "Authors"
+      description: "List the authors of this GPS (Name <@GitHubHandle>)."
+      placeholder: "Alice Nguyen <@alice-nguyen>"
+    validations:
+      required: false
+
+  - type: textarea
+    id: proposed_solutions
+    attributes:
+      label: "Proposed Solutions (CAPs)"
+      description: "Link to any existing CAPs that aim to solve this problem (optional)."
+      placeholder: "- CAP-0005"
+    validations:
+      required: false
+
+  - type: textarea
+    id: discussions
+    attributes:
+      label: "Discussions"
+      description: "Link to relevant GitHub Discussions, forum posts, or threads."
+      placeholder: "- https://github.com/Thomas-nada/CAP/discussions/20"
+    validations:
+      required: false
+
+  - type: textarea
+    id: abstract
+    attributes:
+      label: "Abstract"
+      description: "A short (~200 word) summary of the governance problem and why it matters."
+      placeholder: "Participation in on-chain governance is consistently low across key stakeholder groups..."
+    validations:
+      required: false
+
+  - type: textarea
+    id: background
+    attributes:
+      label: "Background"
+      description: "Provide historical or procedural context explaining why this problem exists."
+      placeholder: "Since Voltaire, participation levels have remained low..."
+    validations:
+      required: false
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: "Problem Description"
+      description: "Describe the governance issue in detail."
+      placeholder: "Low voter turnout undermines legitimacy and risks centralization..."
+    validations:
+      required: false
+
+  - type: textarea
+    id: goals
+    attributes:
+      label: "Governance Goals"
+      description: "List what an ideal solution should aim to achieve."
+      placeholder: "- Increase participation\n- Improve representation\n- Enhance transparency"
+    validations:
+      required: false
+
+  - type: textarea
+    id: open_questions
+    attributes:
+      label: "Open Questions"
+      description: "What questions should a solution (CAP) answer?"
+      placeholder: "- What participation threshold is sufficient for legitimacy?"
+    validations:
+      required: false
+
+  - type: textarea
+    id: next_steps
+    attributes:
+      label: "Proposed Next Steps (Optional)"
+      description: "Suggest next steps such as drafting a CAP or forming a working group."
+      placeholder: "- Explore CAP introducing minimum activity standards for dReps."
+    validations:
+      required: false
+
+  - type: textarea
+    id: references
+    attributes:
+      label: "References (Optional)"
+      description: "Add any relevant links, prior work, or related documents."
+      placeholder: "- https://forum.cardano.org/t/governance-discussion/12345"
+    validations:
+      required: false
