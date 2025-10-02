@@ -8,7 +8,7 @@ Authors:
 Implementors:
   - "N/A"
 Solution-To:
-  - "N/A"
+  - "GPS-0002"
 Discussions:
   - "https://github.com/Thomas-nada/CAP/pull/2"
 Created: 2025-10-01
