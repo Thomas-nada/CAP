@@ -8,127 +8,144 @@ body:
       value: |
         ## 🧠 New CAP Proposal Form
 
-        Thank you for contributing to Cardano governance!  
-        This form will help you submit a **Cardano Amendment Proposal (CAP)** following the official process.
+        Thank you for contributing to Cardano governance!
+        This form helps you submit a Cardano Amendment Proposal (CAP) following the official process.
 
-        🔎 **Important Notes:**
-        - **CAP numbers** are assigned by editors during triage. Use `?` for the number when drafting.
-        - Each CAP will be placed in its own folder named `CAP-XXXX/` with a `README.md` inside.
-        - CAPs must address one or more [Governance Problem Statements (GPS)](./GPS-0001.md) if applicable.
+        🔎 **Notes**
+        - **CAP numbers** are assigned by editors during triage. Use `?` while drafting.
+        - Each CAP will be placed in its own folder `CAP-XXXX/` with a `README.md`.
+        - Link relevant Governance Problem Statements (GPS) where applicable.
 
   - type: input
     id: cap_title
     attributes:
-      label: Title
+      label: "Title"
       description: "A short, descriptive title for the amendment."
       placeholder: "Amendment to Clarify Constitutional Committee Accountability"
+
+  - type: dropdown
+    id: category
+    attributes:
+      label: "Category"
+      description: "Pick the most appropriate category."
+      options:
+        - "Meta"
+        - "Constitution"
+        - "Governance Process"
+        - "Delegation & Voting"
+        - "Treasury & Funding"
+        - "Governance Tools"
+        - "Off-chain Governance"
 
   - type: input
     id: authors
     attributes:
-      label: Authors
+      label: "Authors"
       description: "List all authors in the format: Name <@GitHubHandle>"
       placeholder: "Ada Lovelace <@adalovelace>"
 
   - type: input
     id: implementors
     attributes:
-      label: Implementors
+      label: "Implementors"
       description: "List implementors or write N/A if not applicable."
       placeholder: "N/A"
 
   - type: input
     id: solution_to
     attributes:
-      label: Solution-To (GPS)
-      description: "Reference the Governance Problem Statement(s) this CAP addresses (e.g., GPS-0001). Leave blank if none."
+      label: "Solution-To (GPS)"
+      description: "Reference GPS identifiers this CAP addresses (e.g., GPS-0003). Leave blank if none."
       placeholder: "GPS-0003"
 
   - type: textarea
     id: discussions
     attributes:
-      label: Discussions
-      description: "Links to relevant GitHub discussions, forum threads, or PRs."
-      placeholder: "- https://github.com/your-org/CAPs/discussions/123"
+      label: "Discussions"
+      description: "Links to GitHub Discussions, forum threads, or PRs."
+      placeholder: |
+        - https://github.com/your-org/CAPs/discussions/123
+        - https://forum.cardano.org/t/your-thread
 
   - type: textarea
     id: abstract
     attributes:
-      label: Abstract
+      label: "Abstract"
       description: "A concise (~200 words) summary of the amendment, the governance issue it addresses, and its intended outcome."
       placeholder: "Summarize the motivation for change, nature of the amendment, and intended outcomes."
 
   - type: textarea
     id: motivation
     attributes:
-      label: Motivation: Why is this CAP necessary?
-      description: "Explain the governance problem this amendment solves and how it improves outcomes. Reference linked GPS if applicable."
-      placeholder: "Explain which stakeholders are affected, what problem is being solved, and why this change is necessary."
+      label: "Motivation: Why is this CAP necessary?"
+      description: "Explain the governance problem this amendment solves and how it improves outcomes. Reference the GPS if applicable."
+      placeholder: "Explain stakeholders affected, the problem being solved, and why this change is necessary."
 
   - type: textarea
     id: specification
     attributes:
-      label: Amendment Specification
+      label: "Amendment Specification"
       description: "Provide the **exact text** of the proposed constitutional change or addition."
       placeholder: |
-        - New or updated constitutional text
-        - Governance parameter changes
-        - Definitions of new governance mechanisms
-        - Versioning scheme (if applicable)
+        Include, where relevant:
+        - New article text or updated wording
+        - Changes to governance parameters
+        - Definitions of new governance mechanisms or procedures
+        - Versioning scheme, if applicable
 
   - type: textarea
     id: rationale
     attributes:
-      label: Rationale: How does this CAP achieve its goals?
-      description: "Explain why this solution was chosen, trade-offs considered, community input, and backward compatibility (if applicable)."
+      label: "Rationale: How does this CAP achieve its goals?"
+      description: "Explain why this solution was chosen over alternatives, trade-offs, community input, and any transition considerations."
       placeholder: "Explain the reasoning behind the proposal and why alternatives were rejected."
 
   - type: textarea
     id: acceptance_criteria
     attributes:
-      label: Path to Ratification – Acceptance Criteria
-      description: "Define the measurable conditions under which this amendment becomes **Active**."
+      label: "Path to Ratification – Acceptance Criteria"
+      description: "Define measurable conditions under which this amendment becomes **Active**."
       placeholder: |
-        - Minimum vote thresholds and quorum
+        - Minimum vote thresholds and quorum requirements
         - Constitutional Committee approval steps
-        - Required governance actions
-        - Compatibility with existing processes
+        - Required on-chain or off-chain governance actions
+        - Compatibility with existing governance procedures
 
   - type: textarea
     id: implementation_plan
     attributes:
-      label: Implementation Plan
+      label: "Implementation Plan"
       description: "Outline how the amendment will be implemented once ratified."
       placeholder: |
-        - Update the canonical constitution file
-        - Execute an on-chain governance action
-        - Coordinate off-chain communication
-        - Notify tooling and governance participants
+        - Update the canonical constitution file (e.g., constitution/constitution-v1.txt)
+        - Execute a governance action/transaction
+        - Coordinate off-chain publication and communication
+        - Notify/update relevant tooling, dApps, or participants
 
   - type: textarea
     id: versioning
     attributes:
-      label: Versioning (Optional)
+      label: "Versioning (Optional)"
       description: "Describe how this amendment will be versioned or superseded in future governance processes."
       placeholder: "Optional – explain how future CAPs might replace or modify this one."
 
   - type: textarea
     id: references
     attributes:
-      label: References (Optional)
-      description: "List any relevant documentation, standards, governance decisions, or previous CAPs/GPSs referenced in this proposal."
+      label: "References (Optional)"
+      description: "List relevant documentation, standards, governance decisions, or previous CAPs/GPSs."
       placeholder: |
         - GPS-0003
-        - [Forum discussion](https://forum.cardano.org/t/example)
-        - [CIP-0001](https://github.com/cardano-foundation/CIPs/blob/master/CIP-0001)
+        - https://forum.cardano.org/t/...
+        - https://github.com/cardano-foundation/CIPs/blob/master/CIP-0001
 
   - type: markdown
     attributes:
       value: |
         ## 📜 Submission Checklist
 
-        - [ ] I understand that CAP numbers are assigned by editors and will be replaced automatically.
-        - [ ] I have structured my proposal following the CAP-0001 specification.
-        - [ ] I have linked relevant Governance Problem Statements (GPS) where applicable.
-        - [ ] I have included a clear Amendment Specification.
-        - [ ] I agree that my submission will be licensed under [CC-BY-4.0](https://creativecommons.org/licenses/by/4.0/legalcode).
+        - [ ] I understand CAP numbers are assigned by editors.
+        - [ ] I followed the CAP-0001 structure.
+        - [ ] I linked relevant GPS (if applicable).
+        - [ ] I included exact amendment text in **Amendment Specification**.
+        - [ ] I agree this submission is licensed under CC-BY-4.0.
