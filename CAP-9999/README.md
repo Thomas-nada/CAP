@@ -54,3 +54,44 @@ GPSs are documents that capture governance problems, their context, and associat
 A GPS must be stored in a folder named after its number and in a file called `README.md`. Before a number is assigned, use `????` as a placeholder name (e.g., `GPS-????`). After assignment, rename the folder.
 
 Example:
+
+GPS-0001
+├── README.md
+└── background-notes.md
+
+## Rationale: How does this CAP achieve its goals?
+
+The GPS process ensures that governance challenges are clearly articulated and well understood before solutions are proposed. By separating **problems (GPS)** from **solutions (CAP)**, Cardano governance gains:
+
+- Better-defined context for amendments.
+- Stronger alignment among stakeholders.
+- Clearer evaluation criteria for proposed solutions.
+- A reusable repository of governance challenges to inform future CAPs.
+
+Including sections like **Background**, **Impact**, and **Open Questions** ensures that governance problems are deeply grounded in reality and provide actionable guidance to solution authors.
+
+## Path to Ratification
+
+### Acceptance Criteria
+
+- [x] Review this proposal with governance actors and constitutional stakeholders.  
+- [x] Formulate at least one governance problem statement following this process (e.g., [GPS-0001: Ambiguities in Delegation Rights](https://github.com/[your-org]/CAPs/pull/2)).
+
+### Implementation Plan
+
+- [x] Confirm after several cycles of GPS submissions, reviews, and merges that the GPS process is effective and accessible to the community.
+- [x] Integrate GPS usage into community workflows and governance education.
+
+## Versioning (Optional)
+
+Future revisions of the GPS framework may include additional required sections or updated guidance on linking GPS documents to CAP proposals.
+
+## References (Optional)
+
+- [CAP-0001 – CAP Process](../CAP-0001/README.md)
+- [CIP-9999 – Complementary Naming Convention](https://github.com/cardano-foundation/CIPs/tree/master/CIP-9999)
+
+## Copyright
+
+This CAP is licensed under [CC-BY-4.0](https://creativecommons.org/licenses/by/4.0/legalcode).
+
