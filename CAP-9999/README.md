@@ -80,7 +80,7 @@ Authors:
     - Bob <bob@domain.org>
 Proposed Solutions: []
 Discussions:
-    - https://github.com/cardano-foundation/CAPs/discussions/12
+    - https://github.com/xxxxxxx/CAPs/discussions/12
 Created: 2025-10-01
 License: CC-BY-4.0
 ---
