@@ -23,7 +23,6 @@ jobs:
 
           mkdir -p "$FOLDER"
 
-          # Extract key fields from the issue body
           TITLE=$(echo "$ISSUE_BODY" | awk -F': ' '/### Title/{getline; print}' | xargs)
           CATEGORY=$(echo "$ISSUE_BODY" | awk -F': ' '/### Category/{getline; print}' | xargs)
           IMPLEMENTORS=$(echo "$ISSUE_BODY" | awk -F': ' '/### Implementors/{getline; print}' | xargs)
@@ -38,7 +37,6 @@ jobs:
           VERSIONING=$(echo "$ISSUE_BODY" | awk -F': ' '/### Versioning/{getline; print}' | xargs)
           REFERENCES=$(echo "$ISSUE_BODY" | awk -F': ' '/### References/{getline; print}' | xargs)
 
-          # Default empty fields to "N/A" where appropriate
           [ -z "$CATEGORY" ] && CATEGORY="Governance"
           [ -z "$IMPLEMENTORS" ] && IMPLEMENTORS="N/A"
           [ -z "$SOLUTION_TO" ] && SOLUTION_TO="N/A"
@@ -52,62 +50,68 @@ jobs:
           [ -z "$VERSIONING" ] && VERSIONING="N/A"
           [ -z "$REFERENCES" ] && REFERENCES="N/A"
 
-          # Write CAP file
-          cat > "$FILE_PATH" <<EOF
----
-CAP: ${CAP_NUMBER}
-Title: "${TITLE}"
-Category: ${CATEGORY}
-Status: Draft
-Authors:
-  - TBD
-Implementors: ${IMPLEMENTORS}
-Solution-To:
-  - ${SOLUTION_TO}
-Discussions:
-  - ${DISCUSSIONS}
-Created: ${DATE}
-License: CC-BY-4.0
----
+          echo "---" > "$FILE_PATH"
+          echo "CAP: ${CAP_NUMBER}" >> "$FILE_PATH"
+          echo "Title: \"${TITLE}\"" >> "$FILE_PATH"
+          echo "Category: ${CATEGORY}" >> "$FILE_PATH"
+          echo "Status: Draft" >> "$FILE_PATH"
+          echo "Authors:" >> "$FILE_PATH"
+          echo "  - TBD" >> "$FILE_PATH"
+          echo "Implementors: ${IMPLEMENTORS}" >> "$FILE_PATH"
+          echo "Solution-To:" >> "$FILE_PATH"
+          echo "  - ${SOLUTION_TO}" >> "$FILE_PATH"
+          echo "Discussions:" >> "$FILE_PATH"
+          echo "  - ${DISCUSSIONS}" >> "$FILE_PATH"
+          echo "Created: ${DATE}" >> "$FILE_PATH"
+          echo "License: CC-BY-4.0" >> "$FILE_PATH"
+          echo "---" >> "$FILE_PATH"
+          echo "" >> "$FILE_PATH"
 
-## Abstract
+          echo "## Abstract" >> "$FILE_PATH"
+          echo "" >> "$FILE_PATH"
+          echo "${ABSTRACT}" >> "$FILE_PATH"
+          echo "" >> "$FILE_PATH"
 
-${ABSTRACT}
+          echo "## Motivation: Why is this CAP necessary?" >> "$FILE_PATH"
+          echo "" >> "$FILE_PATH"
+          echo "${MOTIVATION}" >> "$FILE_PATH"
+          echo "" >> "$FILE_PATH"
 
-## Motivation: Why is this CAP necessary?
+          echo "## Amendment Specification" >> "$FILE_PATH"
+          echo "" >> "$FILE_PATH"
+          echo "${SPECIFICATION}" >> "$FILE_PATH"
+          echo "" >> "$FILE_PATH"
 
-${MOTIVATION}
+          echo "## Rationale: How does this CAP achieve its goals?" >> "$FILE_PATH"
+          echo "" >> "$FILE_PATH"
+          echo "${RATIONALE}" >> "$FILE_PATH"
+          echo "" >> "$FILE_PATH"
 
-## Amendment Specification
+          echo "## Path to Ratification" >> "$FILE_PATH"
+          echo "" >> "$FILE_PATH"
+          echo "### Acceptance Criteria" >> "$FILE_PATH"
+          echo "" >> "$FILE_PATH"
+          echo "${ACCEPTANCE}" >> "$FILE_PATH"
+          echo "" >> "$FILE_PATH"
 
-${SPECIFICATION}
+          echo "### Implementation Plan" >> "$FILE_PATH"
+          echo "" >> "$FILE_PATH"
+          echo "${IMPLEMENTATION}" >> "$FILE_PATH"
+          echo "" >> "$FILE_PATH"
 
-## Rationale: How does this CAP achieve its goals?
+          echo "## Versioning (Optional)" >> "$FILE_PATH"
+          echo "" >> "$FILE_PATH"
+          echo "${VERSIONING}" >> "$FILE_PATH"
+          echo "" >> "$FILE_PATH"
 
-${RATIONALE}
+          echo "## References (Optional)" >> "$FILE_PATH"
+          echo "" >> "$FILE_PATH"
+          echo "${REFERENCES}" >> "$FILE_PATH"
+          echo "" >> "$FILE_PATH"
 
-## Path to Ratification
-
-### Acceptance Criteria
-
-${ACCEPTANCE}
-
-### Implementation Plan
-
-${IMPLEMENTATION}
-
-## Versioning (Optional)
-
-${VERSIONING}
-
-## References (Optional)
-
-${REFERENCES}
-
-## Copyright
-
-This CAP is licensed under [CC-BY-4.0](https://creativecommons.org/licenses/by/4.0/legalcode).
-EOF
+          echo "## Copyright" >> "$FILE_PATH"
+          echo "" >> "$FILE_PATH"
+          echo "This CAP is licensed under [CC-BY-4.0](https://creativecommons.org/licenses/by/4.0/legalcode)." >> "$FILE_PATH"
 
       - name: Commit and push CAP folder
         uses: stefanzweifel/git-auto-commit-action@v5
