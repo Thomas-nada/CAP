@@ -17,7 +17,6 @@ jobs:
           ISSUE_BODY: ${{ github.event.issue.body }}
           ISSUE_TITLE: ${{ github.event.issue.title }}
         run: |
-          # Format CAP number with leading zeros
           CAP_NUMBER=$(printf "%04d" ${{ github.event.issue.number }})
           FOLDER="CAP-${CAP_NUMBER}"
           FILE_PATH="${FOLDER}/README.md"
@@ -25,13 +24,11 @@ jobs:
 
           mkdir -p "$FOLDER"
 
-          # ✅ Title comes directly from issue metadata
+          # ✅ Title directly from issue metadata
           TITLE="$ISSUE_TITLE"
-
-          # Strip optional leading "CAP:" if included
           TITLE=$(echo "$TITLE" | sed -E 's/^CAP[: ]*//')
 
-          # Extract other fields from the issue body
+          # Extract other fields
           CATEGORY=$(echo "$ISSUE_BODY" | awk -F': ' '/### Category/{getline; print}' | xargs)
           IMPLEMENTORS=$(echo "$ISSUE_BODY" | awk -F': ' '/### Implementors/{getline; print}' | xargs)
           SOLUTION_TO=$(echo "$ISSUE_BODY" | awk -F': ' '/### Solution-To/{getline; print}' | xargs)
@@ -45,7 +42,7 @@ jobs:
           VERSIONING=$(echo "$ISSUE_BODY" | awk -F': ' '/### Versioning/{getline; print}' | xargs)
           REFERENCES=$(echo "$ISSUE_BODY" | awk -F': ' '/### References/{getline; print}' | xargs)
 
-          # Set defaults for empty values
+          # Defaults
           [ -z "$CATEGORY" ] && CATEGORY="Governance"
           [ -z "$IMPLEMENTORS" ] && IMPLEMENTORS="N/A"
           [ -z "$SOLUTION_TO" ] && SOLUTION_TO="N/A"
@@ -59,10 +56,18 @@ jobs:
           [ -z "$VERSIONING" ] && VERSIONING="N/A"
           [ -z "$REFERENCES" ] && REFERENCES="N/A"
 
-          # Debug log (optional - helps confirm title parsing)
-          echo "📌 CAP-${CAP_NUMBER} Title: $TITLE"
+          # 🧠 Smart linking for Solution-To
+          if [[ "$SOLUTION_TO" =~ ^GPS-[0-9]+$ ]]; then
+            SOLUTION_TO_MARKDOWN="[${SOLUTION_TO}](../GPS/${SOLUTION_TO}.md)"
+          else
+            SOLUTION_TO_MARKDOWN="$SOLUTION_TO"
+          fi
 
-          # Write CAP README.md
+          # Debugging (optional)
+          echo "📌 Generating CAP-${CAP_NUMBER} titled '$TITLE'"
+          echo "📎 Solution-To parsed as: $SOLUTION_TO_MARKDOWN"
+
+          # Generate README.md
           echo "---" > "$FILE_PATH"
           echo "CAP: ${CAP_NUMBER}" >> "$FILE_PATH"
           echo "Title: \"${TITLE}\"" >> "$FILE_PATH"
@@ -72,7 +77,7 @@ jobs:
           echo "  - TBD" >> "$FILE_PATH"
           echo "Implementors: ${IMPLEMENTORS}" >> "$FILE_PATH"
           echo "Solution-To:" >> "$FILE_PATH"
-          echo "  - ${SOLUTION_TO}" >> "$FILE_PATH"
+          echo "  - ${SOLUTION_TO_MARKDOWN}" >> "$FILE_PATH"
           echo "Discussions:" >> "$FILE_PATH"
           echo "  - ${DISCUSSIONS}" >> "$FILE_PATH"
           echo "Created: ${DATE}" >> "$FILE_PATH"
