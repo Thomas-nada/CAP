@@ -1,30 +1,14 @@
-name: New Governance Problem Statement (GPS)
-description: Propose a new Governance Problem Statement to identify a governance challenge.
+name: "New Governance Problem Statement (GPS)"
+description: "Propose a new Governance Problem Statement (GPS) for Cardano governance."
 title: "GPS: [Short Title]"
-labels: ["gps", "proposal"]
+labels: ["gps"]
+
 body:
-  - type: markdown
-    attributes:
-      value: |
-        ## 🧭 New Governance Problem Statement (GPS)
-
-        Use this form to propose a new **Governance Problem Statement (GPS)** — a document describing a governance problem, ambiguity, or systemic challenge.  
-        GPS documents are **problem definitions**, not solutions. CAPs will later address them.
-
-  - type: input
-    id: title
-    attributes:
-      label: Title
-      description: A short, descriptive title for the governance problem.
-      placeholder: "Low Participation and Representation in On-Chain Governance"
-    validations:
-      required: true
-
   - type: dropdown
     id: category
     attributes:
       label: Category
-      description: Select the governance area this problem relates to.
+      description: Choose the governance category this GPS relates to.
       options:
         - Constitution
         - Governance
@@ -39,79 +23,97 @@ body:
     id: authors
     attributes:
       label: Authors
-      description: Names and GitHub handles of primary authors.
-      placeholder: |
-        - Alice Nguyen <@alice-nguyen>
-        - Daniel Cardano <@daniel-c>
+      description: List all authors (Name <@GitHubHandle>).
+      placeholder: "Alice <@alice>, Bob <@bob>"
+    validations:
+      required: false
 
   - type: textarea
     id: proposed_solutions
     attributes:
       label: Proposed Solutions (CAPs)
-      description: Optional – list any CAPs that aim to solve this GPS.
-      placeholder: |
-        - CAP-0005
+      description: List any related CAPs if they exist.
+      placeholder: "CAP-0005"
+    validations:
+      required: false
 
   - type: textarea
     id: discussions
     attributes:
       label: Discussions
-      description: Links to relevant GitHub discussions, forum threads, or other references.
-      placeholder: |
-        - https://github.com/Thomas-nada/CAP/discussions/20
+      description: Link to relevant discussion threads.
+      placeholder: "https://github.com/Thomas-nada/CAP/discussions/XX"
+    validations:
+      required: false
 
   - type: textarea
     id: abstract
     attributes:
       label: Abstract
-      description: A short (~200 word) summary of the governance problem and why it matters.
-      placeholder: "Describe the governance gap or systemic challenge here."
+      description: (~200 words) Summary of the governance problem.
+    validations:
+      required: false
 
   - type: textarea
     id: background
     attributes:
       label: Background
-      description: Relevant historical, procedural, or constitutional context for why this problem exists.
-      placeholder: "Explain prior decisions or conditions leading to this problem."
+      description: Provide context and history of this governance problem.
+    validations:
+      required: false
 
   - type: textarea
-    id: problem
+    id: problem_description
     attributes:
       label: Problem Description
-      description: A clear and detailed definition of the governance or constitutional problem.
-      placeholder: "What ambiguity, gap, or risk is being exposed?"
+      description: Define the governance gap or ambiguity in detail.
+    validations:
+      required: false
 
   - type: textarea
-    id: goals
+    id: use_cases
+    attributes:
+      label: Use Cases
+      description: Provide stakeholder examples illustrating the problem.
+    validations:
+      required: false
+
+  - type: textarea
+    id: governance_goals
     attributes:
       label: Governance Goals
-      description: What should a solution aim to achieve? Also list non-goals if relevant.
-      placeholder: |
-        - Increase participation
-        - Preserve decentralization
-        - Avoid punitive mechanisms
+      description: List what ideal solutions should achieve.
+    validations:
+      required: false
 
   - type: textarea
     id: open_questions
     attributes:
       label: Open Questions
-      description: Critical governance questions any future amendment (CAP) must address.
-      placeholder: |
-        - What participation threshold ensures legitimacy?
-        - Should quorum rules adapt based on turnout?
+      description: List key governance questions any CAP should address.
+    validations:
+      required: false
 
   - type: textarea
-    id: next_steps
+    id: proposed_next_steps
     attributes:
       label: Proposed Next Steps (Optional)
-      description: Suggest follow-ups (e.g., draft a CAP, form a working group, further research).
-      placeholder: |
-        - Draft a CAP proposing minimum activity standards for dReps.
+      description: Suggest possible paths forward.
+    validations:
+      required: false
 
   - type: textarea
     id: references
     attributes:
       label: References (Optional)
-      description: Include any related governance documents, forum threads, or research.
-      placeholder: |
-        - https://forum.cardano.org/t/gps-0001-voter-participation/103521
+      description: Link related documents or resources.
+    validations:
+      required: false
+
+  - type: textarea
+    id: acknowledgements
+    attributes:
+      label: Acknowledgements (Optional)
+      description: Credit contributors or reviewers.
+    validations:
+      required: false
