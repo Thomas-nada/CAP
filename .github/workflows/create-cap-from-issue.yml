@@ -47,7 +47,7 @@ jobs:
 
           # ✅ Fallbacks
           [ -z "$CATEGORY" ] && CATEGORY="Governance"
-          [ -z "$IMPLEMENTORS" ] && IMPLEMENTORS="N/A"
+          [ -z "$IMPLEMENTORS" ] && IMPLEMENTORS="_No response_"
           [ -z "$SOLUTION_TO" ] && SOLUTION_TO="N/A"
           [ -z "$DISCUSSIONS" ] && DISCUSSIONS="_No response_"
           [ -z "$ABSTRACT" ] && ABSTRACT="_No response_"
@@ -85,7 +85,7 @@ jobs:
             echo "Implementors:"
             echo "  - \"${IMPLEMENTORS}\""
             echo "Solution-To:"
-            echo "  - ${SOLUTION_TO_MARKDOWN}"
+            echo "  - \"${SOLUTION_TO_MARKDOWN}\""
             echo "Discussions:"
             echo "  - \"${DISCUSSIONS_MARKDOWN}\""
             echo "Created: ${DATE}"
