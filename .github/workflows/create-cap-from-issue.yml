@@ -1,0 +1,78 @@
+name: Create CAP Markdown from Issue
+
+on:
+  issues:
+    types: [opened]
+
+jobs:
+  generate-cap:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Generate CAP markdown file
+        run: |
+          mkdir -p CAPs
+
+          CAP_NUMBER=${{ github.event.issue.number }}
+          CAP_TITLE="${{ github.event.issue.title }}"
+          SAFE_TITLE=$(echo "$CAP_TITLE" | tr ' ' '-' | tr -dc '[:alnum:]-')
+
+          FILE_PATH="CAPs/CAP-${CAP_NUMBER}-${SAFE_TITLE}.md"
+
+          cat > "$FILE_PATH" <<EOF
+---
+CAP: $CAP_NUMBER
+Title: "$CAP_TITLE"
+Category: Governance
+Status: Draft
+Authors:
+  - TBD
+Implementors: []
+Linked GPS: []
+Discussions: []
+Created: $(date +%Y-%m-%d)
+License: CC-BY-4.0
+---
+
+## Abstract
+
+${{ github.event.issue.body }}
+
+## Motivation: Why is this CAP necessary?
+
+_TBD – describe the motivation here._
+
+## Proposed Amendment (Specification)
+
+_TBD – write the proposed changes here._
+
+## Rationale: How does this CAP achieve its goals?
+
+_TBD – explain why this design was chosen._
+
+## Path to Ratification
+
+### Acceptance Criteria
+
+_TBD – describe how this proposal will be ratified._
+
+### Implementation Plan
+
+- [ ] Publish for public comment
+- [ ] Integrate approved text into constitution
+- [ ] Implement governance tooling (if needed)
+- [ ] Establish petition registry
+
+## Copyright
+
+This CAP is licensed under [CC-BY-4.0](https://creativecommons.org/licenses/by/4.0/legalcode).
+EOF
+
+      - name: Commit and push CAP file
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "Add CAP ${{ github.event.issue.number }} - ${{ github.event.issue.title }}"
+          file_pattern: "CAPs/*.md"
