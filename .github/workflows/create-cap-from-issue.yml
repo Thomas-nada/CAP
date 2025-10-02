@@ -17,7 +17,10 @@ jobs:
           ISSUE_BODY: ${{ github.event.issue.body }}
           ISSUE_TITLE: ${{ github.event.issue.title }}
         run: |
-          CAP_NUMBER=$(printf "%04d" ${{ github.event.issue.number }})
+          # ✅ Count existing CAP folders (ignore CAP-9999)
+          CAP_COUNT=$(ls -d CAP-* 2>/dev/null | grep -v 'CAP-9999' | wc -l)
+          CAP_NUMBER=$(printf "%04d" $((CAP_COUNT + 1)))
+
           FOLDER="CAP-${CAP_NUMBER}"
           FILE_PATH="${FOLDER}/README.md"
           DATE=$(date +%Y-%m-%d)
@@ -58,7 +61,7 @@ jobs:
           [ -z "$VERSIONING" ] && VERSIONING="N/A"
           [ -z "$REFERENCES" ] && REFERENCES="N/A"
 
-          # ✅ Write README.md (no formatting, no linking, just raw input)
+          # ✅ Write README.md (just raw values)
           {
             echo "---"
             echo "CAP: ${CAP_NUMBER}"
