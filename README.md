@@ -20,8 +20,8 @@ Because CAPs are text files in a versioned repository, their revision history be
 | 0002  | [Mandatory On-Chain Coffee Breaks ☕](./CAP-0002) | Proposed | – |
 | 0003  | [Amendment to Clarify the Constitutional Committee Accountability Mechanism](./CAP-0003) | Draft | [GPS-0003](./GPS-0003) |
 | 0004  | [Amendment to Recognize Pineapples as Constitutional Stakeholders](./CAP-0004) | Draft | – |
-| 0009  | [](./CAP-0009) | Draft | – |
 | 0010  | [](./CAP-0010) | Draft | – |
+| 0011  | [Test](./CAP-0011) | Draft | – |
 | 9999  | [Governance Problem Statements](./CAP-9999) | Active | – |
 
 <p align="right"><i>Last updated on 2025-10-02</i></p>
