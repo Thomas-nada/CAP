@@ -1,6 +1,6 @@
 ---
 CAP: 0006
-Title: "Test"
+Title: "GPS: [Short Title]"
 Category: "Constitution"
 Status: Draft
 Authors:
