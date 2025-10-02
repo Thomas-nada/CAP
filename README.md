@@ -24,11 +24,13 @@ Because CAPs are text files in a versioned repository, their revision history be
 
 # Governance Problem Statements (GPS)
 
+<!-- BEGIN_GPS_INDEX -->
 | #     | Title | Status | Proposed Solutions |
 |-------|-----------------------------|----------|-----------------------------|
 | 0001  | [Low Participation and Representation in On-Chain Governance](./GPS-0001) | Open | – |
 
 <p align="right"><i>Last updated on 2025-10-02</i></p>
+<!-- END_GPS_INDEX -->
 
 ---
 
@@ -55,3 +57,17 @@ Proposals deemed ready for review but requiring further author updates or confir
 | Your Name | [@yourhandle](https://github.com/yourhandle) |
 
 ---
+
+---
+
+# Constitutional Amendment Proposals (CAPs)
+
+<!-- BEGIN_CAP_INDEX -->
+| #     | Title | Status | Addresses GPS |
+|-------|----------------------------|----------|--------------------------|
+| 0001  | [CAP Process](./CAP-0001) | Active | – |
+| 0003  | [Amendment to Clarify the Constitutional Committee Accountability Mechanism](./CAP-0003) | Draft | [GPS-0003](./GPS-0003) |
+| 9999  | [Governance Problem Statements](./CAP-9999) | Active | – |
+
+<p align="right"><i>Last updated on 2025-10-02</i></p>
+<!-- END_CAP_INDEX -->
