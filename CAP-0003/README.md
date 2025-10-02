@@ -1,17 +1,18 @@
 ---
 CAP: 0003
-Title: Amendment to Clarify the Constitutional Committee Accountability Mechanism
-Category: Governance
+Title: "Amendment to Clarify the Constitutional Committee Accountability Mechanism"
+Category: "Governance"
 Status: Draft
 Authors:
-  - Ada Lovelace <@adalovelace>
-  - Charles Byron <@cbyron>
-Implementors: []
-Linked GPS:
-  - GPS-0003
+  - "Ada Lovelace <@adalovelace>"
+  - "Charles Byron <@cbyron>"
+Implementors:
+  - "N/A"
+Solution-To:
+  - "GPS-0003"
 Discussions:
-  - https://github.com/Thomas-nada/CAP/discussions/12
-  - https://forum.cardano.org/t/discussion-cap-0002-committee-accountability/101234
+  - "https://github.com/Thomas-nada/CAP/discussions/12"
+  - "https://forum.cardano.org/t/discussion-cap-0002-committee-accountability/101234"
 Created: 2025-09-30
 License: CC-BY-4.0
 ---
@@ -19,7 +20,9 @@ License: CC-BY-4.0
 ## Abstract
 
 This CAP proposes an amendment to the Cardano Constitution that clarifies and strengthens the accountability mechanisms governing the **Constitutional Committee (CC)**.  
+
 The current Constitution outlines the CC’s composition, powers, and responsibilities, but lacks sufficient detail regarding oversight, transparency, and recourse in the event of misconduct or non-performance.  
+
 This amendment introduces explicit procedures for reporting, review, and potential removal of committee members, ensuring that the CC remains a trustworthy and accountable institution within Cardano’s governance framework.
 
 ## Motivation: Why is this CAP necessary?
@@ -33,9 +36,9 @@ This absence creates ambiguity around:
 
 Strengthening these provisions aligns with governance goals of **transparency, legitimacy, and community trust**. It also ensures that the CC’s authority is derived from — and accountable to — the Cardano community it serves.
 
-## Proposed Amendment (Specification)
+## Amendment Specification
 
-This amendment proposes adding a new **Section 4.5: Constitutional Committee Accountability and Oversight** to the Cardano Constitution.  
+This amendment proposes adding a new **Section 4.5: Constitutional Committee Accountability and Oversight** to the Cardano Constitution:
 
 > **New Section 4.5 — Accountability and Oversight of the Constitutional Committee**
 >
@@ -60,6 +63,7 @@ This section SHALL be added as **Article IV, Section 4.5** in the Constitution a
 ## Rationale: How does this CAP achieve its goals?
 
 The proposed accountability mechanism strengthens governance legitimacy by ensuring the Constitutional Committee is not only powerful but also answerable to the community. It:
+
 - Introduces measurable transparency requirements through annual reporting.
 - Empowers the community to initiate oversight through a petition-based process.
 - Creates a structured, fair, and transparent procedure for reviewing misconduct.
@@ -75,6 +79,7 @@ This amendment also builds upon feedback gathered from GPS-0003 (“Ambiguities 
 ### Acceptance Criteria
 
 This amendment will be considered *Ratified* once:
+
 - It has been approved through on-chain governance by a majority of DReps with a quorum of at least 5% of total stake.
 - It has received formal acknowledgment from the existing Constitutional Committee.
 
@@ -84,6 +89,15 @@ This amendment will be considered *Ratified* once:
 - [ ] Integrate approved text into `constitution/constitution-v1.txt` and increment the version number.
 - [ ] Implement on-chain mechanisms for petition submission and Review Panel selection (if required by governance tooling).
 - [ ] Establish a registry for publication of petitions and outcomes.
+
+## Versioning (Optional)
+
+Future amendments may expand or refine Section 4.5 to address new governance needs, oversight mechanisms, or evolving governance tooling capabilities.
+
+## References (Optional)
+
+- [GPS-0003](../GPS-0003) – Ambiguities in Committee Accountability  
+- [Cardano Constitution Draft](https://github.com/input-output-hk/cardano-governance/blob/main/constitution/constitution-v1.txt)
 
 ## Copyright
 
