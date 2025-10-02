@@ -25,25 +25,29 @@ jobs:
 
           mkdir -p "$FOLDER"
 
-          # ✅ Title directly from GitHub metadata
+          # ✅ Title from GitHub issue metadata
           TITLE="$ISSUE_TITLE"
           TITLE=$(echo "$TITLE" | sed -E 's/^CAP[: ]*//')
 
-          # ✅ Extract fields robustly (works even if form headings change)
-          CATEGORY=$(echo "$ISSUE_BODY" | grep -A1 "Category" | tail -n1 | xargs)
-          IMPLEMENTORS=$(echo "$ISSUE_BODY" | grep -A1 "Implementors" | tail -n1 | xargs)
-          SOLUTION_TO=$(echo "$ISSUE_BODY" | grep -A1 "Solution-To" | tail -n1 | xargs)
-          DISCUSSIONS=$(echo "$ISSUE_BODY" | grep -A1 "Discussions" | tail -n1 | xargs)
-          ABSTRACT=$(echo "$ISSUE_BODY" | grep -A1 "Abstract" | tail -n1 | xargs)
-          MOTIVATION=$(echo "$ISSUE_BODY" | grep -A1 "Motivation" | tail -n1 | xargs)
-          SPECIFICATION=$(echo "$ISSUE_BODY" | grep -A1 "Amendment Specification" | tail -n1 | xargs)
-          RATIONALE=$(echo "$ISSUE_BODY" | grep -A1 "Rationale" | tail -n1 | xargs)
-          ACCEPTANCE=$(echo "$ISSUE_BODY" | grep -A1 "Acceptance Criteria" | tail -n1 | xargs)
-          IMPLEMENTATION=$(echo "$ISSUE_BODY" | grep -A1 "Implementation Plan" | tail -n1 | xargs)
-          VERSIONING=$(echo "$ISSUE_BODY" | grep -A1 "Versioning" | tail -n1 | xargs)
-          REFERENCES=$(echo "$ISSUE_BODY" | grep -A1 "References" | tail -n1 | xargs)
+          echo "====== ISSUE BODY ======"
+          echo "$ISSUE_BODY"
+          echo "========================"
 
-          # ✅ Defaults
+          # ✅ Robust field extraction (handles ###, parentheses, etc.)
+          CATEGORY=$(echo "$ISSUE_BODY" | grep -A1 -E "Category" | tail -n1 | tr -d '\r' | xargs)
+          IMPLEMENTORS=$(echo "$ISSUE_BODY" | grep -A1 -E "Implementors" | tail -n1 | tr -d '\r' | xargs)
+          SOLUTION_TO=$(echo "$ISSUE_BODY" | grep -A1 -E "Solution-To" | tail -n1 | tr -d '\r' | xargs)
+          DISCUSSIONS=$(echo "$ISSUE_BODY" | grep -A1 -E "Discussions" | tail -n1 | tr -d '\r' | xargs)
+          ABSTRACT=$(echo "$ISSUE_BODY" | grep -A1 -E "Abstract" | tail -n1 | tr -d '\r' | xargs)
+          MOTIVATION=$(echo "$ISSUE_BODY" | grep -A1 -E "Motivation" | tail -n1 | tr -d '\r' | xargs)
+          SPECIFICATION=$(echo "$ISSUE_BODY" | grep -A1 -E "Amendment Specification" | tail -n1 | tr -d '\r' | xargs)
+          RATIONALE=$(echo "$ISSUE_BODY" | grep -A1 -E "Rationale" | tail -n1 | tr -d '\r' | xargs)
+          ACCEPTANCE=$(echo "$ISSUE_BODY" | grep -A1 -E "Acceptance Criteria" | tail -n1 | tr -d '\r' | xargs)
+          IMPLEMENTATION=$(echo "$ISSUE_BODY" | grep -A1 -E "Implementation Plan" | tail -n1 | tr -d '\r' | xargs)
+          VERSIONING=$(echo "$ISSUE_BODY" | grep -A1 -E "Versioning" | tail -n1 | tr -d '\r' | xargs)
+          REFERENCES=$(echo "$ISSUE_BODY" | grep -A1 -E "References" | tail -n1 | tr -d '\r' | xargs)
+
+          # ✅ Fallback defaults
           [ -z "$CATEGORY" ] && CATEGORY="Governance"
           [ -z "$IMPLEMENTORS" ] && IMPLEMENTORS="N/A"
           [ -z "$SOLUTION_TO" ] && SOLUTION_TO="N/A"
@@ -57,11 +61,18 @@ jobs:
           [ -z "$VERSIONING" ] && VERSIONING="N/A"
           [ -z "$REFERENCES" ] && REFERENCES="N/A"
 
-          # 🧠 Smart linking for Solution-To (now points to actual GitHub folder)
+          # 🧠 Smart link handling for Solution-To
           if [[ "$SOLUTION_TO" =~ ^GPS-[0-9]+$ ]]; then
             SOLUTION_TO_MARKDOWN="[${SOLUTION_TO}](${REPO_URL}/${SOLUTION_TO})"
           else
             SOLUTION_TO_MARKDOWN="$SOLUTION_TO"
+          fi
+
+          # 🧠 Smart link handling for Discussions (if it's a URL)
+          if [[ "$DISCUSSIONS" =~ ^https?:// ]]; then
+            DISCUSSIONS_MARKDOWN="$DISCUSSIONS"
+          else
+            DISCUSSIONS_MARKDOWN="$DISCUSSIONS"
           fi
 
           echo "📌 Generating CAP-${CAP_NUMBER} - '$TITLE'"
@@ -79,7 +90,7 @@ jobs:
           echo "Solution-To:" >> "$FILE_PATH"
           echo "  - ${SOLUTION_TO_MARKDOWN}" >> "$FILE_PATH"
           echo "Discussions:" >> "$FILE_PATH"
-          echo "  - ${DISCUSSIONS}" >> "$FILE_PATH"
+          echo "  - ${DISCUSSIONS_MARKDOWN}" >> "$FILE_PATH"
           echo "Created: ${DATE}" >> "$FILE_PATH"
           echo "License: CC-BY-4.0" >> "$FILE_PATH"
           echo "---" >> "$FILE_PATH"
@@ -130,10 +141,6 @@ jobs:
           echo "## Copyright" >> "$FILE_PATH"
           echo "" >> "$FILE_PATH"
           echo "This CAP is licensed under [CC-BY-4.0](https://creativecommons.org/licenses/by/4.0/legalcode)." >> "$FILE_PATH"
-         
-          echo "====== ISSUE BODY ======"
-          echo "$ISSUE_BODY"
-          echo "========================"
 
       - name: Commit and push CAP folder
         uses: stefanzweifel/git-auto-commit-action@v5
