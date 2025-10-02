@@ -12,64 +12,61 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Generate CAP markdown file
+      - name: Generate CAP markdown file safely
         run: |
           mkdir -p CAPs
 
           CAP_NUMBER=${{ github.event.issue.number }}
           CAP_TITLE="${{ github.event.issue.title }}"
           SAFE_TITLE=$(echo "$CAP_TITLE" | tr ' ' '-' | tr -dc '[:alnum:]-')
-
           FILE_PATH="CAPs/CAP-${CAP_NUMBER}-${SAFE_TITLE}.md"
 
-          cat << 'EOF' > "$FILE_PATH"
----
-CAP: $CAP_NUMBER
-Title: "$CAP_TITLE"
-Category: Governance
-Status: Draft
-Authors:
-  - TBD
-Implementors: []
-Linked GPS: []
-Discussions: []
-Created: $(date +%Y-%m-%d)
-License: CC-BY-4.0
----
-
-## Abstract
-
-${{ github.event.issue.body }}
-
-## Motivation: Why is this CAP necessary?
-
-_TBD – describe the motivation here._
-
-## Proposed Amendment (Specification)
-
-_TBD – write the proposed changes here._
-
-## Rationale: How does this CAP achieve its goals?
-
-_TBD – explain why this design was chosen._
-
-## Path to Ratification
-
-### Acceptance Criteria
-
-_TBD – describe how this proposal will be ratified._
-
-### Implementation Plan
-
-- [ ] Publish for public comment
-- [ ] Integrate approved text into constitution
-- [ ] Implement governance tooling (if needed)
-- [ ] Establish petition registry
-
-## Copyright
-
-This CAP is licensed under [CC-BY-4.0](https://creativecommons.org/licenses/by/4.0/legalcode).
-EOF
+          echo "---" > "$FILE_PATH"
+          echo "CAP: $CAP_NUMBER" >> "$FILE_PATH"
+          echo "Title: \"$CAP_TITLE\"" >> "$FILE_PATH"
+          echo "Category: Governance" >> "$FILE_PATH"
+          echo "Status: Draft" >> "$FILE_PATH"
+          echo "Authors:" >> "$FILE_PATH"
+          echo "  - TBD" >> "$FILE_PATH"
+          echo "Implementors: []" >> "$FILE_PATH"
+          echo "Linked GPS: []" >> "$FILE_PATH"
+          echo "Discussions: []" >> "$FILE_PATH"
+          echo "Created: $(date +%Y-%m-%d)" >> "$FILE_PATH"
+          echo "License: CC-BY-4.0" >> "$FILE_PATH"
+          echo "---" >> "$FILE_PATH"
+          echo "" >> "$FILE_PATH"
+          echo "## Abstract" >> "$FILE_PATH"
+          echo "" >> "$FILE_PATH"
+          echo "${{ github.event.issue.body }}" >> "$FILE_PATH"
+          echo "" >> "$FILE_PATH"
+          echo "## Motivation: Why is this CAP necessary?" >> "$FILE_PATH"
+          echo "" >> "$FILE_PATH"
+          echo "_TBD – describe the motivation here._" >> "$FILE_PATH"
+          echo "" >> "$FILE_PATH"
+          echo "## Proposed Amendment (Specification)" >> "$FILE_PATH"
+          echo "" >> "$FILE_PATH"
+          echo "_TBD – write the proposed changes here._" >> "$FILE_PATH"
+          echo "" >> "$FILE_PATH"
+          echo "## Rationale: How does this CAP achieve its goals?" >> "$FILE_PATH"
+          echo "" >> "$FILE_PATH"
+          echo "_TBD – explain why this design was chosen._" >> "$FILE_PATH"
+          echo "" >> "$FILE_PATH"
+          echo "## Path to Ratification" >> "$FILE_PATH"
+          echo "" >> "$FILE_PATH"
+          echo "### Acceptance Criteria" >> "$FILE_PATH"
+          echo "" >> "$FILE_PATH"
+          echo "_TBD – describe how this proposal will be ratified._" >> "$FILE_PATH"
+          echo "" >> "$FILE_PATH"
+          echo "### Implementation Plan" >> "$FILE_PATH"
+          echo "" >> "$FILE_PATH"
+          echo "- [ ] Publish for public comment" >> "$FILE_PATH"
+          echo "- [ ] Integrate approved text into constitution" >> "$FILE_PATH"
+          echo "- [ ] Implement governance tooling (if needed)" >> "$FILE_PATH"
+          echo "- [ ] Establish petition registry" >> "$FILE_PATH"
+          echo "" >> "$FILE_PATH"
+          echo "## Copyright" >> "$FILE_PATH"
+          echo "" >> "$FILE_PATH"
+          echo "This CAP is licensed under [CC-BY-4.0](https://creativecommons.org/licenses/by/4.0/legalcode)." >> "$FILE_PATH"
 
       - name: Commit and push CAP file
         uses: stefanzweifel/git-auto-commit-action@v5
