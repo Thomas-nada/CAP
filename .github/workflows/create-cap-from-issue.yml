@@ -130,6 +130,10 @@ jobs:
           echo "## Copyright" >> "$FILE_PATH"
           echo "" >> "$FILE_PATH"
           echo "This CAP is licensed under [CC-BY-4.0](https://creativecommons.org/licenses/by/4.0/legalcode)." >> "$FILE_PATH"
+         
+          echo "====== ISSUE BODY ======"
+          echo "$ISSUE_BODY"
+          echo "========================"
 
       - name: Commit and push CAP folder
         uses: stefanzweifel/git-auto-commit-action@v5
