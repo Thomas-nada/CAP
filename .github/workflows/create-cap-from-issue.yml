@@ -31,7 +31,7 @@ jobs:
 
           NORMALIZED_BODY=$(echo "$ISSUE_BODY" | tr -d '\r')
 
-          # ✅ Multiline-safe field parsing
+          # ✅ Multiline-safe parsing
           CATEGORY=$(echo "$NORMALIZED_BODY" | perl -0777 -ne 'print $1 if /Category[^\n]*\n+([^\n#]+)/' | xargs)
           IMPLEMENTORS=$(echo "$NORMALIZED_BODY" | perl -0777 -ne 'print $1 if /Implementors[^\n]*\n+([^\n#]+)/' | xargs)
           SOLUTION_TO=$(echo "$NORMALIZED_BODY" | perl -0777 -ne 'print $1 if /Solution-To[^\n]*\n+([^\n#]+)/' | xargs)
@@ -45,7 +45,7 @@ jobs:
           VERSIONING=$(echo "$NORMALIZED_BODY" | perl -0777 -ne 'print $1 if /Versioning[^\n]*\n+([^\n#]+)/' | xargs)
           REFERENCES=$(echo "$NORMALIZED_BODY" | perl -0777 -ne 'print $1 if /References[^\n]*\n+([^\n#]+)/' | xargs)
 
-          # ✅ Fallbacks (always quoted for YAML safety)
+          # ✅ Fallbacks
           [ -z "$CATEGORY" ] && CATEGORY="Governance"
           [ -z "$IMPLEMENTORS" ] && IMPLEMENTORS="_No response_"
           [ -z "$SOLUTION_TO" ] && SOLUTION_TO="N/A"
@@ -73,7 +73,7 @@ jobs:
             DISCUSSIONS_MARKDOWN="$DISCUSSIONS"
           fi
 
-          # ✅ Write README.md (strict YAML syntax, Markdown links not quoted)
+          # ✅ Write README.md with safe YAML
           {
             echo "---"
             echo "CAP: ${CAP_NUMBER}"
@@ -82,8 +82,15 @@ jobs:
             echo "Status: Draft"
             echo "Authors:"
             echo "  - TBD"
-            echo "Implementors:"
-            echo "  - \"${IMPLEMENTORS}\""
+
+            # ✅ Safe implementors handling
+            if [ "$IMPLEMENTORS" = "_No response_" ] || [ -z "$IMPLEMENTORS" ]; then
+              echo "Implementors: N/A"
+            else
+              echo "Implementors:"
+              echo "  - ${IMPLEMENTORS}"
+            fi
+
             echo "Solution-To:"
             echo "  - ${SOLUTION_TO_MARKDOWN}"
             echo "Discussions:"
@@ -136,3 +143,4 @@ jobs:
         with:
           commit_message: "Add CAP-${{ github.event.issue.number }} - ${{ github.event.issue.title }}"
           file_pattern: "CAP-*/*"
+s
