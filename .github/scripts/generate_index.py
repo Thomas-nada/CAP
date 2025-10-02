@@ -2,6 +2,7 @@ import os
 import re
 import yaml
 from datetime import datetime
+from collections import defaultdict
 
 ROOT_README = "README.md"
 
@@ -29,13 +30,27 @@ def collect_docs(prefix):
                 })
     return sorted(entries, key=lambda x: int(x["number"]))
 
-def format_caps_table(entries):
+def build_reverse_map(gps_entries):
+    """Build a map of CAP -> list of GPS that mention it."""
+    reverse_map = defaultdict(list)
+    for gps in gps_entries:
+        for cap in gps.get("proposed", []):
+            reverse_map[cap].append(f"GPS-{gps['number']}")
+    return reverse_map
+
+def format_caps_table(entries, reverse_map):
     lines = [
-        "| #     | Title | Status |",
-        "|-------|----------------------------|----------|",
+        "| #     | Title | Status | Addresses GPS |",
+        "|-------|----------------------------|----------|--------------------------|",
     ]
     for e in entries:
-        lines.append(f"| {e['number']}  | [{e['title']}]({e['link']}) | {e['status']} |")
+        cap_id = f"CAP-{e['number']}"
+        gps_links = reverse_map.get(cap_id, [])
+        if gps_links:
+            gps_str = ", ".join([f"[{gps}](./{gps})" for gps in gps_links])
+        else:
+            gps_str = "–"
+        lines.append(f"| {e['number']}  | [{e['title']}]({e['link']}) | {e['status']} | {gps_str} |")
     return "\n".join(lines)
 
 def format_gps_table(entries):
@@ -63,10 +78,12 @@ def main():
     caps = collect_docs("CAP-")
     gps = collect_docs("GPS-")
 
+    reverse_map = build_reverse_map(gps)
+
     with open(ROOT_README, "r", encoding="utf-8") as f:
         readme = f.read()
 
-    readme = update_section(readme, "Constitutional Amendment Proposals (CAPs)", format_caps_table(caps))
+    readme = update_section(readme, "Constitutional Amendment Proposals (CAPs)", format_caps_table(caps, reverse_map))
     readme = update_section(readme, "Governance Problem Statements (GPS)", format_gps_table(gps))
 
     with open(ROOT_README, "w", encoding="utf-8") as f:
