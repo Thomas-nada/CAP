@@ -21,7 +21,6 @@ They are meant to live side-by-side with CAPs as first-class citizens in this re
 > [!TIP]  
 > For new GPSs, a reference template is available in [.github/GPS-TEMPLATE.md](.github/GPS-TEMPLATE.md)
 
-
 ---
 
 # Communication Channels
@@ -40,23 +39,24 @@ CAP editors facilitate discussions and progress submissions on GitHub, reviewing
 
 # Constitutional Amendment Proposals (CAPs)
 
-| #     | Title | Status |
-|-------|----------------------------|----------|
-| 0001  | [CAP Process](./CAP-0001)  | Active |
-| 0003  | [Amendment to Clarify the Constitutional Committee Accountability Mechanism](./CAP-0003)  | Draft |
-| 9999  | [Governance Problem Statements](./CAP-9999) | Active |
+| #     | Title | Status | Addresses GPS |
+|-------|----------------------------|----------|--------------------------|
+| 0001  | [CAP Process](./CAP-0001)  | Active | – |
+| 0003  | [Amendment to Clarify the Constitutional Committee Accountability Mechanism](./CAP-0003)  | Draft | – |
+| 0004  | [Example CAP](./CAP-0004)  | Draft | – |
+| 9999  | [Governance Problem Statements](./CAP-9999) | Active | – |
 
-<p align="right"><i>Last updated on 2025-10-01</i></p>
+<p align="right"><i>Last updated on 2025-10-02</i></p>
 
 ---
 
 # Governance Problem Statements (GPS)
 
-| #     | Title | Status |
-|-------|-----------------------------|----------|
-| 0001  | [GPS Process](./GPS-0001)   | Open |
+| #     | Title | Status | Proposed Solutions |
+|-------|-----------------------------|----------|-----------------------------|
+| 0001  | [GPS Process](./GPS-0001)   | Open | – |
 
-<p align="right"><i>Last updated on 2025-10-01</i></p>
+<p align="right"><i>Last updated on 2025-10-02</i></p>
 
 ---
 
