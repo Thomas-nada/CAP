@@ -14,37 +14,9 @@ Because CAPs are text files in a versioned repository, their revision history be
 
 # Governance Problem Statements (GPS)
 
-A [Governance Problem Statement (GPS)](./CAP-9999) is a formalized governance issue documented for the Cardano ecosystem and the name of the process by which such documents are produced and listed.  
-GPSs highlight governance gaps, ambiguities, or problems that may lead to one or more CAPs.  
-They are meant to live side-by-side with CAPs as first-class citizens in this repository.
-
-> [!TIP]  
-> For new GPSs, a reference template is available in [.github/GPS-TEMPLATE.md](.github/GPS-TEMPLATE.md)
-
----
-
-# Communication Channels
-
-Extend or discuss ideas in:  
-- [Governance Forums](https://forum.cardano.org)  
-- [Cardano Governance Telegram](https://t.me/CardanoGovernanceOfficial)  
-- `#governance` on Cardano Discord  
-
-CAP editors facilitate discussions and progress submissions on GitHub, reviewing progress in **bi-weekly meetings** (logged in [`CAPS LOCK`](./CAPS%20LOCK)) which are open to the public.  
-
-> [!NOTE]  
-> To facilitate browsing and sharing, an auto-generated site may later be provided (similar to [cips.cardano.org](https://cips.cardano.org/)).
-
----
-
-# Constitutional Amendment Proposals (CAPs)
-
-| #     | Title | Status | Addresses GPS |
-|-------|----------------------------|----------|--------------------------|
-| 0001  | [CAP Process](./CAP-0001)  | Active | – |
-| 0003  | [Amendment to Clarify the Constitutional Committee Accountability Mechanism](./CAP-0003)  | Draft | – |
-| 0004  | [Example CAP](./CAP-0004)  | Draft | – |
-| 9999  | [Governance Problem Statements](./CAP-9999) | Active | – |
+| #     | Title | Status | Proposed Solutions |
+|-------|-----------------------------|----------|-----------------------------|
+| 0001  | [Low Participation and Representation in On-Chain Governance](./GPS-0001) | Open | – |
 
 <p align="right"><i>Last updated on 2025-10-02</i></p>
 
@@ -54,7 +26,7 @@ CAP editors facilitate discussions and progress submissions on GitHub, reviewing
 
 | #     | Title | Status | Proposed Solutions |
 |-------|-----------------------------|----------|-----------------------------|
-| 0001  | [GPS Process](./GPS-0001)   | Open | – |
+| 0001  | [Low Participation and Representation in On-Chain Governance](./GPS-0001) | Open | – |
 
 <p align="right"><i>Last updated on 2025-10-02</i></p>
 
