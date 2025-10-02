@@ -24,25 +24,25 @@ jobs:
 
           mkdir -p "$FOLDER"
 
-          # ✅ Title directly from issue metadata
+          # ✅ Title directly from GitHub metadata
           TITLE="$ISSUE_TITLE"
           TITLE=$(echo "$TITLE" | sed -E 's/^CAP[: ]*//')
 
-          # Extract other fields
-          CATEGORY=$(echo "$ISSUE_BODY" | awk -F': ' '/### Category/{getline; print}' | xargs)
-          IMPLEMENTORS=$(echo "$ISSUE_BODY" | awk -F': ' '/### Implementors/{getline; print}' | xargs)
-          SOLUTION_TO=$(echo "$ISSUE_BODY" | awk -F': ' '/### Solution-To/{getline; print}' | xargs)
-          DISCUSSIONS=$(echo "$ISSUE_BODY" | awk -F': ' '/### Discussions/{getline; print}' | xargs)
-          ABSTRACT=$(echo "$ISSUE_BODY" | awk -F': ' '/### Abstract/{getline; print}' | xargs)
-          MOTIVATION=$(echo "$ISSUE_BODY" | awk -F': ' '/### Motivation/{getline; print}' | xargs)
-          SPECIFICATION=$(echo "$ISSUE_BODY" | awk -F': ' '/### Amendment Specification/{getline; print}' | xargs)
-          RATIONALE=$(echo "$ISSUE_BODY" | awk -F': ' '/### Rationale/{getline; print}' | xargs)
-          ACCEPTANCE=$(echo "$ISSUE_BODY" | awk -F': ' '/### Path to Ratification/{getline; print}' | xargs)
-          IMPLEMENTATION=$(echo "$ISSUE_BODY" | awk -F': ' '/### Implementation Plan/{getline; print}' | xargs)
-          VERSIONING=$(echo "$ISSUE_BODY" | awk -F': ' '/### Versioning/{getline; print}' | xargs)
-          REFERENCES=$(echo "$ISSUE_BODY" | awk -F': ' '/### References/{getline; print}' | xargs)
+          # ✅ Extract fields robustly (even with parentheses in headers)
+          CATEGORY=$(echo "$ISSUE_BODY" | awk '/### Category/{getline; print}' | xargs)
+          IMPLEMENTORS=$(echo "$ISSUE_BODY" | awk '/### Implementors/{getline; print}' | xargs)
+          SOLUTION_TO=$(echo "$ISSUE_BODY" | awk '/### Solution-To/{getline; print}' | xargs)
+          DISCUSSIONS=$(echo "$ISSUE_BODY" | awk '/### Discussions/{getline; print}' | xargs)
+          ABSTRACT=$(echo "$ISSUE_BODY" | awk '/### Abstract/{getline; print}' | xargs)
+          MOTIVATION=$(echo "$ISSUE_BODY" | awk '/### Motivation/{getline; print}' | xargs)
+          SPECIFICATION=$(echo "$ISSUE_BODY" | awk '/### Amendment Specification/{getline; print}' | xargs)
+          RATIONALE=$(echo "$ISSUE_BODY" | awk '/### Rationale/{getline; print}' | xargs)
+          ACCEPTANCE=$(echo "$ISSUE_BODY" | awk '/### Path to Ratification/{getline; print}' | xargs)
+          IMPLEMENTATION=$(echo "$ISSUE_BODY" | awk '/### Implementation Plan/{getline; print}' | xargs)
+          VERSIONING=$(echo "$ISSUE_BODY" | awk '/### Versioning/{getline; print}' | xargs)
+          REFERENCES=$(echo "$ISSUE_BODY" | awk '/### References/{getline; print}' | xargs)
 
-          # Defaults
+          # ✅ Defaults
           [ -z "$CATEGORY" ] && CATEGORY="Governance"
           [ -z "$IMPLEMENTORS" ] && IMPLEMENTORS="N/A"
           [ -z "$SOLUTION_TO" ] && SOLUTION_TO="N/A"
@@ -56,18 +56,17 @@ jobs:
           [ -z "$VERSIONING" ] && VERSIONING="N/A"
           [ -z "$REFERENCES" ] && REFERENCES="N/A"
 
-          # 🧠 Smart linking for Solution-To
+          # 🧠 Smart linking for Solution-To (works with GPS-0002)
           if [[ "$SOLUTION_TO" =~ ^GPS-[0-9]+$ ]]; then
             SOLUTION_TO_MARKDOWN="[${SOLUTION_TO}](../GPS/${SOLUTION_TO}.md)"
           else
             SOLUTION_TO_MARKDOWN="$SOLUTION_TO"
           fi
 
-          # Debugging (optional)
-          echo "📌 Generating CAP-${CAP_NUMBER} titled '$TITLE'"
+          echo "📌 Generating CAP-${CAP_NUMBER} - '$TITLE'"
           echo "📎 Solution-To parsed as: $SOLUTION_TO_MARKDOWN"
 
-          # Generate README.md
+          # ✅ Write README.md
           echo "---" > "$FILE_PATH"
           echo "CAP: ${CAP_NUMBER}" >> "$FILE_PATH"
           echo "Title: \"${TITLE}\"" >> "$FILE_PATH"
