@@ -2,91 +2,80 @@ name: generate-gps
 
 on:
   issues:
-    types: [opened, edited, labeled]
+    types: [opened, edited]
 
 jobs:
   generate-gps:
-    if: contains(github.event.issue.labels.*.name, 'gps')
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set GPS number (ignore GPS-9999)
+      - name: Set GPS number (ignore CAP-9999)
         id: gps_number
         run: |
-          LAST_GPS=$(find . -maxdepth 1 -type d -name 'GPS-*' \
-            | grep -v 'GPS-9999' \
-            | sed -E 's/.*GPS-0*([0-9]+)/\1/' \
-            | sort -n | tail -n 1)
-          if [ -z "$LAST_GPS" ]; then
-            NEXT_GPS=1
-          else
-            NEXT_GPS=$((LAST_GPS + 1))
-          fi
-          GPS_PADDED=$(printf "%04d" $NEXT_GPS)
-          echo "GPS_NUMBER=$GPS_PADDED" >> $GITHUB_ENV
-          echo "📍 Next GPS: $GPS_PADDED"
+          COUNT=$(find . -type d -name "GPS-*" | grep -v "GPS-9999" | wc -l)
+          NEXT=$(printf "%04d" $((COUNT + 1)))
+          echo "GPS_NUMBER=$NEXT" >> $GITHUB_ENV
 
-      - name: Create GPS folder and README
+      - name: Create new GPS folder and README.md
         run: |
           mkdir -p GPS-${{ env.GPS_NUMBER }}
-          cat <<EOF > GPS-${{ env.GPS_NUMBER }}/README.md
+          cat > GPS-${{ env.GPS_NUMBER }}/README.md << 'EOF'
 ---
 GPS: ${{ env.GPS_NUMBER }}
 Title: "${{ github.event.issue.title }}"
-Category: "${{ github.event.issue.body.category || 'None' }}"
-Status: Draft
+Category: Governance
+Status: Open
 Authors:
-  - "${{ github.event.issue.body.authors || 'TBD' }}"
+  - TBD
 Proposed Solutions:
-  - "${{ github.event.issue.body.proposed_solutions || '_No response_' }}"
+  - "_No response_"
 Discussions:
-  - "${{ github.event.issue.body.discussions || '_No response_' }}"
+  - "_No response_"
 Created: $(date +'%Y-%m-%d')
 License: CC-BY-4.0
 ---
 
 ## Abstract
 
-${{ github.event.issue.body.abstract || '_No response_' }}
+_No response_
 
 ## Background
 
-${{ github.event.issue.body.background || '_No response_' }}
+_No response_
 
 ## Problem Description
 
-${{ github.event.issue.body.problem || '_No response_' }}
+_No response_
 
 ## Use Cases
 
-${{ github.event.issue.body.use_cases || '_No response_' }}
+_No response_
 
 ## Governance Goals
 
-${{ github.event.issue.body.governance_goals || '_No response_' }}
+_No response_
 
 ## Open Questions
 
-${{ github.event.issue.body.open_questions || '_No response_' }}
+_No response_
 
 ## Proposed Next Steps (Optional)
 
-${{ github.event.issue.body.next_steps || '_No response_' }}
+_No response_
 
 ## Status
 
-Draft
+Open
 
 ## References (Optional)
 
-${{ github.event.issue.body.references || '_No response_' }}
+_No response_
 
 ## Acknowledgements (Optional)
 
-${{ github.event.issue.body.acknowledgements || '_No response_' }}
+_No response_
 
 ## Copyright
 
@@ -97,4 +86,4 @@ EOF
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: "Add GPS-${{ env.GPS_NUMBER }} - ${{ github.event.issue.title }}"
-          file_pattern: GPS-${{ env.GPS_NUMBER }}/*
+          file_pattern: GPS-*/*
