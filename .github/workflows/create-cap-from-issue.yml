@@ -47,17 +47,17 @@ jobs:
 
           # ✅ Fallbacks
           [ -z "$CATEGORY" ] && CATEGORY="Governance"
-          [ -z "$IMPLEMENTORS" ] && IMPLEMENTORS="_No response_"
+          [ -z "$IMPLEMENTORS" ] && IMPLEMENTORS="N/A"
           [ -z "$SOLUTION_TO" ] && SOLUTION_TO="N/A"
           [ -z "$DISCUSSIONS" ] && DISCUSSIONS="_No response_"
-          [ -z "$ABSTRACT" ] && ABSTRACT="No response"
-          [ -z "$MOTIVATION" ] && MOTIVATION="No response"
-          [ -z "$SPECIFICATION" ] && SPECIFICATION="No response"
-          [ -z "$RATIONALE" ] && RATIONALE="No response"
-          [ -z "$ACCEPTANCE" ] && ACCEPTANCE="No response"
-          [ -z "$IMPLEMENTATION" ] && IMPLEMENTATION="No response"
-          [ -z "$VERSIONING" ] && VERSIONING="No response"
-          [ -z "$REFERENCES" ] && REFERENCES="No response"
+          [ -z "$ABSTRACT" ] && ABSTRACT="_No response_"
+          [ -z "$MOTIVATION" ] && MOTIVATION="_No response_"
+          [ -z "$SPECIFICATION" ] && SPECIFICATION="_No response_"
+          [ -z "$RATIONALE" ] && RATIONALE="_No response_"
+          [ -z "$ACCEPTANCE" ] && ACCEPTANCE="_No response_"
+          [ -z "$IMPLEMENTATION" ] && IMPLEMENTATION="_No response_"
+          [ -z "$VERSIONING" ] && VERSIONING="_No response_"
+          [ -z "$REFERENCES" ] && REFERENCES="_No response_"
 
           # 🧠 Smart linking for Solution-To
           if [[ "$SOLUTION_TO" =~ ^GPS-[0-9]+$ ]]; then
@@ -73,7 +73,7 @@ jobs:
             DISCUSSIONS_MARKDOWN="$DISCUSSIONS"
           fi
 
-          # ✅ Write README.md with safe YAML
+          # ✅ Write README.md
           {
             echo "---"
             echo "CAP: ${CAP_NUMBER}"
@@ -82,15 +82,8 @@ jobs:
             echo "Status: Draft"
             echo "Authors:"
             echo "  - TBD"
-
-            # ✅ Safe implementors handling
-            if [ "$IMPLEMENTORS" = "_No response_" ] || [ -z "$IMPLEMENTORS" ]; then
-              echo "Implementors: N/A"
-            else
-              echo "Implementors:"
-              echo "  - ${IMPLEMENTORS}"
-            fi
-
+            echo "Implementors:"
+            echo "  - \"${IMPLEMENTORS}\""
             echo "Solution-To:"
             echo "  - ${SOLUTION_TO_MARKDOWN}"
             echo "Discussions:"
