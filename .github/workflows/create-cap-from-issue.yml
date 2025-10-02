@@ -6,7 +6,6 @@ on:
 
 jobs:
   generate-cap:
-  if: startsWith(github.event.issue.title, 'CAP:')
   
     runs-on: ubuntu-latest
 
