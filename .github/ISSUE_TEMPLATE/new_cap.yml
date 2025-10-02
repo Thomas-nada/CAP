@@ -1,0 +1,43 @@
+name: "New CAP Proposal"
+description: "Submit a Cardano Amendment Proposal (CAP)."
+title: "CAP: <short title>"
+labels: ["cap", "draft"]
+body:
+  - type: input
+    id: cap_number
+    attributes:
+      label: CAP Number
+      placeholder: "0004"
+  - type: input
+    id: title
+    attributes:
+      label: Title
+      placeholder: "Amendment to Clarify ..."
+  - type: dropdown
+    id: category
+    attributes:
+      label: Category
+      options:
+        - Governance
+        - Technical
+        - Ecosystem
+  - type: textarea
+    id: abstract
+    attributes:
+      label: Abstract
+  - type: textarea
+    id: motivation
+    attributes:
+      label: Motivation
+  - type: textarea
+    id: specification
+    attributes:
+      label: Proposed Amendment (Specification)
+  - type: textarea
+    id: rationale
+    attributes:
+      label: Rationale
+  - type: textarea
+    id: path_to_ratification
+    attributes:
+      label: Path to Ratification
