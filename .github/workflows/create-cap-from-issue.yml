@@ -25,7 +25,7 @@ jobs:
 
           mkdir -p "$FOLDER"
 
-          # ✅ Clean title from issue metadata
+          # ✅ Title from GitHub issue title
           TITLE="$ISSUE_TITLE"
           TITLE=$(echo "$TITLE" | sed -E 's/^CAP[: ]*//')
 
@@ -33,14 +33,14 @@ jobs:
           echo "$ISSUE_BODY"
           echo "============================"
 
-          # ✅ Normalize to remove \r
+          # ✅ Normalize the body to remove carriage returns
           NORMALIZED_BODY=$(echo "$ISSUE_BODY" | tr -d '\r')
 
           echo "====== NORMALIZED BODY ======"
           echo "$NORMALIZED_BODY"
           echo "============================="
 
-          # ✅ Multiline-safe parsing with perl (ignores line breaks, #, and formatting)
+          # ✅ Parse all fields with multiline-safe regex
           CATEGORY=$(echo "$NORMALIZED_BODY" | perl -0777 -ne 'print $1 if /Category[^\n]*\n+([^\n#]+)/' | xargs)
           IMPLEMENTORS=$(echo "$NORMALIZED_BODY" | perl -0777 -ne 'print $1 if /Implementors[^\n]*\n+([^\n#]+)/' | xargs)
           SOLUTION_TO=$(echo "$NORMALIZED_BODY" | perl -0777 -ne 'print $1 if /Solution-To[^\n]*\n+([^\n#]+)/' | xargs)
@@ -56,26 +56,26 @@ jobs:
 
           # ✅ Fallbacks
           [ -z "$CATEGORY" ] && CATEGORY="Governance"
-          [ -z "$IMPLEMENTORS" ] && IMPLEMENTORS="N/A"
+          [ -z "$IMPLEMENTORS" ] && IMPLEMENTORS="_No response_"
           [ -z "$SOLUTION_TO" ] && SOLUTION_TO="N/A"
-          [ -z "$DISCUSSIONS" ] && DISCUSSIONS="N/A"
-          [ -z "$ABSTRACT" ] && ABSTRACT="N/A"
-          [ -z "$MOTIVATION" ] && MOTIVATION="N/A"
-          [ -z "$SPECIFICATION" ] && SPECIFICATION="N/A"
-          [ -z "$RATIONALE" ] && RATIONALE="N/A"
-          [ -z "$ACCEPTANCE" ] && ACCEPTANCE="N/A"
-          [ -z "$IMPLEMENTATION" ] && IMPLEMENTATION="N/A"
-          [ -z "$VERSIONING" ] && VERSIONING="N/A"
-          [ -z "$REFERENCES" ] && REFERENCES="N/A"
+          [ -z "$DISCUSSIONS" ] && DISCUSSIONS="_No response_"
+          [ -z "$ABSTRACT" ] && ABSTRACT="No response"
+          [ -z "$MOTIVATION" ] && MOTIVATION="No response"
+          [ -z "$SPECIFICATION" ] && SPECIFICATION="No response"
+          [ -z "$RATIONALE" ] && RATIONALE="No response"
+          [ -z "$ACCEPTANCE" ] && ACCEPTANCE="No response"
+          [ -z "$IMPLEMENTATION" ] && IMPLEMENTATION="No response"
+          [ -z "$VERSIONING" ] && VERSIONING="No response"
+          [ -z "$REFERENCES" ] && REFERENCES="No response"
 
-          # 🧠 Smart link for Solution-To
+          # 🧠 Smart linking for Solution-To
           if [[ "$SOLUTION_TO" =~ ^GPS-[0-9]+$ ]]; then
             SOLUTION_TO_MARKDOWN="[${SOLUTION_TO}](${REPO_URL}/${SOLUTION_TO})"
           else
             SOLUTION_TO_MARKDOWN="$SOLUTION_TO"
           fi
 
-          # 🧠 Smart link for Discussions
+          # 🧠 Smart linking for Discussions
           if [[ "$DISCUSSIONS" =~ ^https?:// ]]; then
             DISCUSSIONS_MARKDOWN="$DISCUSSIONS"
           else
@@ -93,7 +93,8 @@ jobs:
           echo "Status: Draft" >> "$FILE_PATH"
           echo "Authors:" >> "$FILE_PATH"
           echo "  - TBD" >> "$FILE_PATH"
-          echo "Implementors: ${IMPLEMENTORS}" >> "$FILE_PATH"
+          echo "Implementors:" >> "$FILE_PATH"
+          echo "  - ${IMPLEMENTORS}" >> "$FILE_PATH"
           echo "Solution-To:" >> "$FILE_PATH"
           echo "  - ${SOLUTION_TO_MARKDOWN}" >> "$FILE_PATH"
           echo "Discussions:" >> "$FILE_PATH"
