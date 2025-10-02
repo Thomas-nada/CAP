@@ -21,7 +21,6 @@ jobs:
           FOLDER="CAP-${CAP_NUMBER}"
           FILE_PATH="${FOLDER}/README.md"
           DATE=$(date +%Y-%m-%d)
-          REPO_URL="https://github.com/Thomas-nada/CAP/tree/main"
 
           mkdir -p "$FOLDER"
 
@@ -46,34 +45,20 @@ jobs:
           REFERENCES=$(echo "$NORMALIZED_BODY" | perl -0777 -ne 'print $1 if /References[^\n]*\n+([^\n#]+)/' | xargs)
 
           # ✅ Fallbacks
-          [ -z "$CATEGORY" ] && CATEGORY="Governance"
-          [ -z "$IMPLEMENTORS" ] && IMPLEMENTORS="_No response_"
+          [ -z "$CATEGORY" ] && CATEGORY="N/A"
+          [ -z "$IMPLEMENTORS" ] && IMPLEMENTORS="N/A"
           [ -z "$SOLUTION_TO" ] && SOLUTION_TO="N/A"
-          [ -z "$DISCUSSIONS" ] && DISCUSSIONS="_No response_"
-          [ -z "$ABSTRACT" ] && ABSTRACT="_No response_"
-          [ -z "$MOTIVATION" ] && MOTIVATION="_No response_"
-          [ -z "$SPECIFICATION" ] && SPECIFICATION="_No response_"
-          [ -z "$RATIONALE" ] && RATIONALE="_No response_"
-          [ -z "$ACCEPTANCE" ] && ACCEPTANCE="_No response_"
-          [ -z "$IMPLEMENTATION" ] && IMPLEMENTATION="_No response_"
-          [ -z "$VERSIONING" ] && VERSIONING="_No response_"
-          [ -z "$REFERENCES" ] && REFERENCES="_No response_"
+          [ -z "$DISCUSSIONS" ] && DISCUSSIONS="N/A"
+          [ -z "$ABSTRACT" ] && ABSTRACT="N/A"
+          [ -z "$MOTIVATION" ] && MOTIVATION="N/A"
+          [ -z "$SPECIFICATION" ] && SPECIFICATION="N/A"
+          [ -z "$RATIONALE" ] && RATIONALE="N/A"
+          [ -z "$ACCEPTANCE" ] && ACCEPTANCE="N/A"
+          [ -z "$IMPLEMENTATION" ] && IMPLEMENTATION="N/A"
+          [ -z "$VERSIONING" ] && VERSIONING="N/A"
+          [ -z "$REFERENCES" ] && REFERENCES="N/A"
 
-          # 🧠 Smart linking for Solution-To
-          if [[ "$SOLUTION_TO" =~ ^GPS-[0-9]+$ ]]; then
-            SOLUTION_TO_MARKDOWN="[${SOLUTION_TO}](${REPO_URL}/${SOLUTION_TO})"
-          else
-            SOLUTION_TO_MARKDOWN="$SOLUTION_TO"
-          fi
-
-          # 🧠 Smart linking for Discussions
-          if [[ "$DISCUSSIONS" =~ ^https?:// ]]; then
-            DISCUSSIONS_MARKDOWN="$DISCUSSIONS"
-          else
-            DISCUSSIONS_MARKDOWN="$DISCUSSIONS"
-          fi
-
-          # ✅ Write README.md
+          # ✅ Write README.md (no formatting, no linking, just raw input)
           {
             echo "---"
             echo "CAP: ${CAP_NUMBER}"
@@ -85,9 +70,9 @@ jobs:
             echo "Implementors:"
             echo "  - \"${IMPLEMENTORS}\""
             echo "Solution-To:"
-            echo "  - \"${SOLUTION_TO_MARKDOWN}\""
+            echo "  - \"${SOLUTION_TO}\""
             echo "Discussions:"
-            echo "  - \"${DISCUSSIONS_MARKDOWN}\""
+            echo "  - \"${DISCUSSIONS}\""
             echo "Created: ${DATE}"
             echo "License: CC-BY-4.0"
             echo "---"
