@@ -2,16 +2,17 @@ name: generate-gps
 
 on:
   issues:
-    types: [opened, edited]
+    types: [opened]
 
 jobs:
   generate-gps:
+    if: startsWith(github.event.issue.title, 'GPS:') || startsWith(github.event.issue.title, 'New GPS')
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set GPS number (ignore CAP-9999)
+      - name: Set GPS number (ignore GPS-9999)
         id: gps_number
         run: |
           COUNT=$(find . -type d -name "GPS-*" | grep -v "GPS-9999" | wc -l)
