@@ -17,6 +17,7 @@ Because CAPs are text files in a versioned repository, their revision history be
 | #     | Title | Status | Addresses GPS |
 |-------|----------------------------|----------|--------------------------|
 | 0001  | [CAP Process](./CAP-0001) | Active | – |
+| 0002  | [Mandatory On-Chain Coffee Breaks ☕](./CAP-0002) | Proposed | – |
 | 0003  | [Amendment to Clarify the Constitutional Committee Accountability Mechanism](./CAP-0003) | Draft | [GPS-0003](./GPS-0003) |
 | 0004  | [Amendment to Recognize Pineapples as Constitutional Stakeholders](./CAP-0004) | Draft | – |
 | 9999  | [Governance Problem Statements](./CAP-9999) | Active | – |
