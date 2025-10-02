@@ -77,7 +77,6 @@ This amendment also builds upon feedback gathered from GPS-0003 (“Ambiguities 
 This amendment will be considered *Ratified* once:
 - It has been approved through on-chain governance by a majority of DReps with a quorum of at least 5% of total stake.
 - It has received formal acknowledgment from the existing Constitutional Committee.
-- The Cardano Foundation has updated constitutional documentation to include Section 4.5.
 
 ### Implementation Plan
 
