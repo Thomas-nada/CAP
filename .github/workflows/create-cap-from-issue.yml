@@ -25,22 +25,13 @@ jobs:
 
           mkdir -p "$FOLDER"
 
-          # ✅ Title from GitHub issue title
+          # ✅ Title from issue title
           TITLE="$ISSUE_TITLE"
           TITLE=$(echo "$TITLE" | sed -E 's/^CAP[: ]*//')
 
-          echo "====== RAW ISSUE BODY ======"
-          echo "$ISSUE_BODY"
-          echo "============================"
-
-          # ✅ Normalize the body to remove carriage returns
           NORMALIZED_BODY=$(echo "$ISSUE_BODY" | tr -d '\r')
 
-          echo "====== NORMALIZED BODY ======"
-          echo "$NORMALIZED_BODY"
-          echo "============================="
-
-          # ✅ Parse all fields with multiline-safe regex
+          # ✅ Multiline-safe field parsing
           CATEGORY=$(echo "$NORMALIZED_BODY" | perl -0777 -ne 'print $1 if /Category[^\n]*\n+([^\n#]+)/' | xargs)
           IMPLEMENTORS=$(echo "$NORMALIZED_BODY" | perl -0777 -ne 'print $1 if /Implementors[^\n]*\n+([^\n#]+)/' | xargs)
           SOLUTION_TO=$(echo "$NORMALIZED_BODY" | perl -0777 -ne 'print $1 if /Solution-To[^\n]*\n+([^\n#]+)/' | xargs)
@@ -54,7 +45,7 @@ jobs:
           VERSIONING=$(echo "$NORMALIZED_BODY" | perl -0777 -ne 'print $1 if /Versioning[^\n]*\n+([^\n#]+)/' | xargs)
           REFERENCES=$(echo "$NORMALIZED_BODY" | perl -0777 -ne 'print $1 if /References[^\n]*\n+([^\n#]+)/' | xargs)
 
-          # ✅ Fallbacks
+          # ✅ Fallbacks (always quoted for YAML safety)
           [ -z "$CATEGORY" ] && CATEGORY="Governance"
           [ -z "$IMPLEMENTORS" ] && IMPLEMENTORS="_No response_"
           [ -z "$SOLUTION_TO" ] && SOLUTION_TO="N/A"
@@ -82,73 +73,63 @@ jobs:
             DISCUSSIONS_MARKDOWN="$DISCUSSIONS"
           fi
 
-          echo "📎 Parsed Solution-To: $SOLUTION_TO"
-          echo "📎 Final link: $SOLUTION_TO_MARKDOWN"
-
-          # ✅ Write README.md
-          echo "---" > "$FILE_PATH"
-          echo "CAP: ${CAP_NUMBER}" >> "$FILE_PATH"
-          echo "Title: \"${TITLE}\"" >> "$FILE_PATH"
-          echo "Category: ${CATEGORY}" >> "$FILE_PATH"
-          echo "Status: Draft" >> "$FILE_PATH"
-          echo "Authors:" >> "$FILE_PATH"
-          echo "  - TBD" >> "$FILE_PATH"
-          echo "Implementors:" >> "$FILE_PATH"
-          echo "  - ${IMPLEMENTORS}" >> "$FILE_PATH"
-          echo "Solution-To:" >> "$FILE_PATH"
-          echo "  - ${SOLUTION_TO_MARKDOWN}" >> "$FILE_PATH"
-          echo "Discussions:" >> "$FILE_PATH"
-          echo "  - ${DISCUSSIONS_MARKDOWN}" >> "$FILE_PATH"
-          echo "Created: ${DATE}" >> "$FILE_PATH"
-          echo "License: CC-BY-4.0" >> "$FILE_PATH"
-          echo "---" >> "$FILE_PATH"
-          echo "" >> "$FILE_PATH"
-
-          echo "## Abstract" >> "$FILE_PATH"
-          echo "" >> "$FILE_PATH"
-          echo "${ABSTRACT}" >> "$FILE_PATH"
-          echo "" >> "$FILE_PATH"
-
-          echo "## Motivation: Why is this CAP necessary?" >> "$FILE_PATH"
-          echo "" >> "$FILE_PATH"
-          echo "${MOTIVATION}" >> "$FILE_PATH"
-          echo "" >> "$FILE_PATH"
-
-          echo "## Amendment Specification" >> "$FILE_PATH"
-          echo "" >> "$FILE_PATH"
-          echo "${SPECIFICATION}" >> "$FILE_PATH"
-          echo "" >> "$FILE_PATH"
-
-          echo "## Rationale: How does this CAP achieve its goals?" >> "$FILE_PATH"
-          echo "" >> "$FILE_PATH"
-          echo "${RATIONALE}" >> "$FILE_PATH"
-          echo "" >> "$FILE_PATH"
-
-          echo "## Path to Ratification" >> "$FILE_PATH"
-          echo "" >> "$FILE_PATH"
-          echo "### Acceptance Criteria" >> "$FILE_PATH"
-          echo "" >> "$FILE_PATH"
-          echo "${ACCEPTANCE}" >> "$FILE_PATH"
-          echo "" >> "$FILE_PATH"
-
-          echo "### Implementation Plan" >> "$FILE_PATH"
-          echo "" >> "$FILE_PATH"
-          echo "${IMPLEMENTATION}" >> "$FILE_PATH"
-          echo "" >> "$FILE_PATH"
-
-          echo "## Versioning (Optional)" >> "$FILE_PATH"
-          echo "" >> "$FILE_PATH"
-          echo "${VERSIONING}" >> "$FILE_PATH"
-          echo "" >> "$FILE_PATH"
-
-          echo "## References (Optional)" >> "$FILE_PATH"
-          echo "" >> "$FILE_PATH"
-          echo "${REFERENCES}" >> "$FILE_PATH"
-          echo "" >> "$FILE_PATH"
-
-          echo "## Copyright" >> "$FILE_PATH"
-          echo "" >> "$FILE_PATH"
-          echo "This CAP is licensed under [CC-BY-4.0](https://creativecommons.org/licenses/by/4.0/legalcode)." >> "$FILE_PATH"
+          # ✅ Write README.md (strict YAML syntax)
+          {
+            echo "---"
+            echo "CAP: ${CAP_NUMBER}"
+            echo "Title: \"${TITLE}\""
+            echo "Category: \"${CATEGORY}\""
+            echo "Status: Draft"
+            echo "Authors:"
+            echo "  - TBD"
+            echo "Implementors:"
+            echo "  - \"${IMPLEMENTORS}\""
+            echo "Solution-To:"
+            echo "  - \"${SOLUTION_TO_MARKDOWN}\""
+            echo "Discussions:"
+            echo "  - \"${DISCUSSIONS_MARKDOWN}\""
+            echo "Created: ${DATE}"
+            echo "License: CC-BY-4.0"
+            echo "---"
+            echo ""
+            echo "## Abstract"
+            echo ""
+            echo "${ABSTRACT}"
+            echo ""
+            echo "## Motivation: Why is this CAP necessary?"
+            echo ""
+            echo "${MOTIVATION}"
+            echo ""
+            echo "## Amendment Specification"
+            echo ""
+            echo "${SPECIFICATION}"
+            echo ""
+            echo "## Rationale: How does this CAP achieve its goals?"
+            echo ""
+            echo "${RATIONALE}"
+            echo ""
+            echo "## Path to Ratification"
+            echo ""
+            echo "### Acceptance Criteria"
+            echo ""
+            echo "${ACCEPTANCE}"
+            echo ""
+            echo "### Implementation Plan"
+            echo ""
+            echo "${IMPLEMENTATION}"
+            echo ""
+            echo "## Versioning (Optional)"
+            echo ""
+            echo "${VERSIONING}"
+            echo ""
+            echo "## References (Optional)"
+            echo ""
+            echo "${REFERENCES}"
+            echo ""
+            echo "## Copyright"
+            echo ""
+            echo "This CAP is licensed under [CC-BY-4.0](https://creativecommons.org/licenses/by/4.0/legalcode)."
+          } > "$FILE_PATH"
 
       - name: Commit and push CAP folder
         uses: stefanzweifel/git-auto-commit-action@v5
