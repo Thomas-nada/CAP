@@ -16,20 +16,22 @@ def parse_front_matter(file_path):
     return {}
 
 def collect_docs(prefix):
-    """Collect all CAP or GPS documents and their metadata."""
+    """Recursively collect all CAP or GPS documents and their metadata."""
     entries = []
-    for name in sorted(os.listdir(".")):
-        if name.startswith(prefix) and os.path.isdir(name):
-            readme = os.path.join(name, "README.md")
-            if os.path.exists(readme):
-                data = parse_front_matter(readme)
-                entries.append({
-                    "number": str(data.get(prefix.rstrip('-'), name.split('-')[1])).zfill(4),
-                    "title": data.get("Title", "Untitled"),
-                    "status": data.get("Status", "Unknown"),
-                    "proposed": data.get("Proposed Solutions", []),
-                    "link": f"./{name}"
-                })
+    for root, dirs, files in os.walk("."):
+        for d in dirs:
+            if d.startswith(prefix):
+                folder_path = os.path.join(root, d)
+                readme = os.path.join(folder_path, "README.md")
+                if os.path.exists(readme):
+                    data = parse_front_matter(readme)
+                    entries.append({
+                        "number": str(data.get(prefix.rstrip('-'), d.split('-')[1])).zfill(4),
+                        "title": data.get("Title", "Untitled"),
+                        "status": data.get("Status", "Unknown"),
+                        "proposed": data.get("Proposed Solutions", []),
+                        "link": f"./{os.path.relpath(folder_path)}"
+                    })
     return sorted(entries, key=lambda x: int(x["number"]))
 
 def build_reverse_map(gps_entries):
@@ -49,10 +51,7 @@ def format_caps_table(entries, reverse_map):
     for e in entries:
         cap_id = f"CAP-{e['number']}"
         gps_links = reverse_map.get(cap_id, [])
-        if gps_links:
-            gps_str = ", ".join([f"[{gps}](./{gps})" for gps in gps_links])
-        else:
-            gps_str = "–"
+        gps_str = ", ".join([f"[{gps}](./{gps})" for gps in gps_links]) if gps_links else "–"
         lines.append(f"| {e['number']}  | [{e['title']}]({e['link']}) | {e['status']} | {gps_str} |")
     return "\n".join(lines)
 
@@ -63,10 +62,7 @@ def format_gps_table(entries):
         "|-------|-----------------------------|----------|-----------------------------|",
     ]
     for e in entries:
-        if e["proposed"]:
-            links = ", ".join([f"[{cap}](./{cap})" for cap in e["proposed"]])
-        else:
-            links = "–"
+        links = ", ".join([f"[{cap}](./{cap})" for cap in e["proposed"]]) if e["proposed"] else "–"
         lines.append(f"| {e['number']}  | [{e['title']}]({e['link']}) | {e['status']} | {links} |")
     return "\n".join(lines)
 
@@ -86,18 +82,18 @@ def update_section(content, section_name, new_table):
     return new_content
 
 def main():
-    # Collect CAP and GPS metadata
+    # Recursively find CAPs and GPSs
     caps = collect_docs("CAP-")
     gps = collect_docs("GPS-")
 
-    # Debug: print what was found
+    # Debug: show what was detected
     print("Detected CAPs:", [f"CAP-{e['number']}" for e in caps])
     print("Detected GPSs:", [f"GPS-{e['number']}" for e in gps])
 
-    # Build CAP->GPS reverse mapping
+    # Build CAP -> GPS reverse map
     reverse_map = build_reverse_map(gps)
 
-    # Read root README
+    # Read the root README.md
     with open(ROOT_README, "r", encoding="utf-8") as f:
         readme = f.read()
 
@@ -105,7 +101,7 @@ def main():
     readme = update_section(readme, "Constitutional Amendment Proposals (CAPs)", format_caps_table(caps, reverse_map))
     readme = update_section(readme, "Governance Problem Statements (GPS)", format_gps_table(gps))
 
-    # Write the updated README
+    # Write updated README.md
     with open(ROOT_README, "w", encoding="utf-8") as f:
         f.write(readme)
 
