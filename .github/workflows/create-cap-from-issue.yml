@@ -73,7 +73,7 @@ jobs:
             DISCUSSIONS_MARKDOWN="$DISCUSSIONS"
           fi
 
-          # ✅ Write README.md (strict YAML syntax)
+          # ✅ Write README.md (strict YAML syntax, Markdown links not quoted)
           {
             echo "---"
             echo "CAP: ${CAP_NUMBER}"
@@ -85,7 +85,7 @@ jobs:
             echo "Implementors:"
             echo "  - \"${IMPLEMENTORS}\""
             echo "Solution-To:"
-            echo "  - \"${SOLUTION_TO_MARKDOWN}\""
+            echo "  - ${SOLUTION_TO_MARKDOWN}"
             echo "Discussions:"
             echo "  - \"${DISCUSSIONS_MARKDOWN}\""
             echo "Created: ${DATE}"
