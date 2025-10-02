@@ -1,0 +1,83 @@
+name: Generate GPS
+
+on:
+  issues:
+    types: [opened]
+
+jobs:
+  generate-gps:
+    if: contains(github.event.issue.labels.*.name, 'gps')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Find next GPS number
+        id: gps_number
+        run: |
+          LAST=$(ls -d GPS-* 2>/dev/null | grep -o '[0-9]\+' | sort -n | tail -1)
+          if [ -z "$LAST" ]; then
+            NEXT=1
+          else
+            NEXT=$((LAST + 1))
+          fi
+          printf -v PADDED "%04d" $NEXT
+          echo "GPS_NUMBER=$PADDED" >> $GITHUB_ENV
+
+      - name: Create GPS directory and README
+        run: |
+          mkdir -p GPS-${GPS_NUMBER}
+          cat <<EOF > GPS-${GPS_NUMBER}/README.md
+---
+GPS: ${GPS_NUMBER}
+Title: "${{ github.event.issue.title }}"
+Category: "${{ github.event.issue.body.category || 'N/A' }}"
+Status: Open
+Authors:
+  - "${{ github.event.issue.body.authors || 'TBD' }}"
+Proposed Solutions:
+  - "${{ github.event.issue.body.proposed_solutions || '_No response_' }}"
+Discussions:
+  - "${{ github.event.issue.body.discussions || '_No response_' }}"
+Created: $(date +%Y-%m-%d)
+License: CC-BY-4.0
+---
+
+## Abstract
+
+${{ github.event.issue.body.abstract || '_No response_' }}
+
+## Background
+
+${{ github.event.issue.body.background || '_No response_' }}
+
+## Problem Description
+
+${{ github.event.issue.body.problem || '_No response_' }}
+
+## Governance Goals
+
+${{ github.event.issue.body.goals || '_No response_' }}
+
+## Open Questions
+
+${{ github.event.issue.body.open_questions || '_No response_' }}
+
+## Proposed Next Steps
+
+${{ github.event.issue.body.next_steps || '_No response_' }}
+
+## References
+
+${{ github.event.issue.body.references || '_No response_' }}
+
+## Copyright
+
+This GPS is licensed under [CC-BY-4.0](https://creativecommons.org/licenses/by/4.0/legalcode).
+EOF
+
+      - name: Commit and push changes
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "Add GPS-${GPS_NUMBER} - ${{ github.event.issue.title }}"
+          file_pattern: "GPS-${GPS_NUMBER}/README.md"
