@@ -6,13 +6,13 @@ body:
   - type: markdown
     attributes:
       value: |
-        ## 🧠 New CAP Proposal Form
+        ## 🧠 New CAP Proposal
 
         Thank you for contributing to Cardano governance!
         This form helps you submit a Cardano Amendment Proposal (CAP) following the official process.
 
         🔎 **Notes**
-        - **CAP numbers** are assigned by editors during triage. Use `?` while drafting.
+        - **CAP numbers** are automatically assigned.
         - Each CAP will be placed in its own folder `CAP-XXXX/` with a `README.md`.
         - Link relevant Governance Problem Statements (GPS) where applicable.
 
