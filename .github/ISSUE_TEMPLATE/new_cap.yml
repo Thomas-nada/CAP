@@ -1,6 +1,6 @@
 name: "New CAP Proposal"
 description: "Submit a new Constitutional Amendment Proposal (CAP) for Cardano governance."
-title: ""
+title: "title"
 labels: ["cap", "draft"]
 body:
   - type: markdown
