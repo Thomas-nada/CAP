@@ -75,7 +75,7 @@ Future updates to the CAP process will be introduced as amendments to this CAP. 
 - [CIP-0001] – Cardano Improvement Proposal process  
 - [GPS-0001] – Governance Problem Statement framework  
 
-## Copyright
+## Copyright 
 
 This CAP is licensed under [CC-BY-4.0](https://creativecommons.org/licenses/by/4.0/legalcode).
 
