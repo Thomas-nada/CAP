@@ -122,9 +122,7 @@ Each CAP lives in a folder named after its number (4-digit, zero-padded) with a 
 
 ```
 CAP-0001
-├── README.md
-├── diagram.png
-└── schema.json
+└── README.md
 ```
 
 ---
