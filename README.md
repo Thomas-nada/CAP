@@ -69,8 +69,6 @@ For more details, see [CAP-9999 – Governance Problem Statements](./CAP-9999).
 <!-- BEGIN_GPS_INDEX -->
 | #     | Title | Status | Proposed Solutions |
 |-------|-----------------------------|----------|-----------------------------|
-| 0002  | [The Great Governance Burnout Problem ☕🔥](./GPS-0002) | Open | – |
-| 0003  | [Ambiguities in Constitutional Committee Accountability](./GPS-0003) | Open | – |
 
 <p align="right"><i>Last updated on 2025-10-08</i></p>
 <!-- END_GPS_INDEX -->
