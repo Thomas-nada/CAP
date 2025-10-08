@@ -18,7 +18,7 @@ Because CAPs are text files in a versioned repository, their revision history be
 |-------|----------------------------|----------|--------------------------|
 | 0001  | [CAP Process](./CAP-0001) | Active | – |
 | 0002  | [Mandatory On-Chain Coffee Breaks ☕](./CAP-0002) | Proposed | – |
-| 0003  | [Amendment to Clarify the Constitutional Committee Accountability Mechanism](./CAP-0003) | Proposed | [GPS-0003](./GPS-0003) |
+| 0003  | [Amendment to Clarify the Constitutional Committee Accountability Mechanism](./CAP-0003) | Proposed | – |
 | 0004  | [Amendment to Recognize Pineapples as Constitutional Stakeholders](./CAP-0004) | Proposed | – |
 | 9999  | [Governance Problem Statements](./CAP-9999) | Active | – |
 
@@ -32,7 +32,7 @@ Because CAPs are text files in a versioned repository, their revision history be
 |-------|-----------------------------|----------|-----------------------------|
 | 0001  | [Low Participation and Representation in On-Chain Governance](./GPS-0001) | Open | – |
 | 0002  | [The Great Governance Burnout Problem ☕🔥](./GPS-0002) | Open | – |
-| 0003  | [Ambiguities in Constitutional Committee Accountability](./GPS-0003) | Open | [CAP-0003](./CAP-0003) |
+| 0003  | [Ambiguities in Constitutional Committee Accountability](./GPS-0003) | Open | – |
 
 <p align="right"><i>Last updated on 2025-10-08</i></p>
 <!-- END_GPS_INDEX -->
