@@ -69,7 +69,6 @@ For more details, see [CAP-9999 – Governance Problem Statements](./CAP-9999).
 <!-- BEGIN_GPS_INDEX -->
 | #     | Title | Status | Proposed Solutions |
 |-------|-----------------------------|----------|-----------------------------|
-| 0001  | [Low Participation and Representation in On-Chain Governance](./GPS-0001) | Open | – |
 | 0002  | [The Great Governance Burnout Problem ☕🔥](./GPS-0002) | Open | – |
 | 0003  | [Ambiguities in Constitutional Committee Accountability](./GPS-0003) | Open | – |
 
