@@ -1,8 +1,8 @@
 ---
-CAP: 0002
+CAP: "0002"
 Title: "Mandatory On-Chain Coffee Breaks ☕"
 Category: "Meta"
-Status: Proposed
+Status: "Proposed"
 Authors:
   - "Cardano Sloth <sloth@lazychain.io>"
 Implementors:
@@ -11,55 +11,84 @@ Solution-To:
   - "GPS-0002"
 Discussions:
   - "https://github.com/Thomas-nada/CAP/pull/2"
-Created: 2025-10-01
-License: CC-BY-4.0
+Created: "2025-10-01"
+License: "CC-BY-4.0"
 ---
 
 ## Abstract
 
-This Cardano Amendment Proposal (CAP) humorously suggests introducing **mandatory coffee breaks** into the Cardano governance process. At a protocol level, this would manifest as "Coffee Epochs" — special slots in the chain where no blocks are produced, allowing developers, stake pool operators, and DReps to hydrate and caffeinate.
+This Cardano Amendment Proposal (CAP) humorously proposes the introduction of **mandatory coffee breaks** into the Cardano governance process.  
+At a protocol level, this would manifest as **Coffee Epochs** — designated slots in the blockchain where no blocks are produced, giving developers, stake pool operators, and DReps the opportunity to hydrate and caffeinate.
+
+This CAP also serves as a lighthearted exploration of how **human factors** and **community well-being** intersect with governance design.
+
+---
 
 ## Motivation: Why is this CAP necessary?
 
-Decentralized governance is a marathon, not a sprint. Yet, too often, contributors burn out without proper breaks. Coffee is the lifeblood of developers and governance participants.  
-By formalizing coffee breaks into the governance schedule, Cardano ensures a well-caffeinated ecosystem — leading to better decision-making, happier developers, and fewer rage posts on Twitter.
+Decentralized governance is a marathon, not a sprint. Yet contributors often burn out without adequate breaks. Coffee is the lifeblood of many developers and governance participants.
 
-## Amendment Specification
+By formalizing coffee breaks into the governance schedule, Cardano could ensure a more **sustainable and human-centered governance process**, leading to better decision-making, happier developers, and fewer rage posts on social media.
 
-- Every 1000 blocks, a **Coffee Epoch (CE)** is declared.
-- During a CE:
+---
+
+## Specification
+
+### Coffee Epochs
+
+- Every **1000 blocks**, a **Coffee Epoch (CE)** occurs.
+- During a Coffee Epoch:
   - No new blocks are produced.
   - Smart contracts may execute a `brew()` function to log coffee consumption.
-  - Stake pools must submit a “Proof of Coffee” (PoC) transaction — containing metadata describing their brew.
-- Failing to submit PoC twice in a row results in a temporary label: ☕ “Under-caffeinated node.”
+  - Stake pools must submit a **Proof of Coffee (PoC)** transaction containing metadata describing their brew.
+
+### Compliance
+
+- Failure to submit PoC transactions for **two consecutive Coffee Epochs** results in a temporary label: ☕ **"Under-caffeinated node."**
+
+### Optional Extensions
+
+- Governance tooling may integrate coffee-related metadata visualizations.
+- Future iterations may include additional beverage standards (e.g., `brew(tea)`).
+
+---
 
 ## Rationale: How does this CAP achieve its goals?
 
-Humor aside, this CAP highlights the importance of **community health and pacing** in governance. Introducing structured downtime — even conceptually — reminds us that decentralized governance involves humans with real needs.  
-The PoC concept also opens the door to **on-chain fun metadata standards** and creative experiments with governance incentives.
+While humorous in nature, this CAP draws attention to the importance of **community health, pacing, and culture** in governance systems. Introducing structured downtime — even conceptually — acknowledges that decentralized governance involves real humans with real needs.
+
+Moreover, the **Proof of Coffee (PoC)** mechanism could inspire creative **on-chain metadata standards** and foster experimentation with governance incentives and rituals.
+
+---
 
 ## Path to Ratification
 
 ### Acceptance Criteria
 
-- At least three working `brew()` smart contracts exist on testnet.
-- Community meme contest produces ≥ 100 coffee-related governance memes.
-- One DRep drinks a triple espresso live during a governance vote.
+- [ ] At least three functioning `brew()` smart contracts deployed on testnet.  
+- [ ] A community meme contest produces **≥ 100 coffee-related governance memes**.  
+- [ ] At least one DRep drinks a **triple espresso live during a governance vote**.
 
 ### Implementation Plan
 
-- Write a Plutus reference implementation for `brew()`.
-- Publish PoC metadata standard as a draft.
-- Schedule the first Coffee Epoch test on the preview network.
+- [ ] Develop and publish a Plutus reference implementation for `brew()`.  
+- [ ] Publish a draft metadata standard for Proof of Coffee transactions.  
+- [ ] Schedule the first Coffee Epoch test event on the **preview network**.
+
+---
 
 ## Versioning (Optional)
 
-Future amendments may adjust Coffee Epoch frequency, Proof of Coffee requirements, or other caffeine-related governance parameters as needed.
+Future amendments may update the **Coffee Epoch frequency**, revise **Proof of Coffee requirements**, or explore additional **beverage governance parameters** as needed.
+
+---
 
 ## References (Optional)
 
-- [Plutus Documentation](https://developers.cardano.org/docs/smart-contracts/plutus/)
+- [Plutus Documentation](https://developers.cardano.org/docs/smart-contracts/plutus/)  
 - [CAP-0001 – CAP Process](../CAP-0001/README.md)
+
+---
 
 ## Copyright
 
