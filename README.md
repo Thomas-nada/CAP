@@ -60,24 +60,6 @@ For more details, see [CIS-9999 – Constitution Issue Statements](./CIS-9999).
 <p align="right"><i>Last updated on 2025-10-08</i></p>
 <!-- END_CAP_INDEX -->
 
-<p align="right"><i>Last updated: 2025-10-08</i></p>
-
----
-
-# 📜 Constitutional Amendment Proposals (CAPs)
-
-<!-- BEGIN_CAP_INDEX -->
-| #     | Title | Status | Addresses CIS |
-|-------|----------------------------|----------|--------------------------|
-| 0001  | [CAP Process](./CAP-0001) | Active | – |
-| 0002  | [Mandatory On-Chain Coffee Breaks ☕](./CAP-0002) | Proposed | – |
-| 0003  | [Amendment to Clarify the Constitutional Committee Accountability Mechanism](./CAP-0003) | Proposed | – |
-| 0004  | [Amendment to Recognize Pineapples as Constitutional Stakeholders](./CAP-0004) | Proposed | – |
-| 9999  | [Constitution Issue Statements](./CIS-9999) | Active | – |
-
-<p align="right"><i>Last updated on 2025-10-08</i></p>
-<!-- END_CAP_INDEX -->
-
 ---
 
 # 🧭 Constitution Issue Statements (CIS)
