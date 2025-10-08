@@ -1,19 +1,13 @@
-# Governance Problem Statements (GPS)
+# Cardano Constitution Amendment Proposals
 
-# Constitutional Amendment Proposals (CAPs)
+The Cardano Constitution Amendment Proposals (CAPs) repository contains two complementary types document:
 
-# Cardano Amendment Proposals (CAPs) & Governance Problem Statements (GPSs)
+- **Cardano Amendment Proposals (CAPs):** Formal proposals to amend, clarify, or extend Cardano’s Constitution.
+- **Constitution Issue Statements (CISs):** Structured descriptions of Constitution problems, ambiguities, or risks that require community attention and may guide future CAPs.
 
-The Cardano governance repository contains two complementary types of governance documents:
-
-- **Cardano Amendment Proposals (CAPs):** Formal proposals to amend, clarify, or extend Cardano’s Constitution and governance framework.
-- **Governance Problem Statements (GPSs):** Structured descriptions of governance challenges, ambiguities, or risks that require community attention and may guide future CAPs.
-
-Together, **CAPs and GPSs form the core of Cardano’s off-chain governance documentation**.  
-They provide the foundation for constitutional amendments, governance process refinements, and transparent community deliberation.  
+Together, **CAPs and CISs form aid Cardano’s off-chain governance documentation**.  
+They provide the foundation for constitutional amendments and transparent community deliberation.  
 Because these documents are stored as Markdown files in a versioned repository, their history serves as the authoritative record of Cardano’s evolving governance system.
-
----
 
 ## 🧭 What is a CAP?
 
