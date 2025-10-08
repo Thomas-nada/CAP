@@ -1,5 +1,5 @@
 ---
-GPS: "0001"
+CIS: "0001"
 Title: "Low Participation and Representation in On-Chain Governance"
 Category: "Governance"
 Status: "Open"
@@ -9,7 +9,7 @@ Authors:
 Proposed-Amendments: []
 Discussions:
   - "https://github.com/Thomas-nada/CAP/discussions/20"
-  - "https://forum.cardano.org/t/gps-0001-voter-participation-and-representation/103521"
+  - "https://forum.cardano.org/t/cis-0001-voter-participation-and-representation/103521"
 Created: "2025-09-27"
 License: "CC-BY-4.0"
 ---
@@ -18,7 +18,7 @@ License: "CC-BY-4.0"
 
 On-chain governance is central to Cardano’s constitutional model. However, **participation in governance actions and constitutional processes remains consistently low** across key stakeholder groups — particularly ADA holders and delegated representatives (dReps).  
 
-This Governance Problem Statement (GPS) explores the systemic causes and consequences of low participation and representation, the governance risks it poses, and provides a foundation for future **Cardano Amendment Proposals (CAPs)** aimed at improving engagement, representation, and legitimacy in governance.
+This **Constitution Issue Statement (CIS)** explores the systemic causes and consequences of low participation and representation, the governance risks it poses, and provides a foundation for future **Cardano Amendment Proposals (CAPs)** aimed at improving engagement, representation, and legitimacy in governance.
 
 ---
 
@@ -109,4 +109,4 @@ These scenarios demonstrate that low participation is not a theoretical concern 
 
 ## Copyright
 
-This GPS is licensed under [CC-BY-4.0](https://creativecommons.org/licenses/by/4.0/legalcode).
+This CIS is licensed under [CC-BY-4.0](https://creativecommons.org/licenses/by/4.0/legalcode).
