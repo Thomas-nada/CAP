@@ -8,7 +8,7 @@ Authors:
 Implementors:
   - "N/A"
 Solution-To:
-  - "GPS-0002"
+  - "CIS-0002"
 Discussions:
   - "https://github.com/Thomas-nada/CAP/pull/2"
 Created: "2025-10-01"
@@ -29,6 +29,8 @@ This CAP also serves as a lighthearted exploration of how **human factors** and 
 Decentralized governance is a marathon, not a sprint. Yet contributors often burn out without adequate breaks. Coffee is the lifeblood of many developers and governance participants.
 
 By formalizing coffee breaks into the governance schedule, Cardano could ensure a more **sustainable and human-centered governance process**, leading to better decision-making, happier developers, and fewer rage posts on social media.
+
+This CAP addresses [**CIS-0002 – The Great Governance Burnout Problem ☕🔥**](../CIS-0002/README.md), which highlights the risks of contributor exhaustion and community disengagement in long-term governance processes.
 
 ---
 
@@ -86,7 +88,8 @@ Future amendments may update the **Coffee Epoch frequency**, revise **Proof of C
 ## References (Optional)
 
 - [Plutus Documentation](https://developers.cardano.org/docs/smart-contracts/plutus/)  
-- [CAP-0001 – CAP Process](../CAP-0001/README.md)
+- [CAP-0001 – CAP Process](../CAP-0001/README.md)  
+- [CIS-0002 – The Great Governance Burnout Problem ☕🔥](../CIS-0002/README.md)
 
 ---
 
