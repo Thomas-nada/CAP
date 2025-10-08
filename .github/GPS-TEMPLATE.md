@@ -1,64 +1,108 @@
 ---
-GPS: XXXX
-Title: [Title of the Governance Problem Statement]
-Category: Governance
-Status: Open
+GPS: "XXXX"
+Title: "[Title of the Governance Problem Statement]"
+Category: "Governance" # or Meta
+Status: "Open"
 Authors:
-  - Name <@GitHubHandle>
-Proposed Solutions: [] # Optional: link related CAPs once they exist
+  - "Name <@GitHubHandle>"
+Proposed-Solutions: [] # Optional: link related CAPs once they exist
 Discussions:
-  - https://github.com/Thomas-nada/CAP/discussions/?
-Created: YYYY-MM-DD
-License: CC-BY-4.0
+  - "https://github.com/[org]/CAP/discussions/??"
+Created: "YYYY-MM-DD"
+License: "CC-BY-4.0"
 ---
 
 ## Abstract
 
-A short (~200 word) summary of the governance or constitutional issue. Explain the governance gap, ambiguity, or systemic challenge this document highlights and why it matters for Cardano governance.
+A short (~200 word) summary of the governance or constitutional issue. Explain the governance gap, ambiguity, or systemic challenge this document highlights and why it matters for Cardano governance.  
+
+This section should frame the problem without prescribing a solution — leaving room for multiple CAPs to address it in different ways.
+
+---
 
 ## Background
 
-Provide relevant historical, contextual, or procedural information explaining **why** this governance problem exists. Mention any prior proposals, constitutional articles, or governance decisions that contribute to or attempt to address this issue.
+Provide historical, contextual, or procedural information explaining **why** this governance problem exists.  
+Mention any prior proposals, constitutional articles, or governance decisions that contributed to or attempted to address this issue.  
+This section establishes the context and shows why the problem is relevant now.
 
-## Problem Description
+---
 
-A clear and detailed definition of the governance or constitutional problem. What ambiguity, gap, conflict, or systemic issue is being exposed? Clearly state the scope and implications of the problem.
+## Problem
+
+Define the governance or constitutional problem clearly and thoroughly.  
+What ambiguity, gap, conflict, or systemic issue is being exposed? What are its causes and consequences?  
+Describe the scope of the issue and its implications for governance processes, constitutional interpretation, or stakeholder participation.
+
+---
+
+## Impact
+
+Explain how this problem affects governance outcomes, stakeholders, or the Constitution.  
+Highlight risks such as reduced legitimacy, stalled decision-making, weakened accountability, or governance capture.  
+Where relevant, quantify the impact with examples or data.
+
+---
 
 ## Use Cases
 
-Offer concrete examples from the perspective of stakeholders (e.g., dReps, SPOs, voters, Constitutional Committee, tooling developers) that illustrate the governance problem in real-world contexts. Highlight existing approaches or workarounds and explain why they are insufficient.
+Offer concrete examples from the perspective of different stakeholders (e.g., dReps, SPOs, voters, Constitutional Committee, tooling developers) that illustrate the problem in real-world contexts.  
+Highlight existing workarounds or approaches and explain why they are insufficient.
 
-## Governance Goals
+---
 
-List what an ideal solution should aim to achieve. Goals may include principles such as transparency, accountability, legitimacy, scalability, or constitutional integrity.  
-Also list **non-goals** or constraints to define the boundaries of acceptable solutions. These goals will later help assess the effectiveness of proposed CAPs.
+## Goals
+
+List the **governance goals** that any solution to this problem should aim to achieve. Examples include:
+
+- Transparency  
+- Accountability  
+- Legitimacy  
+- Scalability  
+- Constitutional integrity  
+
+Also define **non-goals** or constraints — boundaries that solutions should not cross. These goals will later guide CAP authors and reviewers in assessing solution quality.
+
+---
 
 ## Open Questions
 
-List critical governance questions that any future amendment (CAP) should address. These guide solution design and ensure that proposals respond directly to the problem’s root causes.
+List critical governance questions that future amendments (CAPs) should answer.  
+These guide solution design and ensure proposals address the root causes of the problem.
 
 For example:
-- What governance body is responsible for resolving this ambiguity?
+- Which governance body is responsible for resolving this ambiguity?
 - How should conflicts between constitutional articles be resolved?
 - What mechanisms would ensure accountability in this area?
 
+---
+
 ## Proposed Next Steps (Optional)
 
-Suggest possible paths forward — such as drafting a CAP, forming a working group, conducting further research, or gathering stakeholder input — without prescribing a specific solution.
+Suggest possible paths forward without prescribing a solution.  
+These could include drafting a CAP, forming a working group, conducting research, or gathering stakeholder input.
+
+---
 
 ## Status
 
-`Open` – The problem is clearly stated but no CAP has solved it yet.  
-`Addressed (by CAP-XXXX)` – One or more CAPs have fully addressed the problem.  
-`Inactive (reason)` – The problem is withdrawn, obsolete, or invalid.
+- **Open** – The problem is clearly stated but not yet addressed by any CAP.  
+- **Addressed (by CAP-XXXX)** – One or more CAPs have fully resolved the problem.  
+- **Inactive (reason)** – The problem is withdrawn, obsolete, or no longer relevant.
+
+---
 
 ## References (Optional)
 
-Include links to related governance proposals, constitutional documents, forum discussions, or research papers.
+Link to related governance proposals, constitutional documents, forum threads, or research papers.
+
+---
 
 ## Acknowledgements (Optional)
 
 Credit any contributors, reviewers, or community members who provided input or feedback.
+
+---
 
 ## Copyright
 
