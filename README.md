@@ -22,7 +22,7 @@ Because CAPs are text files in a versioned repository, their revision history be
 | 0004  | [Amendment to Recognize Pineapples as Constitutional Stakeholders](./CAP-0004) | Draft | – |
 | 9999  | [Governance Problem Statements](./CAP-9999) | Active | – |
 
-<p align="right"><i>Last updated on 2025-10-07</i></p>
+<p align="right"><i>Last updated on 2025-10-08</i></p>
 <!-- END_CAP_INDEX -->
 
 # Governance Problem Statements (GPS)
@@ -34,7 +34,7 @@ Because CAPs are text files in a versioned repository, their revision history be
 | 0002  | [The Great Governance Burnout Problem ☕🔥](./GPS-0002) | Open | – |
 | 0003  | [Ambiguities in Constitutional Committee Accountability](./GPS-0003) | Open | [CAP-0003](./CAP-0003) |
 
-<p align="right"><i>Last updated on 2025-10-07</i></p>
+<p align="right"><i>Last updated on 2025-10-08</i></p>
 <!-- END_GPS_INDEX -->
 
 ---
