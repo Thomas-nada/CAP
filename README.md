@@ -95,6 +95,7 @@ Some proposals are awaiting author revisions or confirmation of eligibility befo
 | Name | GitHub |
 |------|--------|
 | Thomas Lindseth | [@Thomas-nada](https://github.com/Thomas-nada) |
+| Larisa Mcfarlane | [@LallyMack](https://github.com/LallyMack) |
 
 ---
 
