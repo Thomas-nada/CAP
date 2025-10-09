@@ -75,3 +75,17 @@ CIS-0002/
 CIS-????/
 
 Each proposal resides in its own folder with a `README.md` as the primary document. Supporting files (appendices, diagrams, translations) may also be included.
+
+---
+
+# Constitutional Amendment Proposals (CAPs)
+
+<!-- BEGIN_CAP_INDEX -->
+| #     | Title | Status | Addresses GPS |
+|-------|----------------------------|----------|--------------------------|
+| 0001  | [CAP Process](./CAP-0001) | Active | – |
+| 0002  | [Mandatory On-Chain Coffee Breaks ☕](./CAP-0002) | Proposed | – |
+| 9999  | [Constitution Issue Statements (CIS) — Process](./CAP-9999) | Active | – |
+
+<p align="right"><i>Last updated on 2025-10-09</i></p>
+<!-- END_CAP_INDEX -->
