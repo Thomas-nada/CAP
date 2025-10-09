@@ -47,7 +47,7 @@ For more details, see [CIS-9999 – Constitution Issue Statements](./CIS-9999).
 |-------|----------------------------|----------|--------------------------|
 | 0001  | [CAP Process](./CAP-0001) | Active | – |
 | 0002  | [Mandatory On-Chain Coffee Breaks ☕](./CAP-0002) | Proposed | – |
-| 9999  | [Governance Problem Statements](./CAP-9999) | Active | – |
+| 9999  | [Constitution Issue Statements (CIS) — Process](./CAP-9999) | Active | – |
 
 <p align="right"><i>Last updated on 2025-10-08</i></p>
 <!-- END_CAP_INDEX -->
