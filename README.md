@@ -53,7 +53,8 @@ Some proposals are awaiting author revisions or confirmation of eligibility befo
 
 | Name | GitHub |
 |------|--------|
-| Your Name | [@yourhandle](https://github.com/yourhandle) |
+| Thomas Lindseth | [@Thomas-nada](https://github.com/Thomas-nada) |
+
 
 ---
 
