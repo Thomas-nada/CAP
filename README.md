@@ -1,9 +1,3 @@
-# Governance Problem Statements (GPS)
-
-# Constitutional Amendment Proposals (CAPs)
-
-# Cardano Constitution Amendment Proposals
-
 The Cardano Constitution Amendment Proposals (CAPs) repository contains two complementary types document:
 
 - **Cardano Amendment Proposals (CAPs):** Formal proposals to amend, clarify, or extend Cardano’s Constitution.
