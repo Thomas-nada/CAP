@@ -1,14 +1,14 @@
 ---
 CAP: XXXX
 Title: "[Title of the Constitutional Amendment Proposal]"
-Category: "Governance" # or Meta / Constitution / Standards
+Category: "Guardrails" # or Meta / Constitution / Standards
 Status: "Draft"
 Authors:
   - "Name <@GitHubHandle>"
 Implementors:
   - "N/A"
 Solution-To:
-  - "GPS-XXXX"
+  - "CIS-XXXX"
 Discussions:
   - "https://github.com/[org]/CAP/discussions/??"
 Created: "YYYY-MM-DD"
@@ -24,10 +24,10 @@ This section should clearly describe the motivation for change, the nature of th
 
 ## Motivation: Why is this CAP necessary?
 
-Explain the purpose of this amendment and the governance problem it seeks to solve. Reference the linked [Governance Problem Statement (GPS)] if applicable.  
+Explain the purpose of this amendment and the governance problem it seeks to solve. Reference the linked [**Constitution Issue Statement (CIS)**] if applicable.  
 Clearly outline which stakeholders are impacted (e.g., dReps, SPOs, Constitutional Committee, governance bodies) and how the amendment improves governance outcomes.
 
-If this CAP modifies or supersedes an existing constitutional article, explain why that is necessary and what shortcomings it addresses.
+If this CAP modifies or supersedes an existing constitutional article or governance guardrail, explain why that is necessary and what shortcomings it addresses.
 
 ---
 
@@ -38,7 +38,7 @@ Provide the **exact text** of the proposed constitutional change or addition. Th
 Include, where relevant:
 
 - New or amended article text  
-- Changes to governance parameters  
+- Changes to governance parameters or guardrails  
 - Definitions of new governance mechanisms or procedures  
 - Versioning scheme, if applicable
 
@@ -46,7 +46,7 @@ Include, where relevant:
 
 ## Rationale: How does this CAP achieve its goals?
 
-Discuss the reasoning behind the proposed amendment and how it addresses the governance issue described in the GPS. Cover:
+Discuss the reasoning behind the proposed amendment and how it addresses the governance issue described in the CIS. Cover:
 
 - Why this solution was chosen over alternatives  
 - Key considerations and trade-offs  
@@ -85,7 +85,7 @@ Describe how this amendment will be versioned or superseded in future governance
 
 ## References (Optional)
 
-List any relevant documentation, standards, governance decisions, or previous CAPs/GPSs referenced in this proposal.
+List any relevant documentation, standards, governance decisions, or previous CAPs/CISs referenced in this proposal.
 
 ---
 
