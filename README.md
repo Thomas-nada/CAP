@@ -25,7 +25,7 @@ For new CAPs, a template is available here: [.github/CAP-TEMPLATE.md](.github/CA
 
 ## 🧭 What is a CIS?
 
-A [Constitution Issue Statement (CIS)](./CIS-9999) is a formal document that articulates a constitutional problem, its context, and its impact.  
+A [Constitution Issue Statement (CIS)](./CIS-0001) is a formal document that articulates a constitutional problem, its context, and its impact.  
 Where CAPs propose solutions, CISs **define the problems** those solutions aim to solve.
 
 Each CIS:
@@ -47,8 +47,6 @@ For more details, see [CIS-9999 – Constitution Issue Statements](./CIS-9999).
 |-------|----------------------------|----------|--------------------------|
 | 0001  | [CAP Process](./CAP-0001) | Active | – |
 | 0002  | [Mandatory On-Chain Coffee Breaks ☕](./CAP-0002) | Proposed | – |
-| 0003  | [Amendment to Clarify the Constitutional Committee Accountability Mechanism](./CAP-0003) | Proposed | – |
-| 0004  | [Amendment to Recognize Pineapples as Constitutional Stakeholders](./CAP-0004) | Proposed | – |
 | 9999  | [Governance Problem Statements](./CAP-9999) | Active | – |
 
 <p align="right"><i>Last updated on 2025-10-08</i></p>
@@ -62,9 +60,6 @@ For more details, see [CIS-9999 – Constitution Issue Statements](./CIS-9999).
 | #     | Title | Status | Proposed Solutions |
 |-------|-----------------------------|----------|-----------------------------|
 | 0001  | [Low Participation and Representation in On-Chain Governance](./CIS-0001) | Open | – |
-| 0002  | [The Great Governance Burnout Problem ☕🔥](./CIS-0002) | Open | – |
-| 0003  | [Ambiguities in Constitutional Committee Accountability](./CIS-0003) | Open | – |
-
 <p align="right"><i>Last updated on 2025-10-08</i></p>
 <!-- END_CIS_INDEX -->
 
