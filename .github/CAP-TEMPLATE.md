@@ -25,7 +25,7 @@ This section should clearly describe the motivation for change, the nature of th
 ## Motivation: Why is this CAP necessary?
 
 Explain the purpose of this amendment and the governance problem it seeks to solve. Reference the linked [**Constitution Issue Statement (CIS)**] if applicable.  
-Clearly outline which stakeholders are impacted (e.g., dReps, SPOs, Constitutional Committee, governance bodies) and how the amendment improves governance outcomes.
+Clearly outline which stakeholders are impacted (e.g., DReps, SPOs, Constitutional Committee) and how the amendment improves governance outcomes.
 
 If this CAP modifies or supersedes an existing constitutional article or governance guardrail, explain why that is necessary and what shortcomings it addresses.
 
@@ -38,7 +38,7 @@ Provide the **exact text** of the proposed constitutional change or addition. Th
 Include, where relevant:
 
 - New or amended article text  
-- Changes to governance parameters or guardrails  
+- Changes to guardrails  
 - Definitions of new governance mechanisms or procedures  
 - Versioning scheme, if applicable
 
@@ -61,8 +61,7 @@ Discuss the reasoning behind the proposed amendment and how it addresses the gov
 
 Define the conditions under which this amendment becomes **Ratified**. Examples include:
 
-- Minimum vote thresholds and quorum requirements  
-- Constitutional Committee certification  
+- Minimum vote thresholds and quorum requirements    
 - Required on-chain or off-chain governance actions  
 - Compatibility with existing governance processes
 
