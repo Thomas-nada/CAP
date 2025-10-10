@@ -1,14 +1,16 @@
 import os, re, datetime, yaml
 
+# ✅ Ensure the script runs from the repository root
+os.chdir(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
+
 def parse_yaml_header(path):
     """Extract YAML-like header from the top of the file, tolerant to newlines/spacing."""
     with open(path, encoding="utf-8") as f:
         content = f.read()
-    # Normalize newlines
     content = content.replace("\r\n", "\n").replace("\r", "\n")
-    # Match the first YAML block anywhere near the top
     header_match = re.search(r"---\n(.*?)\n---", content, re.S)
     if not header_match:
+        print(f"⚠️ No YAML header found in {path}")
         return {}
     header = header_match.group(1)
     try:
@@ -27,7 +29,6 @@ def build_cap_table():
             continue
         data = parse_yaml_header(readme_path)
         if not data:
-            print(f"⚠️ No YAML header found in {readme_path}")
             continue
         cap_num = data.get("CAP", folder.split("-")[1])
         title = str(data.get("Title", "Untitled")).strip('"')
@@ -55,7 +56,6 @@ def build_cis_table():
             continue
         data = parse_yaml_header(readme_path)
         if not data:
-            print(f"⚠️ No YAML header found in {readme_path}")
             continue
         cis_num = data.get("CIS", folder.split("-")[1])
         title = str(data.get("Title", "Untitled")).strip('"')
@@ -78,6 +78,7 @@ def update_section(text, tag, new_table):
     return re.sub(pattern, f"<!-- BEGIN_{tag} -->\n{new_table}\n<!-- END_{tag} -->", text)
 
 if __name__ == "__main__":
+    print("📍 Working directory:", os.getcwd())
     with open("README.md", encoding="utf-8") as f:
         readme = f.read()
 
