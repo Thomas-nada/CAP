@@ -60,6 +60,7 @@ For more details, see [CIS-9999 – Constitution Issue Statements](./CIS-9999).
 | # | Title | Status | Proposed Solutions |
 |-------|-----------------------------|----------|-----------------------------|
 | 0001 | [Low Participation and Representation in On-Chain Governance](./CIS-0001) | Open | – |
+| 0002 | [The Bureaucratic Overwording Epidemic](./CIS-0002) | Open | [CAP-0003](./CAP-0003) |
 <p align="right"><i>Last updated on 2025-10-10</i></p>
 <!-- END_CIS_INDEX -->
 
