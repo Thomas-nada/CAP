@@ -4,7 +4,7 @@ Title: "CAP Process"
 Category: "Meta"
 Status: "Active"
 Authors:
-  - "Your Name <your.email@domain>"
+  - "Thomas Lindseth <thomas@kryptolabs.no>"
 Implementors:
   - "N/A"
 Solution-To:
