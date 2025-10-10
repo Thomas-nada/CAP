@@ -21,7 +21,7 @@ def build_cap_table():
             continue
         data = parse_yaml_header(readme_path)
         cap_num = data.get("CAP", folder.split("-")[1])
-        title = data.get("Title", "Untitled").strip('"')
+        title = str(data.get("Title", "Untitled")).strip('"')
         status = data.get("Status", "Unknown")
         solution_to = data.get("Solution-To", [])
         if not solution_to:
@@ -44,7 +44,7 @@ def build_cis_table():
             continue
         data = parse_yaml_header(readme_path)
         cis_num = data.get("CIS", folder.split("-")[1])
-        title = data.get("Title", "Untitled").strip('"')
+        title = str(data.get("Title", "Untitled")).strip('"')
         status = data.get("Status", "Unknown")
         amendments = data.get("Proposed-Amendments", [])
         if not amendments:
