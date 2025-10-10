@@ -19,6 +19,13 @@ def parse_yaml_header(path):
         print(f"⚠️ YAML parse error in {path}: {e}")
         return {}
 
+def pad_number(num):
+    """Ensure CAP/CIS numbers are zero-padded to four digits."""
+    try:
+        return f"{int(num):04d}"
+    except Exception:
+        return str(num)
+
 def build_cap_table():
     rows = []
     caps = [d for d in os.listdir() if d.startswith("CAP-") and os.path.isdir(d)]
@@ -30,12 +37,12 @@ def build_cap_table():
         data = parse_yaml_header(readme_path)
         if not data:
             continue
-        cap_num = data.get("CAP", folder.split("-")[1])
+        cap_num = pad_number(data.get("CAP", folder.split("-")[1]))
         title = str(data.get("Title", "Untitled")).strip('"')
         status = data.get("Status", "Unknown")
         solution_to = data.get("Solution-To", [])
         if not solution_to:
-            link_text = "–"
+            link_text = "N/A"
         else:
             links = [f"[{c}](./{c})" for c in solution_to]
             link_text = ", ".join(links)
@@ -57,7 +64,7 @@ def build_cis_table():
         data = parse_yaml_header(readme_path)
         if not data:
             continue
-        cis_num = data.get("CIS", folder.split("-")[1])
+        cis_num = pad_number(data.get("CIS", folder.split("-")[1]))
         title = str(data.get("Title", "Untitled")).strip('"')
         status = data.get("Status", "Unknown")
         amendments = data.get("Proposed-Amendments", [])
