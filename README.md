@@ -43,13 +43,13 @@ For more details, see [CIS-9999 – Constitution Issue Statements](./CIS-9999).
 # 📜 Constitutional Amendment Proposals (CAP)
 
 <!-- BEGIN_CAP_INDEX -->
-| #     | Title | Status | Addresses CIS |
-|-------|----------------------------|----------|--------------------------|
-| 0001  | [CAP Process](./CAP-0001) | Active | – |
-| 0002  | [Mandatory On-Chain Coffee Breaks ☕](./CAP-0002) | Proposed | – |
-| 9999  | [Constitution Issue Statements (CIS) — Process](./CAP-9999) | Active | – |
-
-<p align="right"><i>Last updated on 2025-10-08</i></p>
+| # | Title | Status | Addresses CIS |
+|-------|-----------------------------|----------|-----------------------------|
+| 0001 | [CAP Process](./CAP-0001) | Active | [N/A](./N/A) |
+| 0002 | [Mandatory On-Chain Coffee Breaks ☕](./CAP-0002) | Proposed | [CIS-0002](./CIS-0002) |
+| 3 | [Test Constitutional Amendment Proposal ](./CAP-0003) | Proposed | [CIS-0002](./CIS-0002) |
+| 9999 | [Constitution Issue Statements (CIS) — Process](./CAP-9999) | Active | [N/A](./N/A) |
+<p align="right"><i>Last updated on 2025-10-10</i></p>
 <!-- END_CAP_INDEX -->
 
 ---
@@ -57,10 +57,11 @@ For more details, see [CIS-9999 – Constitution Issue Statements](./CIS-9999).
 # 🧭 Constitution Issue Statements (CIS)
 
 <!-- BEGIN_CIS_INDEX -->
-| #     | Title | Status | Proposed Solutions |
+| # | Title | Status | Proposed Solutions |
 |-------|-----------------------------|----------|-----------------------------|
-| 0001  | [Low Participation and Representation in On-Chain Governance](./CIS-0001) | Open | – |
-<p align="right"><i>Last updated on 2025-10-08</i></p>
+| 0001 | [Low Participation and Representation in On-Chain Governance](./CIS-0001) | Open | – |
+| 2 | [Test Constitution Issue Statement](./CIS-0002) | Open | [CAP-0003](./CAP-0003) |
+<p align="right"><i>Last updated on 2025-10-10</i></p>
 <!-- END_CIS_INDEX -->
 
 ---
