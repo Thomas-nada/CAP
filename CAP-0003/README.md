@@ -1,6 +1,6 @@
 ---
 CAP: 0003
-Title: "Test Constitutional Amendment Proposal "
+Title: "Test Constitutional Amendment Proposal"
 Category: "Meta"
 Status: "Proposed"
 Authors:
