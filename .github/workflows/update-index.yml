@@ -3,7 +3,7 @@ name: Auto-update CAP/CIS Index
 on:
   push:
     branches:
-      - '**'      # keep this for testing; change to 'main' later
+      - '**'      # Allow running on any branch for testing; change to 'main' later
     paths:
       - 'CAP-*/*.md'
       - 'CIS-*/*.md'
@@ -23,7 +23,6 @@ jobs:
         with:
           python-version: '3.x'
 
-      # 👇 This guarantees PyYAML is installed before your script runs
       - name: Install dependencies
         shell: bash
         run: |
@@ -40,6 +39,15 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
+
           git add README.md
-          git diff --quiet && echo "No changes to commit" || git commit -m "🔁 Auto-update CAP/CIS index"
-          git push
+
+          if git diff --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "🔁 Auto-update CAP/CIS index"
+            # Fetch the latest branch state and rebase before pushing
+            git fetch origin $GITHUB_REF_NAME
+            git rebase origin/$GITHUB_REF_NAME
+            git push origin HEAD:$GITHUB_REF_NAME
+          fi
