@@ -1,8 +1,9 @@
 name: Auto-update CAP/CIS Index
+
 on:
   push:
     branches:
-      - '**'
+      - '**'      # temporary: allow it to run on any branch for testing
     paths:
       - 'CAP-*/*.md'
       - 'CIS-*/*.md'
@@ -12,14 +13,22 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.x'
 
-      - name: Update CAP/CIS Index
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pyyaml
+
+      - name: Run index updater
         run: |
           python .github/scripts/update_index.py
 
