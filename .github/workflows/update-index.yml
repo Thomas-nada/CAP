@@ -3,7 +3,7 @@ name: Auto-update CAP/CIS Index
 on:
   push:
     branches:
-      - '**'      # Allow running on any branch for testing; change to 'main' later
+      - '**'      # Allow on all branches for testing; switch to 'main' later
     paths:
       - 'CAP-*/*.md'
       - 'CIS-*/*.md'
@@ -17,6 +17,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # full history for rebasing
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -46,8 +48,7 @@ jobs:
             echo "No changes to commit"
           else
             git commit -m "🔁 Auto-update CAP/CIS index"
-            # Fetch the latest branch state and rebase before pushing
-            git fetch origin $GITHUB_REF_NAME
-            git rebase origin/$GITHUB_REF_NAME
-            git push origin HEAD:$GITHUB_REF_NAME
+            # Safely pull latest branch commits before pushing
+            git pull --rebase origin $GITHUB_REF_NAME || true
+            git push --force-with-lease origin HEAD:$GITHUB_REF_NAME
           fi
