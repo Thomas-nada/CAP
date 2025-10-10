@@ -18,7 +18,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # full history for rebasing
+          fetch-depth: 0  # get full history for safe pulls
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -42,13 +42,11 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-          git add README.md
-
-          if git diff --quiet; then
-            echo "No changes to commit"
-          else
+          if ! git diff --quiet README.md; then
+            git add README.md
             git commit -m "🔁 Auto-update CAP/CIS index"
-            # Safely pull latest branch commits before pushing
             git pull --rebase origin $GITHUB_REF_NAME || true
             git push --force-with-lease origin HEAD:$GITHUB_REF_NAME
+          else
+            echo "✅ No index changes detected; skipping commit and push"
           fi
