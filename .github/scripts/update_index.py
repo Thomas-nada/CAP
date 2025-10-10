@@ -1,25 +1,34 @@
 import os, re, datetime, yaml
 
 def parse_yaml_header(path):
-    """Extract YAML-like header from the top of the file."""
+    """Extract YAML-like header from the top of the file, tolerant to newlines/spacing."""
     with open(path, encoding="utf-8") as f:
         content = f.read()
-    header_match = re.match(r"---\n(.*?)\n---", content, re.S)
+    # Normalize newlines
+    content = content.replace("\r\n", "\n").replace("\r", "\n")
+    # Match the first YAML block anywhere near the top
+    header_match = re.search(r"---\n(.*?)\n---", content, re.S)
     if not header_match:
         return {}
     header = header_match.group(1)
     try:
         return yaml.safe_load(header)
-    except Exception:
+    except Exception as e:
+        print(f"⚠️ YAML parse error in {path}: {e}")
         return {}
 
 def build_cap_table():
     rows = []
-    for folder in sorted([d for d in os.listdir() if d.startswith("CAP-")]):
+    caps = [d for d in os.listdir() if d.startswith("CAP-") and os.path.isdir(d)]
+    print("📘 Detected CAP folders:", caps)
+    for folder in sorted(caps):
         readme_path = os.path.join(folder, "README.md")
         if not os.path.exists(readme_path):
             continue
         data = parse_yaml_header(readme_path)
+        if not data:
+            print(f"⚠️ No YAML header found in {readme_path}")
+            continue
         cap_num = data.get("CAP", folder.split("-")[1])
         title = str(data.get("Title", "Untitled")).strip('"')
         status = data.get("Status", "Unknown")
@@ -38,11 +47,16 @@ def build_cap_table():
 
 def build_cis_table():
     rows = []
-    for folder in sorted([d for d in os.listdir() if d.startswith("CIS-")]):
+    ciss = [d for d in os.listdir() if d.startswith("CIS-") and os.path.isdir(d)]
+    print("📗 Detected CIS folders:", ciss)
+    for folder in sorted(ciss):
         readme_path = os.path.join(folder, "README.md")
         if not os.path.exists(readme_path):
             continue
         data = parse_yaml_header(readme_path)
+        if not data:
+            print(f"⚠️ No YAML header found in {readme_path}")
+            continue
         cis_num = data.get("CIS", folder.split("-")[1])
         title = str(data.get("Title", "Untitled")).strip('"')
         status = data.get("Status", "Unknown")
