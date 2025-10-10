@@ -40,10 +40,10 @@ For more details, see [CIS-9999 – Constitution Issue Statements](./CIS-9999).
 
 ---
 
-# 📜 Constitutional Amendment Proposals (CAPs)
+# 📜 Constitutional Amendment Proposals (CAP)
 
 <!-- BEGIN_CAP_INDEX -->
-| #     | Title | Status | Addresses GPS |
+| #     | Title | Status | Addresses CIS |
 |-------|----------------------------|----------|--------------------------|
 | 0001  | [CAP Process](./CAP-0001) | Active | – |
 | 0002  | [Mandatory On-Chain Coffee Breaks ☕](./CAP-0002) | Proposed | – |
