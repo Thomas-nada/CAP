@@ -2,7 +2,7 @@ name: Auto-update CAP/CIS Index
 on:
   push:
     branches:
-      - Automatic-indexing
+      - '**'
     paths:
       - 'CAP-*/*.md'
       - 'CIS-*/*.md'
