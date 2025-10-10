@@ -3,7 +3,7 @@ name: Auto-update CAP/CIS Index
 on:
   push:
     branches:
-      - '**'      # temporary: allow it to run on any branch for testing
+      - '**'      # keep this for testing; change to 'main' later
     paths:
       - 'CAP-*/*.md'
       - 'CIS-*/*.md'
@@ -23,16 +23,20 @@ jobs:
         with:
           python-version: '3.x'
 
+      # 👇 This guarantees PyYAML is installed before your script runs
       - name: Install dependencies
+        shell: bash
         run: |
           python -m pip install --upgrade pip
-          pip install pyyaml
+          pip install --no-cache-dir PyYAML
 
       - name: Run index updater
+        shell: bash
         run: |
           python .github/scripts/update_index.py
 
       - name: Commit and push updates
+        shell: bash
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
