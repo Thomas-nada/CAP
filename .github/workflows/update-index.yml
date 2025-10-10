@@ -3,7 +3,7 @@ name: Auto-update CAP/CIS Index
 on:
   push:
     branches:
-      - '**'      # Allow on all branches for testing; switch to 'main' later
+      - main
     paths:
       - 'CAP-*/*.md'
       - 'CIS-*/*.md'
