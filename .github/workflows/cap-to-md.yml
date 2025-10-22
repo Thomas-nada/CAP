@@ -1,4 +1,64 @@
 name: "CAP Issue → Markdown PR"
+
+
+on:
+issues:
+types: [opened]
+
+
+permissions:
+contents: write
+pull-requests: write
+issues: read
+
+
+jobs:
+build-cap-md:
+if: contains(github.event.issue.labels.*.name, 'CAP')
+runs-on: ubuntu-latest
+steps:
+- name: Check out
+uses: actions/checkout@v4
+
+
+- name: Generate CAP markdown from Issue Form
+id: gen
+uses: actions/github-script@v7
+with:
+script: |
+const issue = context.payload.issue;
+const body = issue.body || '';
+
+
+// Helper: extract a block between headings like `### Field` ... next `###` or EOF
+function getBlock(label) {
+const pattern = new RegExp(`(^|\n)###\\s+${label}\\s*\n([\s\S]*?)(?=\n### |$)`, 'i');
+const m = body.match(pattern);
+return m ? m[2].trim() : '';
+}
+
+
+// Retrieve fields (IDs in the form become "### <label>")
+const cap = getBlock('CAP') || '0000';
+if (!/^\d{4}$/.test(cap)) core.setFailed(`CAP number must be four digits, got: ${cap}`);
+
+
+const title = getBlock('Title');
+const category = getBlock('Category') || 'Guardrails';
+const status = getBlock('Status') || 'Draft';
+
+
+// Multi-line lists → array (one per line, strip bullets)
+const toList = (txt) => txt
+.split(/\r?\n/)
+.map(s => s.replace(/^[-*]\s*/, '').trim())
+.filter(Boolean);
+
+
+const authors = toList(getBlock('Authors'));
+const implementors = toList(getBlock('Implementors'));
+const solutionTo = toList(getBlock('Solution-To \(CIS references\)'))
+.concat(toList(getBlock('Solution-To'))); // fallback
 const discussions = toList(getBlock('Discussions \(URLs\)')).concat(toList(getBlock('Discussions')));
 
 
@@ -14,69 +74,4 @@ const references = getBlock('References \(Optional\)') || getBlock('References')
 
 const created = new Date().toISOString().slice(0,10);
 const license = 'CC-BY-4.0';
-
-
-// Front matter lists as YAML arrays
-function yamlArray(items) {
-if (!items || items.length === 0) return ' - "N/A"';
-return items.map(v => ` - "${v.replace(/"/g, '\\"')}"`).join('\n');
-}
-
-
-// Build markdown content
-const md = `---\n`+
-`CAP: ${cap}\n`+
-`Title: "${title.replace(/"/g, '\\"')}"\n`+
-`Category: "${category}"\n`+
-`Status: "${status}"\n`+
-`Authors:\n${yamlArray(authors)}\n`+
-`Implementors:\n${yamlArray(implementors)}\n`+
-`Solution-To:\n${yamlArray(solutionTo)}\n`+
-`Discussions:\n${yamlArray(discussions)}\n`+
-`Created: "${created}"\n`+
-`License: "${license}"\n`+
-`---\n\n`+
-`## Abstract\n\n${abstract}\n\n---\n\n`+
-`## Motivation: Why is this CAP necessary?\n\n${motivation}\n\n---\n\n`+
-`## Amendment Specification\n\n${spec}\n\n---\n\n`+
-`## Rationale: How does this CAP achieve its goals?\n\n${rationale}\n\n---\n\n`+
-`## Path to Ratification\n\n### Acceptance Criteria\n\n${acceptance || ''}\n\n### Implementation Plan\n\n${implementation || ''}\n\n---\n\n`+
-`## Versioning (Optional)\n\n${versioning || ''}\n\n---\n\n`+
-`## References (Optional)\n\n${references || ''}\n\n---\n\n`+
-`## Copyright\n\nThis CAP is licensed under [CC-BY-4.0](https://creativecommons.org/licenses/by/4.0/legalcode).\n`;
-
-
-// File path and branch
-const branch = `cap/${cap}`;
-const filePath = `caps/CAP-${cap}.md`;
-
-
-core.setOutput('branch', branch);
-core.setOutput('filePath', filePath);
-core.setOutput('content', md);
-
-
-- name: Create branch and commit
-run: |
-git config user.name "github-actions[bot]"
-git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-git checkout -b "${{ steps.gen.outputs.branch }}"
-mkdir -p "$(dirname "${{ steps.gen.outputs.filePath }}")"
-printf "%s" "${{ steps.gen.outputs.content }}" > "${{ steps.gen.outputs.filePath }}"
-git add "${{ steps.gen.outputs.filePath }}"
-git commit -m "Add CAP ${{ steps.gen.outputs.filePath }} from issue #${{ github.event.issue.number }}"
-git push --set-upstream origin "${{ steps.gen.outputs.branch }}"
-
-
-- name: Open Pull Request
-uses: peter-evans/create-pull-request@v6
-with:
-title: "Add ${{ steps.gen.outputs.filePath }}"
-body: |
-This PR was auto-generated from [issue #${{ github.event.issue.number }}](${{ github.event.issue.html_url }}).
-
-
-- CAP number: `${{ steps.gen.outputs.branch }}`
-- File: `${{ steps.gen.outputs.filePath }}`
-branch: ${{ steps.gen.outputs.branch }}
 delete-branch: false
