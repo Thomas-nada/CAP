@@ -1,0 +1,84 @@
+name: "New CAP (Constitutional Amendment Proposal)"
+attributes:
+label: Discussions (URLs)
+description: "One per line (GitHub Discussions or relevant links)"
+placeholder: |
+https://github.com/[org]/CAP/discussions/123
+render: text
+
+
+- type: textarea
+id: abstract
+attributes:
+label: Abstract
+description: "~200 words summarizing the amendment and governance issue."
+placeholder: "A short (~200 words) summary …"
+render: markdown
+validations:
+required: true
+
+
+- type: textarea
+id: motivation
+attributes:
+label: Motivation: Why is this CAP necessary?
+description: "Explain the governance problem, stakeholders, and links to CIS."
+render: markdown
+validations:
+required: true
+
+
+- type: textarea
+id: spec
+attributes:
+label: Amendment Specification (canonical text)
+description: "Provide the exact text of the proposed constitutional change or addition."
+render: markdown
+validations:
+required: true
+
+
+- type: textarea
+id: rationale
+attributes:
+label: Rationale: How does this CAP achieve its goals?
+render: markdown
+validations:
+required: true
+
+
+- type: textarea
+id: acceptance
+attributes:
+label: Path to Ratification — Acceptance Criteria
+render: markdown
+
+
+- type: textarea
+id: implementation
+attributes:
+label: Path to Ratification — Implementation Plan
+render: markdown
+
+
+- type: textarea
+id: versioning
+attributes:
+label: Versioning (Optional)
+render: markdown
+
+
+- type: textarea
+id: references
+attributes:
+label: References (Optional)
+render: markdown
+
+
+- type: checkboxes
+id: confirm
+attributes:
+label: Confirmation
+options:
+- label: "I confirm the CAP number is four digits (e.g., 0001) and unique."
+required: true
