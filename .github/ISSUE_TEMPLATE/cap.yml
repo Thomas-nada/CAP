@@ -11,15 +11,6 @@ body:
         Please fill out this form to propose a new CAP.  
         Read the [CAP Process (CAP-0001)](https://github.com/[your-org]/CAPs/blob/main/CAP-0001/README.md) before submission.
 
-  - type: input
-    id: title
-    attributes:
-      label: CAP Title
-      description: The proposed title of your CAP.
-      placeholder: e.g. "Guardrails — Parameter Thresholds"
-    validations:
-      required: true
-
   - type: dropdown
     id: category
     attributes:
