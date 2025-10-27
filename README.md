@@ -1,9 +1,9 @@
-The Cardano Constitution Amendment Proposals (CAPs) repository contains two complementary types document:
+The Cardano Constitution Amendment Proposals (CAP) repository contains two complementary types document:
 
-- **Cardano Amendment Proposals (CAPs):** Formal proposals to amend, clarify, or extend Cardano’s Constitution.
-- **Constitution Issue Statements (CISs):** Structured descriptions of Constitution problems, ambiguities, or risks that require community attention and may guide future CAPs.
+- **Cardano Amendment Proposals (CAP):** Formal proposals to amend, clarify, or extend Cardano’s Constitution.
+- **Constitution Issue Statements (CIS):** Structured descriptions of Constitution problems, ambiguities, or risks that require community attention and may guide future CAPs.
 
-Together, **CAPs and CISs form aid Cardano’s off-chain governance documentation**.  
+Together, **CAP and CIS form aid Cardano’s off-chain governance documentation**.  
 They provide the foundation for constitutional amendments and transparent community deliberation.  
 Because these documents are stored as Markdown files in a versioned repository, their history serves as the authoritative record of Cardano’s evolving governance system.
 
