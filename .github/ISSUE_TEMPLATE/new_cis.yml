@@ -13,14 +13,6 @@ body:
         Please read the CIS process guidance before submitting.
 
   # ── Metadata ───────────────────────────────────────────────────────────────────
-  - type: input
-    id: cis_title
-    attributes:
-      label: CIS Title
-      description: The proposed title of this CIS.
-      placeholder: e.g., "Low Participation and Representation in On-Chain Governance"
-    validations:
-      required: true
 
   - type: dropdown
     id: category
