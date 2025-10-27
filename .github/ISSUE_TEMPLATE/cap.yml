@@ -1,24 +1,22 @@
-name: "New CAP (Constitutional Amendment Proposal)"
-description: "Propose a new CAP via a structured form. Generates a CAP-XXXX.md file via PR."
-title: "CAP-XXXX: <short descriptive title>"
-labels:
-  - CAP
+name: 📝 New CAP Proposal
+description: Submit a new Cardano Amendment Proposal (CAP)
+title: "CAP Proposal: <short descriptive title>"
+labels: ["proposal", "CAP"]
+assignees: []
 body:
-  - type: input
-    id: cap_number
+  - type: markdown
     attributes:
-      label: CAP
-      description: "Four digits, e.g. 0001"
-      placeholder: "0001"
-    validations:
-      required: true
+      value: |
+        ## Cardano Amendment Proposal (CAP)
+        Please fill out this form to propose a new CAP.  
+        Read the [CAP Process (CAP-0001)](https://github.com/[your-org]/CAPs/blob/main/CAP-0001/README.md) before submission.
 
   - type: input
     id: title
     attributes:
-      label: Title
-      description: "Title of the Constitutional Amendment Proposal"
-      placeholder: "[Title of the Constitutional Amendment Proposal]"
+      label: CAP Title
+      description: The proposed title of your CAP.
+      placeholder: e.g. "Guardrails — Parameter Thresholds"
     validations:
       required: true
 
@@ -26,132 +24,106 @@ body:
     id: category
     attributes:
       label: Category
-      description: "Choose one category"
+      description: Select the appropriate CAP category.
       options:
-        - Guardrails
         - Meta
         - Constitution
+        - Guardrails
         - Standards
     validations:
       required: true
-
-  - type: dropdown
-    id: status
-    attributes:
-      label: Status
-      options:
-        - Draft
-        - Review
-        - Ratified
-        - Withdrawn
-    validations:
-      required: true
-
-  - type: textarea
-    id: authors
-    attributes:
-      label: Authors
-      description: "One per line, e.g. Name <@GitHubHandle>"
-      placeholder: |
-        Ada Lovelace <@ada>
-        Charles Babbage <@babbage>
-      render: text
-    validations:
-      required: true
-
-  - type: textarea
-    id: implementors
-    attributes:
-      label: Implementors
-      description: "One per line. Use 'N/A' if none."
-      placeholder: |
-        N/A
-      render: text
-    validations:
-      required: true
-
-  - type: textarea
-    id: solution_to
-    attributes:
-      label: Solution-To (CIS references)
-      description: "One per line, e.g. CIS-0001"
-      placeholder: |
-        CIS-0001
-      render: text
-
-  - type: textarea
-    id: discussions
-    attributes:
-      label: Discussions (URLs)
-      description: "One per line (GitHub Discussions or relevant links)"
-      placeholder: |
-        https://github.com/[org]/CAP/discussions/123
-      render: text
 
   - type: textarea
     id: abstract
     attributes:
       label: Abstract
-      description: "~200 words summarizing the amendment and governance issue."
-      placeholder: "A short (~200 words) summary ..."
-      render: markdown
+      description: A short (~200 words) summary of the problem and proposed governance change.
+      placeholder: e.g. "This CAP proposes introducing a new threshold guardrail for ... "
     validations:
       required: true
 
   - type: textarea
     id: motivation
     attributes:
-      label: Motivation: Why is this CAP necessary?
-      description: "Explain the governance problem, stakeholders, and links to CIS."
-      render: markdown
+      label: Motivation
+      description: Why is this CAP necessary? What challenges or governance gaps does it address?
+      placeholder: |
+        1. ...
+        2. ...
     validations:
       required: true
 
   - type: textarea
-    id: spec
+    id: specification
     attributes:
-      label: Amendment Specification (canonical text)
-      description: "Provide the exact text of the proposed constitutional change or addition."
-      render: markdown
+      label: Specification
+      description: Describe the proposal in technical and procedural detail — what governance rule, process, or standard is being proposed?
+      placeholder: |
+        Define the process, governance mechanism, or standard here.
     validations:
       required: true
 
   - type: textarea
     id: rationale
     attributes:
-      label: Rationale: How does this CAP achieve its goals?
-      render: markdown
+      label: Rationale
+      description: Explain your design choices, alternatives considered, and how this proposal solves the problem.
+      placeholder: e.g. "We considered X but chose Y because..."
+    validations:
+      required: false
+
+  - type: textarea
+    id: path_to_ratification
+    attributes:
+      label: Path to Ratification
+      description: Describe the acceptance criteria and implementation plan for this CAP to become ratified.
+      placeholder: |
+        - Acceptance Criteria:
+        - Implementation Plan:
     validations:
       required: true
 
-  - type: textarea
-    id: acceptance
+  - type: input
+    id: authors
     attributes:
-      label: Path to Ratification - Acceptance Criteria
-      render: markdown
+      label: Authors
+      description: List all authors with contact info.
+      placeholder: e.g. "Jane Doe <jane@domain.org>"
+    validations:
+      required: true
+
+  - type: input
+    id: implementors
+    attributes:
+      label: Implementors
+      description: (Optional) List implementors or teams responsible.
+      placeholder: e.g. "Governance Tech WG"
 
   - type: textarea
-    id: implementation
+    id: discussions
     attributes:
-      label: Path to Ratification - Implementation Plan
-      render: markdown
+      label: Discussion Links
+      description: Provide URLs for GitHub Discussions, Forum posts, or other related threads.
+      placeholder: e.g. "https://github.com/[your-org]/CAPs/discussions/123"
 
-  - type: textarea
-    id: versioning
+  - type: dropdown
+    id: license
     attributes:
-      label: Versioning (Optional)
-      render: markdown
-
-  - type: textarea
-    id: references
-    attributes:
-      label: References (Optional)
-      render: markdown
-
-  - type: checkboxes
-    id: confirm
-    attributes:
-      label: Confirmation
+      label: License
+      description: Choose the license under which your CAP is published.
       options:
-        - label: "I confirm the CAP number is four digits (e.g., 0001) and unique."
-          required: true
+        - CC-BY-4.0
+        - Apache-2.0
+    validations:
+      required: true
+
+  - type: markdown
+    attributes:
+      value: |
+        ---
+        ✅ **Before submitting**
+        - Review your CAP for clarity and completeness.
+        - Ensure no implementation code is included.
+        - Link to any related Constitution Issue Statement (CIS) or prior CAPs.
+        - Submissions are triaged and reviewed by CAP Editors.
+
