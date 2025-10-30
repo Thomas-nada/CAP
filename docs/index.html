@@ -3,33 +3,114 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Cardano CAP/CIS Viewer</title>
-  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <title>Cardano CAP & CIS Viewer</title>
+
+  <!-- TailwindCSS -->
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+
+  <!-- Markdown renderer -->
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+  <style>
+    body {
+      font-family: "Inter", "Segoe UI", Roboto, sans-serif;
+      background-color: #f9fafb;
+    }
+
+    /* Make Markdown look clean */
+    .markdown-body {
+      line-height: 1.7;
+    }
+    .markdown-body h1, .markdown-body h2, .markdown-body h3 {
+      font-weight: 700;
+      color: #1a365d;
+      margin-top: 1.5em;
+      margin-bottom: 0.6em;
+    }
+    .markdown-body code {
+      background: #edf2f7;
+      padding: 2px 4px;
+      border-radius: 4px;
+    }
+    .markdown-body pre {
+      background: #edf2f7;
+      padding: 0.75rem;
+      border-radius: 0.5rem;
+      overflow-x: auto;
+    }
+    .markdown-body a {
+      color: #2b6cb0;
+    }
+    .markdown-body strong {
+      color: #2b6cb0;
+    }
+
+    /* Sidebar link active style */
+    .active {
+      background-color: #2b6cb0;
+      color: white !important;
+    }
+
+    /* Smooth hover */
+    .hoverable:hover {
+      background-color: #e2e8f0;
+    }
+
+    /* Sticky header bar */
+    #header {
+      background: linear-gradient(90deg, #2b6cb0, #4299e1);
+      color: white;
+      padding: 1rem 2rem;
+      font-size: 1.5rem;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+
+    #header span {
+      font-size: 1rem;
+      font-weight: 400;
+      opacity: 0.9;
+    }
+  </style>
 </head>
-<body class="flex h-screen text-gray-800">
 
-  <!-- Sidebar -->
-  <aside id="sidebar" class="w-72 bg-gray-100 border-r overflow-y-auto p-4">
-    <h1 class="text-2xl font-bold mb-4">CAP Viewer</h1>
-    <div id="caps-section">
-      <h2 class="font-semibold text-lg mb-2">CAPs</h2>
-      <ul id="caps-list" class="mb-6 space-y-1"></ul>
-    </div>
-    <div id="ciss-section">
-      <h2 class="font-semibold text-lg mb-2">CISs</h2>
-      <ul id="ciss-list" class="space-y-1"></ul>
-    </div>
-  </aside>
+<body class="flex flex-col h-screen">
+  <!-- Header bar -->
+  <header id="header">
+    <div>Cardano CAP & CIS Viewer</div>
+    <span>Governance Repository</span>
+  </header>
 
-  <!-- Main Content -->
-  <main class="flex-1 overflow-y-auto p-6 prose max-w-none" id="content">
-    <p class="text-gray-500">Select a CAP or CIS from the sidebar to view its content.</p>
-  </main>
+  <div class="flex flex-1 overflow-hidden">
+    <!-- Sidebar -->
+    <aside id="sidebar" class="w-72 bg-gray-100 border-r overflow-y-auto p-4">
+      <h1 class="text-xl font-semibold mb-4 text-gray-800">Documents</h1>
+
+      <div id="caps-section">
+        <h2 class="font-bold text-lg mb-2 text-blue-800">CAPs</h2>
+        <ul id="caps-list" class="mb-6 space-y-1"></ul>
+      </div>
+
+      <div id="ciss-section">
+        <h2 class="font-bold text-lg mb-2 text-blue-800">CISs</h2>
+        <ul id="ciss-list" class="space-y-1"></ul>
+      </div>
+    </aside>
+
+    <!-- Main content -->
+    <main class="flex-1 overflow-y-auto p-8 bg-white markdown-body" id="content">
+      <p class="text-gray-500 italic">Select a CAP or CIS from the sidebar to view its content.</p>
+    </main>
+  </div>
 
   <script>
     const REPO = "Thomas-nada/CAP";
     const apiURL = `https://api.github.com/repos/${REPO}/contents`;
+    let current = null;
 
     async function fetchFolders() {
       const res = await fetch(apiURL);
@@ -41,34 +122,36 @@
       const capsList = document.getElementById("caps-list");
       const cissList = document.getElementById("ciss-list");
 
-      for (const folder of caps) {
-        const li = document.createElement("li");
-        li.textContent = folder.name;
-        li.className = "cursor-pointer hover:bg-blue-100 rounded px-2 py-1";
-        li.onclick = () => loadReadme(folder.name);
-        capsList.appendChild(li);
-      }
-
-      for (const folder of ciss) {
-        const li = document.createElement("li");
-        li.textContent = folder.name;
-        li.className = "cursor-pointer hover:bg-blue-100 rounded px-2 py-1";
-        li.onclick = () => loadReadme(folder.name);
-        cissList.appendChild(li);
-      }
+      for (const folder of caps) addLink(folder, capsList);
+      for (const folder of ciss) addLink(folder, cissList);
     }
 
-    async function loadReadme(folder) {
+    function addLink(folder, container) {
+      const li = document.createElement("li");
+      li.textContent = folder.name;
+      li.className = "cursor-pointer block px-3 py-2 rounded-md text-gray-700 hoverable";
+      li.onclick = () => loadReadme(folder.name, li);
+      container.appendChild(li);
+    }
+
+    async function loadReadme(folder, element) {
+      // reset active styles
+      document.querySelectorAll("#sidebar li").forEach(li => li.classList.remove("active"));
+      element.classList.add("active");
+
       const url = `https://raw.githubusercontent.com/${REPO}/main/${folder}/README.md`;
       const res = await fetch(url);
+      const contentDiv = document.getElementById("content");
+
       if (!res.ok) {
-        document.getElementById("content").innerHTML = `<p class='text-red-500'>README.md not found in ${folder}</p>`;
+        contentDiv.innerHTML = `<p class='text-red-500'>README.md not found in ${folder}</p>`;
         return;
       }
+
       const md = await res.text();
       const html = marked.parse(md);
-      document.getElementById("content").innerHTML = html;
-      window.scrollTo(0, 0);
+      contentDiv.innerHTML = html;
+      window.scrollTo({ top: 0, behavior: "smooth" });
     }
 
     fetchFolders();
