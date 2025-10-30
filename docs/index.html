@@ -166,7 +166,6 @@
   <script>
     const REPO = "Thomas-nada/CAP";
     const apiURL = `https://api.github.com/repos/${REPO}/contents`;
-
     let allItems = [];
 
     async function fetchFolders() {
@@ -180,6 +179,13 @@
         populateList(caps, document.getElementById("caps-list")),
         populateList(ciss, document.getElementById("ciss-list"))
       ]);
+
+      // After populating, check if URL has a hash and load that item
+      const hash = window.location.hash.replace("#", "");
+      if (hash) {
+        const target = allItems.find(li => li.textContent.startsWith(hash));
+        if (target) target.click();
+      }
     }
 
     async function populateList(folders, container) {
@@ -195,7 +201,6 @@
         const res = await fetch(url);
         if (!res.ok) return "";
         const md = await res.text();
-
         const match = md.match(/^---[\s\S]*?---/);
         if (match) {
           const block = match[0];
@@ -214,7 +219,11 @@
       li.dataset.text = text.toLowerCase();
       li.innerHTML = `<strong>${folderName}</strong>${title ? " – " + title : ""}`;
       li.className = "cursor-pointer block rounded-md hover:bg-gray-200 px-2 py-1";
-      li.onclick = () => loadReadme(folderName, li);
+      li.onclick = () => {
+        loadReadme(folderName, li);
+        // Update URL hash
+        history.replaceState(null, "", `#${folderName}`);
+      };
       container.appendChild(li);
       allItems.push(li);
     }
@@ -245,10 +254,10 @@
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
 
+    // YAML + Markdown parser
     function parseFrontMatter(md) {
       const m = md.match(/^---\s*([\s\S]*?)\s*---\s*/);
       if (!m) return { meta: null, body: md };
-
       const block = m[1];
       const lines = block.split(/\r?\n/);
       const meta = {};
@@ -329,6 +338,13 @@
       const html = marked.parse(body);
       return `<div class="markdown-body">${metaBox}${html}</div>`;
     }
+
+    // Handle hash changes manually (user pastes new link)
+    window.addEventListener("hashchange", () => {
+      const hash = window.location.hash.replace("#", "");
+      const target = allItems.find(li => li.textContent.startsWith(hash));
+      if (target) target.click();
+    });
 
     fetchFolders();
   </script>
