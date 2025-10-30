@@ -46,6 +46,16 @@
       font-weight: 600;
     }
 
+    /* Search input */
+    #search {
+      width: 100%;
+      margin-bottom: 1rem;
+      padding: 6px 10px;
+      border: 1px solid #d0d7de;
+      border-radius: 6px;
+      font-size: 0.9rem;
+    }
+
     /* Markdown look (GitHub-style) */
     .markdown-body {
       background: white;
@@ -127,6 +137,7 @@
 
   <div class="flex flex-1 overflow-hidden">
     <aside id="sidebar" class="w-80 overflow-y-auto p-4">
+      <input id="search" type="text" placeholder="Search CAPs or CISs..." oninput="filterList()" />
       <h1 class="text-xl font-semibold mb-4 text-gray-800">Documents</h1>
       <div id="caps-section">
         <h2 class="font-bold text-lg mb-2 text-blue-800">CAPs</h2>
@@ -148,6 +159,8 @@
   <script>
     const REPO = "Thomas-nada/CAP";
     const apiURL = `https://api.github.com/repos/${REPO}/contents`;
+
+    let allItems = [];
 
     async function fetchFolders() {
       const res = await fetch(apiURL);
@@ -181,15 +194,25 @@
           if (titleMatch) return titleMatch[1];
         }
       } catch (e) {}
-      return ""; // fallback
+      return "";
     }
 
     function addLink(folderName, title, container) {
+      const text = title ? `${folderName} – ${title}` : folderName;
       const li = document.createElement("li");
+      li.dataset.text = text.toLowerCase();
       li.innerHTML = `<strong>${folderName}</strong>${title ? " – " + title : ""}`;
       li.className = "cursor-pointer block rounded-md hover:bg-gray-200 px-2 py-1";
       li.onclick = () => loadReadme(folderName, li);
       container.appendChild(li);
+      allItems.push(li);
+    }
+
+    function filterList() {
+      const query = document.getElementById("search").value.toLowerCase();
+      allItems.forEach(li => {
+        li.style.display = li.dataset.text.includes(query) ? "block" : "none";
+      });
     }
 
     async function loadReadme(folder, element) {
@@ -211,6 +234,7 @@
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
 
+    // YAML parser + Markdown rendering
     function parseFrontMatter(md) {
       const m = md.match(/^---\s*([\s\S]*?)\s*---\s*/);
       if (!m) return { meta: null, body: md };
@@ -219,7 +243,6 @@
       const lines = block.split(/\r?\n/);
       const meta = {};
       let i = 0;
-
       const stripQ = (s) => s.replace(/^"(.*)"$/, '$1').replace(/^'(.*)'$/, '$1').trim();
 
       while (i < lines.length) {
@@ -231,7 +254,6 @@
 
         const key = keyMatch[1];
         const after = keyMatch[2];
-
         if (after && !/^\s*$/.test(after)) {
           meta[key] = stripQ(after);
           i++;
