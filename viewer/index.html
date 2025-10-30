@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cardano CAP/CIS Viewer</title>
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="flex h-screen text-gray-800">
+
+  <!-- Sidebar -->
+  <aside id="sidebar" class="w-72 bg-gray-100 border-r overflow-y-auto p-4">
+    <h1 class="text-2xl font-bold mb-4">CAP Viewer</h1>
+    <div id="caps-section">
+      <h2 class="font-semibold text-lg mb-2">CAPs</h2>
+      <ul id="caps-list" class="mb-6 space-y-1"></ul>
+    </div>
+    <div id="ciss-section">
+      <h2 class="font-semibold text-lg mb-2">CISs</h2>
+      <ul id="ciss-list" class="space-y-1"></ul>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="flex-1 overflow-y-auto p-6 prose max-w-none" id="content">
+    <p class="text-gray-500">Select a CAP or CIS from the sidebar to view its content.</p>
+  </main>
+
+  <script>
+    const REPO = "Thomas-nada/CAP";
+    const apiURL = `https://api.github.com/repos/${REPO}/contents`;
+
+    async function fetchFolders() {
+      const res = await fetch(apiURL);
+      const data = await res.json();
+
+      const caps = data.filter(f => f.name.startsWith("CAP-"));
+      const ciss = data.filter(f => f.name.startsWith("CIS-"));
+
+      const capsList = document.getElementById("caps-list");
+      const cissList = document.getElementById("ciss-list");
+
+      for (const folder of caps) {
+        const li = document.createElement("li");
+        li.textContent = folder.name;
+        li.className = "cursor-pointer hover:bg-blue-100 rounded px-2 py-1";
+        li.onclick = () => loadReadme(folder.name);
+        capsList.appendChild(li);
+      }
+
+      for (const folder of ciss) {
+        const li = document.createElement("li");
+        li.textContent = folder.name;
+        li.className = "cursor-pointer hover:bg-blue-100 rounded px-2 py-1";
+        li.onclick = () => loadReadme(folder.name);
+        cissList.appendChild(li);
+      }
+    }
+
+    async function loadReadme(folder) {
+      const url = `https://raw.githubusercontent.com/${REPO}/main/${folder}/README.md`;
+      const res = await fetch(url);
+      if (!res.ok) {
+        document.getElementById("content").innerHTML = `<p class='text-red-500'>README.md not found in ${folder}</p>`;
+        return;
+      }
+      const md = await res.text();
+      const html = marked.parse(md);
+      document.getElementById("content").innerHTML = html;
+      window.scrollTo(0, 0);
+    }
+
+    fetchFolders();
+  </script>
+</body>
+</html>
