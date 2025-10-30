@@ -56,7 +56,6 @@
       line-height: 1.6;
       color: #24292f;
     }
-
     .markdown-body h1, .markdown-body h2, .markdown-body h3 {
       border-bottom: 1px solid #d8dee4;
       padding-bottom: 0.3em;
@@ -64,7 +63,6 @@
       margin-bottom: 0.8em;
       font-weight: 600;
     }
-
     .markdown-body h1 { font-size: 1.8rem; }
     .markdown-body h2 { font-size: 1.4rem; }
     .markdown-body h3 { font-size: 1.1rem; }
@@ -74,9 +72,7 @@
       margin-top: 0.5rem;
       margin-bottom: 1rem;
     }
-    .markdown-body li {
-      margin-top: 0.2rem;
-    }
+    .markdown-body li { margin-top: 0.2rem; }
 
     .markdown-body hr {
       border: none;
@@ -97,31 +93,29 @@
       padding: 1rem;
       overflow-x: auto;
     }
-    .markdown-body a {
-      color: #0969da;
-      text-decoration: none;
-    }
+    .markdown-body a { color: #0969da; text-decoration: none; }
     .markdown-body a:hover { text-decoration: underline; }
-
-    /* Checkbox styling */
-    .markdown-body input[type="checkbox"] {
-      margin-right: 0.5rem;
-      vertical-align: middle;
-    }
 
     /* YAML header box */
     .yaml-box {
       background: #f6f8fa;
       border: 1px solid #d0d7de;
       border-radius: 8px;
-      padding: 1rem 1.5rem;
+      padding: 1rem 1.25rem;
       margin-bottom: 1.5rem;
       font-size: 0.95rem;
     }
-    .yaml-box table { width: 100%; border-collapse: collapse; }
-    .yaml-box th, .yaml-box td { text-align: left; padding: 4px 8px; }
-    .yaml-box th { font-weight: 600; width: 25%; }
-    .yaml-box tr:nth-child(even) { background: #fdfdfd; }
+    .yaml-grid {
+      display: grid;
+      grid-template-columns: 220px 1fr;
+      gap: 6px 14px;
+      align-items: start;
+    }
+    .yaml-key {
+      font-weight: 600;
+      color: #24292f;
+    }
+    .yaml-value ul { list-style-type: disc; margin-left: 1.2rem; }
   </style>
 </head>
 
@@ -191,38 +185,117 @@
       }
 
       const md = await res.text();
-      const formatted = renderMarkdownWithYaml(md);
-      contentDiv.innerHTML = formatted;
+      const html = renderMarkdownWithYaml(md);
+      contentDiv.innerHTML = html;
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
 
-    // Detect and format YAML header
-    function renderMarkdownWithYaml(md) {
-      const yamlMatch = md.match(/^---[\\s\\S]*?---/);
-      let yamlBox = "";
-      let body = md;
+    // ---- YAML + Markdown rendering helpers ----
 
-      if (yamlMatch) {
-        const yaml = yamlMatch[0].replace(/---/g, "").trim();
-        body = md.slice(yamlMatch[0].length).trim();
-        const lines = yaml.split(/\\r?\\n/).filter(l => l.trim().length > 0);
-        let rows = "";
-        lines.forEach(line => {
-          const [key, ...rest] = line.split(":");
-          const value = rest.join(":").trim().replace(/^"|"$/g, "");
-          rows += `<tr><th>${key.trim()}</th><td>${value}</td></tr>`;
-        });
-        yamlBox = `
-          <div class="yaml-box">
-            <table>${rows}</table>
-          </div>
-        `;
+    // Very small front-matter parser that understands:
+    // key: "value"
+    // key:
+    //   - "item"
+    //   - "item2"
+    function parseFrontMatter(md) {
+      const m = md.match(/^---\s*([\s\S]*?)\s*---\s*/);
+      if (!m) return { meta: null, body: md };
+
+      const block = m[1];
+      const lines = block.split(/\r?\n/);
+      const meta = {};
+      let i = 0;
+
+      const stripQ = (s) => s.replace(/^"(.*)"$/, '$1').replace(/^'(.*)'$/, '$1').trim();
+
+      while (i < lines.length) {
+        const line = lines[i];
+        if (!line.trim()) { i++; continue; }
+
+        const keyMatch = line.match(/^([A-Za-z0-9_-]+):\s*(.*)$/);
+        if (!keyMatch) { i++; continue; }
+
+        const key = keyMatch[1];
+        const after = keyMatch[2];
+
+        // Inline value
+        if (after && !/^\s*$/.test(after)) {
+          meta[key] = stripQ(after);
+          i++;
+          continue;
+        }
+
+        // Multiline array
+        i++;
+        const arr = [];
+        while (i < lines.length) {
+          const li = lines[i];
+          const mli = li.match(/^\s*-\s*(.*)$/);
+          if (!mli) break;
+          arr.push(stripQ(mli[1]));
+          i++;
+        }
+        meta[key] = arr.length ? arr : "";
       }
 
-      const html = marked.parse(body);
-      return `<div class="markdown-body">${yamlBox}${html}</div>`;
+      const body = md.slice(m[0].length).trim();
+      return { meta, body };
     }
 
+    function linkify(str) {
+      if (!str) return "";
+      // URLs
+      str = str.replace(/((https?:\/\/)[^\s)]+)/g, '<a href="$1" target="_blank" rel="noopener">$1</a>');
+      // Emails
+      str = str.replace(/([A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,})/gi, '<a href="mailto:$1">$1</a>');
+      return str;
+    }
+
+    function renderMeta(meta) {
+      if (!meta) return "";
+
+      // Preferred display order
+      const order = ["CAP", "Title", "Category", "Status", "Authors", "Implementors", "Solution-To", "Discussions", "Created", "License"];
+      const keys = [...new Set([...order, ...Object.keys(meta)])];
+
+      let rows = "";
+      keys.forEach(k => {
+        if (meta[k] === undefined || meta[k] === null || meta[k] === "") return;
+
+        let val = meta[k];
+        let htmlVal = "";
+
+        if (Array.isArray(val)) {
+          if (!val.length) return;
+          const items = val.map(v => `<li>${linkify(v)}</li>`).join("");
+          htmlVal = `<ul>${items}</ul>`;
+        } else {
+          htmlVal = linkify(String(val));
+        }
+
+        rows += `
+          <div class="yaml-key">${k}</div>
+          <div class="yaml-value">${htmlVal}</div>
+        `;
+      });
+
+      return `
+        <div class="yaml-box">
+          <div class="yaml-grid">
+            ${rows}
+          </div>
+        </div>
+      `;
+    }
+
+    function renderMarkdownWithYaml(md) {
+      const { meta, body } = parseFrontMatter(md);
+      const metaBox = renderMeta(meta);
+      const html = marked.parse(body);
+      return `<div class="markdown-body">${metaBox}${html}</div>`;
+    }
+
+    // Boot
     fetchFolders();
   </script>
 </body>
