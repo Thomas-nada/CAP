@@ -14,7 +14,6 @@
       background-color: #f7f9fa;
       color: #24292f;
     }
-
     #header {
       background: #0366d6;
       color: white;
@@ -26,7 +25,6 @@
       align-items: center;
       box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     }
-
     #sidebar {
       background: #f6f8fa;
       border-right: 1px solid #d0d7de;
@@ -44,7 +42,6 @@
       color: white;
       font-weight: 600;
     }
-
     #search {
       width: 100%;
       margin-bottom: 1rem;
@@ -53,7 +50,6 @@
       border-radius: 6px;
       font-size: 0.9rem;
     }
-
     .markdown-body {
       background: white;
       padding: 2rem;
@@ -63,7 +59,6 @@
       line-height: 1.6;
       color: #24292f;
     }
-
     .markdown-body h1, .markdown-body h2, .markdown-body h3 {
       border-bottom: 1px solid #d8dee4;
       padding-bottom: 0.3em;
@@ -71,24 +66,20 @@
       margin-bottom: 0.8em;
       font-weight: 600;
     }
-
     .markdown-body h1 { font-size: 1.8rem; }
     .markdown-body h2 { font-size: 1.4rem; }
     .markdown-body h3 { font-size: 1.1rem; }
-
     .markdown-body ul, .markdown-body ol {
       margin-left: 1.5rem;
       margin-top: 0.5rem;
       margin-bottom: 1rem;
     }
     .markdown-body li { margin-top: 0.2rem; }
-
     .markdown-body hr {
       border: none;
       border-top: 1px solid #d0d7de;
       margin: 2rem 0;
     }
-
     .markdown-body code {
       background: #f6f8fa;
       border-radius: 6px;
@@ -104,7 +95,6 @@
     }
     .markdown-body a { color: #0969da; text-decoration: none; }
     .markdown-body a:hover { text-decoration: underline; }
-
     .yaml-box {
       background: #f6f8fa;
       border: 1px solid #d0d7de;
@@ -121,6 +111,21 @@
     }
     .yaml-key { font-weight: 600; color: #24292f; }
     .yaml-value ul { list-style-type: disc; margin-left: 1.2rem; }
+
+    /* overlay form */
+    #overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(255,255,255,0.97);
+      z-index: 50;
+      display: none;
+      flex-direction: column;
+    }
+    #overlay form {
+      flex: 1;
+      overflow-y: auto;
+      padding: 2rem;
+    }
   </style>
 </head>
 
@@ -132,65 +137,98 @@
 
   <div class="flex flex-1 overflow-hidden">
     <aside id="sidebar" class="w-80 overflow-y-auto p-4">
-
-      <!-- New Proposal Buttons -->
       <div class="space-y-2 mb-4">
-        <a href="https://github.com/Thomas-nada/CAP/issues/new?template=cap.yml" target="_blank"
-           class="block w-full text-center bg-blue-600 text-white py-2 px-3 rounded-md font-medium hover:bg-blue-700 transition">
-          📝 New CAP Proposal
-        </a>
-        <a href="https://github.com/Thomas-nada/CAP/issues/new?template=new_cis.yml" target="_blank"
-           class="block w-full text-center bg-green-600 text-white py-2 px-3 rounded-md font-medium hover:bg-green-700 transition">
-          🧩 New CIS Proposal
-        </a>
+        <button onclick="openOverlay('CAP')" class="block w-full text-center bg-blue-600 text-white py-2 px-3 rounded-md font-medium hover:bg-blue-700">📝 New CAP Proposal</button>
+        <button onclick="openOverlay('CIS')" class="block w-full text-center bg-green-600 text-white py-2 px-3 rounded-md font-medium hover:bg-green-700">🧩 New CIS Proposal</button>
       </div>
-
       <input id="search" type="text" placeholder="Search CAPs or CISs..." oninput="filterList()" />
       <h1 class="text-xl font-semibold mb-4 text-gray-800">Documents</h1>
-
-      <div id="caps-section">
-        <h2 class="font-bold text-lg mb-2 text-blue-800">CAPs</h2>
-        <ul id="caps-list" class="mb-6 space-y-1"></ul>
-      </div>
-
-      <div id="ciss-section">
-        <h2 class="font-bold text-lg mb-2 text-blue-800">CISs</h2>
-        <ul id="ciss-list" class="space-y-1"></ul>
-      </div>
+      <div id="caps-section"><h2 class="font-bold text-lg mb-2 text-blue-800">CAPs</h2><ul id="caps-list" class="mb-6 space-y-1"></ul></div>
+      <div id="ciss-section"><h2 class="font-bold text-lg mb-2 text-blue-800">CISs</h2><ul id="ciss-list" class="space-y-1"></ul></div>
     </aside>
+    <main class="flex-1 overflow-y-auto p-8" id="content"><div class="markdown-body"><p class="text-gray-500 italic">Loading...</p></div></main>
+  </div>
 
-    <main class="flex-1 overflow-y-auto p-8" id="content">
-      <div class="markdown-body">
-        <p class="text-gray-500 italic">Loading...</p>
+  <!-- FULL PAGE FORM OVERLAY -->
+  <div id="overlay" class="hidden flex">
+    <div class="flex items-center justify-between border-b border-gray-300 p-4 bg-white">
+      <div class="flex space-x-4">
+        <button id="tabCAP" class="font-semibold text-blue-600 border-b-2 border-blue-600 pb-1" onclick="switchTab('CAP')">New CAP</button>
+        <button id="tabCIS" class="font-semibold text-gray-500 pb-1 hover:text-blue-600" onclick="switchTab('CIS')">New CIS</button>
       </div>
-    </main>
+      <button onclick="closeOverlay()" class="text-gray-500 hover:text-red-600 font-semibold">✖ Close</button>
+    </div>
+
+    <form id="formCAP" class="space-y-4 overflow-y-auto">
+      <h2 class="text-2xl font-bold mb-2">Submit a new Cardano Amendment Proposal (CAP)</h2>
+      <input id="cap_title" class="w-full border rounded p-2" placeholder="CAP Proposal: <short descriptive title>">
+      <select id="cap_category" class="w-full border rounded p-2">
+        <option value="">Select category</option><option>Meta</option><option>Constitution</option><option>Guardrails</option><option>Standards</option>
+      </select>
+      <textarea id="cap_abstract" class="w-full border rounded p-2" rows="3" placeholder="Abstract"></textarea>
+      <textarea id="cap_motivation" class="w-full border rounded p-2" rows="3" placeholder="Motivation"></textarea>
+      <textarea id="cap_specification" class="w-full border rounded p-2" rows="3" placeholder="Specification"></textarea>
+      <textarea id="cap_rationale" class="w-full border rounded p-2" rows="3" placeholder="Rationale (optional)"></textarea>
+      <textarea id="cap_path" class="w-full border rounded p-2" rows="3" placeholder="Path to Ratification"></textarea>
+      <input id="cap_authors" class="w-full border rounded p-2" placeholder="Authors">
+      <input id="cap_implementors" class="w-full border rounded p-2" placeholder="Implementors (optional)">
+      <textarea id="cap_discussions" class="w-full border rounded p-2" rows="2" placeholder="Discussion Links"></textarea>
+      <select id="cap_license" class="w-full border rounded p-2">
+        <option>CC-BY-4.0</option><option>Apache-2.0</option>
+      </select>
+      <div class="flex space-x-3 pt-4">
+        <button type="button" onclick="previewIssue('CAP')" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Preview on GitHub</button>
+        <button type="button" onclick="closeOverlay()" class="bg-gray-200 px-4 py-2 rounded hover:bg-gray-300">Cancel</button>
+      </div>
+    </form>
+
+    <form id="formCIS" class="space-y-4 hidden overflow-y-auto">
+      <h2 class="text-2xl font-bold mb-2">Submit a new Constitution Issue Statement (CIS)</h2>
+      <input id="cis_title" class="w-full border rounded p-2" placeholder="CIS Proposal: <short descriptive title>">
+      <select id="cis_category" class="w-full border rounded p-2">
+        <option value="">Select category</option><option>Governance</option><option>Constitution</option><option>Process</option><option>Guardrails / Risk</option><option>Interpretation / Clarification</option><option>Other</option>
+      </select>
+      <textarea id="cis_authors" class="w-full border rounded p-2" rows="2" placeholder="Authors"></textarea>
+      <textarea id="cis_discussions" class="w-full border rounded p-2" rows="2" placeholder="Discussion Links"></textarea>
+      <textarea id="cis_related" class="w-full border rounded p-2" rows="2" placeholder="Related CAPs"></textarea>
+      <textarea id="cis_abstract" class="w-full border rounded p-2" rows="3" placeholder="Abstract"></textarea>
+      <textarea id="cis_background" class="w-full border rounded p-2" rows="3" placeholder="Background"></textarea>
+      <textarea id="cis_problem" class="w-full border rounded p-2" rows="3" placeholder="Problem"></textarea>
+      <textarea id="cis_impact" class="w-full border rounded p-2" rows="3" placeholder="Impact"></textarea>
+      <textarea id="cis_goals" class="w-full border rounded p-2" rows="3" placeholder="Goals"></textarea>
+      <textarea id="cis_open" class="w-full border rounded p-2" rows="3" placeholder="Open Questions"></textarea>
+      <textarea id="cis_usecases" class="w-full border rounded p-2" rows="3" placeholder="Use Cases (optional)"></textarea>
+      <textarea id="cis_nextsteps" class="w-full border rounded p-2" rows="3" placeholder="Next Steps (optional)"></textarea>
+      <textarea id="cis_references" class="w-full border rounded p-2" rows="3" placeholder="References (optional)"></textarea>
+      <select id="cis_license" class="w-full border rounded p-2">
+        <option>CC-BY-4.0</option><option>Apache-2.0</option>
+      </select>
+      <div class="flex space-x-3 pt-4">
+        <button type="button" onclick="previewIssue('CIS')" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">Preview on GitHub</button>
+        <button type="button" onclick="closeOverlay()" class="bg-gray-200 px-4 py-2 rounded hover:bg-gray-300">Cancel</button>
+      </div>
+    </form>
   </div>
 
   <script>
     const REPO = "Thomas-nada/CAP";
     const apiURL = `https://api.github.com/repos/${REPO}/contents`;
     let allItems = [];
-
     async function fetchFolders() {
       const res = await fetch(apiURL);
       const data = await res.json();
       const caps = data.filter(f => f.name.startsWith("CAP-"));
       const ciss = data.filter(f => f.name.startsWith("CIS-"));
-
       await Promise.all([
         populateList(caps, document.getElementById("caps-list")),
         populateList(ciss, document.getElementById("ciss-list"))
       ]);
-
       const hash = window.location.hash.replace("#", "");
       if (hash) {
         const target = allItems.find(li => li.textContent.startsWith(hash));
         if (target) target.click();
-      } else {
-        loadRootReadme();
-      }
+      } else loadRootReadme();
     }
-
     async function loadRootReadme() {
       const url = `https://raw.githubusercontent.com/${REPO}/main/README.md`;
       const res = await fetch(url);
@@ -200,10 +238,8 @@
         return;
       }
       const md = await res.text();
-      const html = marked.parse(md);
-      contentDiv.innerHTML = `<div class="markdown-body">${html}</div>`;
+      contentDiv.innerHTML = `<div class="markdown-body">${marked.parse(md)}</div>`;
     }
-
     async function populateList(folders, container) {
       for (const folder of folders) {
         const readmeUrl = `https://raw.githubusercontent.com/${REPO}/main/${folder.name}/README.md`;
@@ -211,143 +247,107 @@
         addLink(folder.name, title, container);
       }
     }
-
     async function extractTitle(url) {
       try {
         const res = await fetch(url);
         if (!res.ok) return "";
         const md = await res.text();
-        const match = md.match(/^---[\s\S]*?---/);
+        const match = md.match(/^---[\\s\\S]*?---/);
         if (match) {
           const block = match[0];
-          const titleMatch = block.match(/Title:\s*["']?(.+?)["']?(\r?\n|$)/i);
+          const titleMatch = block.match(/Title:\\s*["']?(.+?)["']?(\\r?\\n|$)/i);
           if (titleMatch) return titleMatch[1].trim();
         }
-      } catch (e) {
-        console.error("Error fetching title:", e);
-      }
+      } catch { }
       return "";
     }
-
     function addLink(folderName, title, container) {
       const text = title ? `${folderName} – ${title}` : folderName;
       const li = document.createElement("li");
       li.dataset.text = text.toLowerCase();
       li.innerHTML = `<strong>${folderName}</strong>${title ? " – " + title : ""}`;
       li.className = "cursor-pointer block rounded-md hover:bg-gray-200 px-2 py-1";
-      li.onclick = () => {
-        loadReadme(folderName, li);
-        history.replaceState(null, "", `#${folderName}`);
-      };
+      li.onclick = () => { loadReadme(folderName, li); history.replaceState(null, "", `#${folderName}`); };
       container.appendChild(li);
       allItems.push(li);
     }
-
     function filterList() {
-      const query = document.getElementById("search").value.toLowerCase();
-      allItems.forEach(li => {
-        li.style.display = li.dataset.text.includes(query) ? "block" : "none";
-      });
+      const q = document.getElementById("search").value.toLowerCase();
+      allItems.forEach(li => li.style.display = li.dataset.text.includes(q) ? "block" : "none");
     }
-
-    async function loadReadme(folder, element) {
+    async function loadReadme(folder, el) {
       document.querySelectorAll("#sidebar li").forEach(li => li.classList.remove("active"));
-      element.classList.add("active");
+      el.classList.add("active");
       const url = `https://raw.githubusercontent.com/${REPO}/main/${folder}/README.md`;
       const res = await fetch(url);
-      const contentDiv = document.getElementById("content");
-
+      const div = document.getElementById("content");
       if (!res.ok) {
-        contentDiv.innerHTML = `<div class='markdown-body'><p class='text-red-500'>README.md not found in ${folder}</p></div>`;
+        div.innerHTML = `<div class='markdown-body'><p class='text-red-500'>README.md not found in ${folder}</p></div>`;
         return;
       }
-
       const md = await res.text();
-      const html = renderMarkdownWithYaml(md);
-      contentDiv.innerHTML = html;
-      window.scrollTo({ top: 0, behavior: "smooth" });
+      div.innerHTML = `<div class="markdown-body">${marked.parse(md)}</div>`;
+      window.scrollTo({ top: 0 });
     }
-
-    function parseFrontMatter(md) {
-      const m = md.match(/^---\s*([\s\S]*?)\s*---\s*/);
-      if (!m) return { meta: null, body: md };
-      const block = m[1];
-      const lines = block.split(/\r?\n/);
-      const meta = {};
-      let i = 0;
-      const stripQ = s => s.replace(/^"(.*)"$/, '$1').replace(/^'(.*)'$/, '$1').trim();
-
-      while (i < lines.length) {
-        const line = lines[i];
-        if (!line.trim()) { i++; continue; }
-        const keyMatch = line.match(/^([A-Za-z0-9_-]+):\s*(.*)$/);
-        if (!keyMatch) { i++; continue; }
-        const key = keyMatch[1];
-        const after = keyMatch[2];
-        if (after && !/^\s*$/.test(after)) {
-          meta[key] = stripQ(after);
-          i++;
-          continue;
-        }
-        i++;
-        const arr = [];
-        while (i < lines.length) {
-          const li = lines[i];
-          const mli = li.match(/^\s*-\s*(.*)$/);
-          if (!mli) break;
-          arr.push(stripQ(mli[1]));
-          i++;
-        }
-        meta[key] = arr.length ? arr : "";
-      }
-      const body = md.slice(m[0].length).trim();
-      return { meta, body };
-    }
-
-    function linkify(str) {
-      if (!str) return "";
-      str = str.replace(/((https?:\/\/)[^\s)]+)/g, '<a href="$1" target="_blank" rel="noopener">$1</a>');
-      str = str.replace(/([A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,})/gi, '<a href="mailto:$1">$1</a>');
-      return str;
-    }
-
-    function renderMeta(meta) {
-      if (!meta) return "";
-      const order = ["CAP", "Title", "Category", "Status", "Authors", "Implementors", "Solution-To", "Discussions", "Created", "License"];
-      const keys = [...new Set([...order, ...Object.keys(meta)])];
-      let rows = "";
-      keys.forEach(k => {
-        if (meta[k] === undefined || meta[k] === null || meta[k] === "") return;
-        let val = meta[k];
-        let htmlVal = "";
-        if (Array.isArray(val)) {
-          if (!val.length) return;
-          const items = val.map(v => `<li>${linkify(v)}</li>`).join("");
-          htmlVal = `<ul>${items}</ul>`;
-        } else {
-          htmlVal = linkify(String(val));
-        }
-        rows += `<div class="yaml-key">${k}</div><div class="yaml-value">${htmlVal}</div>`;
-      });
-      return `<div class="yaml-box"><div class="yaml-grid">${rows}</div></div>`;
-    }
-
-    function renderMarkdownWithYaml(md) {
-      const { meta, body } = parseFrontMatter(md);
-      const metaBox = renderMeta(meta);
-      const html = marked.parse(body);
-      return `<div class="markdown-body">${metaBox}${html}</div>`;
-    }
-
     window.addEventListener("hashchange", () => {
       const hash = window.location.hash.replace("#", "");
       if (hash) {
-        const target = allItems.find(li => li.textContent.startsWith(hash));
-        if (target) target.click();
-      } else {
-        loadRootReadme();
-      }
+        const t = allItems.find(li => li.textContent.startsWith(hash));
+        if (t) t.click();
+      } else loadRootReadme();
     });
+
+    // Overlay logic
+    function openOverlay(type) {
+      document.getElementById("overlay").style.display = "flex";
+      switchTab(type);
+    }
+    function closeOverlay() {
+      document.getElementById("overlay").style.display = "none";
+    }
+    function switchTab(type) {
+      document.getElementById("tabCAP").classList.toggle("text-blue-600", type === "CAP");
+      document.getElementById("tabCAP").classList.toggle("border-blue-600", type === "CAP");
+      document.getElementById("tabCIS").classList.toggle("text-green-600", type === "CIS");
+      document.getElementById("formCAP").classList.toggle("hidden", type !== "CAP");
+      document.getElementById("formCIS").classList.toggle("hidden", type !== "CIS");
+    }
+
+    function previewIssue(type) {
+      if (type === "CAP") {
+        const title = encodeURIComponent(document.getElementById("cap_title").value || "CAP Proposal");
+        let body = `## Category\n${document.getElementById("cap_category").value}\n\n` +
+          `## Abstract\n${document.getElementById("cap_abstract").value}\n\n` +
+          `## Motivation\n${document.getElementById("cap_motivation").value}\n\n` +
+          `## Specification\n${document.getElementById("cap_specification").value}\n\n` +
+          `## Rationale\n${document.getElementById("cap_rationale").value}\n\n` +
+          `## Path to Ratification\n${document.getElementById("cap_path").value}\n\n` +
+          `## Authors\n${document.getElementById("cap_authors").value}\n\n` +
+          `## Implementors\n${document.getElementById("cap_implementors").value}\n\n` +
+          `## Discussions\n${document.getElementById("cap_discussions").value}\n\n` +
+          `## License\n${document.getElementById("cap_license").value}`;
+        const link = `https://github.com/${REPO}/issues/new?template=cap.yml&title=${title}&body=${encodeURIComponent(body)}`;
+        window.open(link, "_blank");
+      } else {
+        const title = encodeURIComponent(document.getElementById("cis_title").value || "CIS Proposal");
+        let body = `## Category\n${document.getElementById("cis_category").value}\n\n` +
+          `## Authors\n${document.getElementById("cis_authors").value}\n\n` +
+          `## Discussions\n${document.getElementById("cis_discussions").value}\n\n` +
+          `## Related CAPs\n${document.getElementById("cis_related").value}\n\n` +
+          `## Abstract\n${document.getElementById("cis_abstract").value}\n\n` +
+          `## Background\n${document.getElementById("cis_background").value}\n\n` +
+          `## Problem\n${document.getElementById("cis_problem").value}\n\n` +
+          `## Impact\n${document.getElementById("cis_impact").value}\n\n` +
+          `## Goals\n${document.getElementById("cis_goals").value}\n\n` +
+          `## Open Questions\n${document.getElementById("cis_open").value}\n\n` +
+          `## Use Cases\n${document.getElementById("cis_usecases").value}\n\n` +
+          `## Next Steps\n${document.getElementById("cis_nextsteps").value}\n\n` +
+          `## References\n${document.getElementById("cis_references").value}\n\n` +
+          `## License\n${document.getElementById("cis_license").value}`;
+        const link = `https://github.com/${REPO}/issues/new?template=new_cis.yml&title=${title}&body=${encodeURIComponent(body)}`;
+        window.open(link, "_blank");
+      }
+    }
 
     fetchFolders();
   </script>
