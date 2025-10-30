@@ -126,7 +126,7 @@
   </header>
 
   <div class="flex flex-1 overflow-hidden">
-    <aside id="sidebar" class="w-72 overflow-y-auto p-4">
+    <aside id="sidebar" class="w-80 overflow-y-auto p-4">
       <h1 class="text-xl font-semibold mb-4 text-gray-800">Documents</h1>
       <div id="caps-section">
         <h2 class="font-bold text-lg mb-2 text-blue-800">CAPs</h2>
@@ -156,18 +156,39 @@
       const caps = data.filter(f => f.name.startsWith("CAP-"));
       const ciss = data.filter(f => f.name.startsWith("CIS-"));
 
-      const capsList = document.getElementById("caps-list");
-      const cissList = document.getElementById("ciss-list");
-
-      for (const folder of caps) addLink(folder, capsList);
-      for (const folder of ciss) addLink(folder, cissList);
+      await Promise.all([
+        populateList(caps, document.getElementById("caps-list")),
+        populateList(ciss, document.getElementById("ciss-list"))
+      ]);
     }
 
-    function addLink(folder, container) {
+    async function populateList(folders, container) {
+      for (const folder of folders) {
+        const readmeUrl = `https://raw.githubusercontent.com/${REPO}/main/${folder.name}/README.md`;
+        const title = await extractTitle(readmeUrl);
+        addLink(folder.name, title, container);
+      }
+    }
+
+    async function extractTitle(url) {
+      try {
+        const res = await fetch(url);
+        const md = await res.text();
+        const match = md.match(/^---[\\s\\S]*?---/);
+        if (match) {
+          const block = match[0];
+          const titleMatch = block.match(/Title:\s*"(.*?)"/i);
+          if (titleMatch) return titleMatch[1];
+        }
+      } catch (e) {}
+      return ""; // fallback
+    }
+
+    function addLink(folderName, title, container) {
       const li = document.createElement("li");
-      li.textContent = folder.name;
-      li.className = "cursor-pointer block rounded-md hover:bg-gray-200";
-      li.onclick = () => loadReadme(folder.name, li);
+      li.innerHTML = `<strong>${folderName}</strong>${title ? " – " + title : ""}`;
+      li.className = "cursor-pointer block rounded-md hover:bg-gray-200 px-2 py-1";
+      li.onclick = () => loadReadme(folderName, li);
       container.appendChild(li);
     }
 
@@ -190,13 +211,6 @@
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
 
-    // ---- YAML + Markdown rendering helpers ----
-
-    // Very small front-matter parser that understands:
-    // key: "value"
-    // key:
-    //   - "item"
-    //   - "item2"
     function parseFrontMatter(md) {
       const m = md.match(/^---\s*([\s\S]*?)\s*---\s*/);
       if (!m) return { meta: null, body: md };
@@ -218,14 +232,12 @@
         const key = keyMatch[1];
         const after = keyMatch[2];
 
-        // Inline value
         if (after && !/^\s*$/.test(after)) {
           meta[key] = stripQ(after);
           i++;
           continue;
         }
 
-        // Multiline array
         i++;
         const arr = [];
         while (i < lines.length) {
@@ -244,27 +256,20 @@
 
     function linkify(str) {
       if (!str) return "";
-      // URLs
       str = str.replace(/((https?:\/\/)[^\s)]+)/g, '<a href="$1" target="_blank" rel="noopener">$1</a>');
-      // Emails
       str = str.replace(/([A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,})/gi, '<a href="mailto:$1">$1</a>');
       return str;
     }
 
     function renderMeta(meta) {
       if (!meta) return "";
-
-      // Preferred display order
       const order = ["CAP", "Title", "Category", "Status", "Authors", "Implementors", "Solution-To", "Discussions", "Created", "License"];
       const keys = [...new Set([...order, ...Object.keys(meta)])];
-
       let rows = "";
       keys.forEach(k => {
         if (meta[k] === undefined || meta[k] === null || meta[k] === "") return;
-
         let val = meta[k];
         let htmlVal = "";
-
         if (Array.isArray(val)) {
           if (!val.length) return;
           const items = val.map(v => `<li>${linkify(v)}</li>`).join("");
@@ -272,13 +277,11 @@
         } else {
           htmlVal = linkify(String(val));
         }
-
         rows += `
           <div class="yaml-key">${k}</div>
           <div class="yaml-value">${htmlVal}</div>
         `;
       });
-
       return `
         <div class="yaml-box">
           <div class="yaml-grid">
@@ -295,7 +298,6 @@
       return `<div class="markdown-body">${metaBox}${html}</div>`;
     }
 
-    // Boot
     fetchFolders();
   </script>
 </body>
