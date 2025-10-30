@@ -5,89 +5,135 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Cardano CAP & CIS Viewer</title>
 
-  <!-- TailwindCSS -->
+  <!-- Tailwind for layout -->
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-
   <!-- Markdown renderer -->
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 
   <style>
     body {
-      font-family: "Inter", "Segoe UI", Roboto, sans-serif;
-      background-color: #f9fafb;
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: #f7f9fa;
+      color: #24292f;
     }
 
-    /* Make Markdown look clean */
-    .markdown-body {
-      line-height: 1.7;
-    }
-    .markdown-body h1, .markdown-body h2, .markdown-body h3 {
-      font-weight: 700;
-      color: #1a365d;
-      margin-top: 1.5em;
-      margin-bottom: 0.6em;
-    }
-    .markdown-body code {
-      background: #edf2f7;
-      padding: 2px 4px;
-      border-radius: 4px;
-    }
-    .markdown-body pre {
-      background: #edf2f7;
-      padding: 0.75rem;
-      border-radius: 0.5rem;
-      overflow-x: auto;
-    }
-    .markdown-body a {
-      color: #2b6cb0;
-    }
-    .markdown-body strong {
-      color: #2b6cb0;
-    }
-
-    /* Sidebar link active style */
-    .active {
-      background-color: #2b6cb0;
-      color: white !important;
-    }
-
-    /* Smooth hover */
-    .hoverable:hover {
-      background-color: #e2e8f0;
-    }
-
-    /* Sticky header bar */
+    /* Header */
     #header {
-      background: linear-gradient(90deg, #2b6cb0, #4299e1);
+      background: #0366d6;
       color: white;
       padding: 1rem 2rem;
       font-size: 1.5rem;
-      font-weight: 700;
-      letter-spacing: 0.5px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
+      font-weight: 600;
       box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
     }
 
-    #header span {
-      font-size: 1rem;
-      font-weight: 400;
-      opacity: 0.9;
+    /* Sidebar */
+    #sidebar {
+      background: #f6f8fa;
+      border-right: 1px solid #d0d7de;
+    }
+    #sidebar li {
+      padding: 6px 10px;
+      border-radius: 6px;
+      margin-bottom: 2px;
+      cursor: pointer;
+      font-size: 0.95rem;
+    }
+    #sidebar li:hover {
+      background: #eaeef2;
+    }
+    #sidebar li.active {
+      background: #0366d6;
+      color: white;
+      font-weight: 600;
+    }
+
+    /* GitHub-like Markdown styling */
+    .markdown-body {
+      font-size: 16px;
+      line-height: 1.6;
+      color: #24292f;
+      background: white;
+      padding: 2rem;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+    .markdown-body h1, .markdown-body h2, .markdown-body h3 {
+      border-bottom: 1px solid #d8dee4;
+      padding-bottom: 0.3em;
+      margin-top: 1.5em;
+      margin-bottom: 0.8em;
+      font-weight: 600;
+    }
+    .markdown-body h1 { font-size: 1.8rem; }
+    .markdown-body h2 { font-size: 1.4rem; }
+    .markdown-body h3 { font-size: 1.1rem; }
+
+    .markdown-body table {
+      border-collapse: collapse;
+      width: 100%;
+      margin: 1rem 0;
+      border: 1px solid #d0d7de;
+      font-size: 0.95rem;
+    }
+    .markdown-body th, .markdown-body td {
+      border: 1px solid #d0d7de;
+      padding: 6px 12px;
+      text-align: left;
+    }
+    .markdown-body th {
+      background: #f6f8fa;
+      font-weight: 600;
+    }
+
+    .markdown-body blockquote {
+      border-left: 4px solid #d0d7de;
+      color: #57606a;
+      padding-left: 1rem;
+      margin: 1rem 0;
+    }
+    .markdown-body code {
+      background: #f6f8fa;
+      border-radius: 6px;
+      padding: 0.2rem 0.4rem;
+      font-size: 0.9rem;
+      font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+    }
+    .markdown-body pre {
+      background: #f6f8fa;
+      border-radius: 6px;
+      padding: 1rem;
+      overflow-x: auto;
+    }
+    .markdown-body a {
+      color: #0969da;
+      text-decoration: none;
+    }
+    .markdown-body a:hover {
+      text-decoration: underline;
+    }
+
+    .markdown-body ul, .markdown-body ol {
+      margin-left: 1.5rem;
+      margin-top: 0.5rem;
+      margin-bottom: 1rem;
     }
   </style>
 </head>
 
 <body class="flex flex-col h-screen">
-  <!-- Header bar -->
+  <!-- Header -->
   <header id="header">
     <div>Cardano CAP & CIS Viewer</div>
-    <span>Governance Repository</span>
+    <span class="text-sm opacity-90">Governance Repository</span>
   </header>
 
   <div class="flex flex-1 overflow-hidden">
     <!-- Sidebar -->
-    <aside id="sidebar" class="w-72 bg-gray-100 border-r overflow-y-auto p-4">
+    <aside id="sidebar" class="w-72 overflow-y-auto p-4">
       <h1 class="text-xl font-semibold mb-4 text-gray-800">Documents</h1>
 
       <div id="caps-section">
@@ -101,16 +147,17 @@
       </div>
     </aside>
 
-    <!-- Main content -->
-    <main class="flex-1 overflow-y-auto p-8 bg-white markdown-body" id="content">
-      <p class="text-gray-500 italic">Select a CAP or CIS from the sidebar to view its content.</p>
+    <!-- Main Markdown content -->
+    <main class="flex-1 overflow-y-auto p-8" id="content">
+      <div class="markdown-body">
+        <p class="text-gray-500 italic">Select a CAP or CIS from the sidebar to view its content.</p>
+      </div>
     </main>
   </div>
 
   <script>
     const REPO = "Thomas-nada/CAP";
     const apiURL = `https://api.github.com/repos/${REPO}/contents`;
-    let current = null;
 
     async function fetchFolders() {
       const res = await fetch(apiURL);
@@ -129,13 +176,12 @@
     function addLink(folder, container) {
       const li = document.createElement("li");
       li.textContent = folder.name;
-      li.className = "cursor-pointer block px-3 py-2 rounded-md text-gray-700 hoverable";
+      li.className = "cursor-pointer block rounded-md hover:bg-gray-200";
       li.onclick = () => loadReadme(folder.name, li);
       container.appendChild(li);
     }
 
     async function loadReadme(folder, element) {
-      // reset active styles
       document.querySelectorAll("#sidebar li").forEach(li => li.classList.remove("active"));
       element.classList.add("active");
 
@@ -144,13 +190,13 @@
       const contentDiv = document.getElementById("content");
 
       if (!res.ok) {
-        contentDiv.innerHTML = `<p class='text-red-500'>README.md not found in ${folder}</p>`;
+        contentDiv.innerHTML = `<div class='markdown-body'><p class='text-red-500'>README.md not found in ${folder}</p></div>`;
         return;
       }
 
       const md = await res.text();
       const html = marked.parse(md);
-      contentDiv.innerHTML = html;
+      contentDiv.innerHTML = `<div class='markdown-body'>${html}</div>`;
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
 
