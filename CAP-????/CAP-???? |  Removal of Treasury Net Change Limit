@@ -1,0 +1,103 @@
+---
+CAP: 0042
+Title: "Removal of Treasury Net Change Limit"
+Category: "Constitution"
+Status: "Draft"
+Authors:
+  - "Cardano Community Member <@GitHubHandle>"
+Implementors:
+  - "N/A"
+Solution-To:
+  - "CIS-0000"
+Discussions:
+  - "https://github.com/cardano-foundation/CAP/discussions/0000"
+Created: "2024-03-20"
+License: "CC-BY-4.0"
+---
+
+## Abstract
+
+This Constitutional Amendment Proposal (CAP) seeks to remove the concept of the "Net Change Limit" (NCL) from the Cardano Constitution. Currently, the Constitution mandates that treasury withdrawals must not violate a specific net change limit agreed upon by DReps. While intended as a sustainability guardrail, practical observation suggests the NCL functions as a psychological "spending target" for governance bodies, encouraging spending up to the limit rather than assessing the merit of individual proposals. This amendment proposes striking the language regarding the NCL from **Article IV, Section 3** and removing the associated guardrails (**TREASURY-01a** and **TREASURY-02a**) from **Appendix I**. This change aims to shift the focus of fiscal responsibility back to the merit-based assessment of the Ecosystem Budget and individual withdrawal actions.
+
+---
+
+## Motivation: Why is this CAP necessary?
+
+The current Constitution establishes a "net change limit" to control the rate of treasury depletion. However, this mechanism has unintended behavioral consequences for governance participants, specifically Delegated Representatives (DReps).
+
+Instead of acting as a hard brake on excessive spending, the NCL often serves as a "goal post." It creates a psychological anchor where spending is deemed acceptable simply because it falls within the NCL, potentially bypassing rigorous scrutiny of the actual value and necessity of the withdrawal.
+
+This amendment is necessary to:
+1.  **Eliminate Psychological Anchoring:** Prevent DReps from viewing the NCL as a budget allocation that "should" be spent.
+2.  **Reinforce Meritocracy:** Ensure that budget proposals and treasury withdrawals are evaluated strictly on their individual merits and alignment with the ecosystem's strategic goals, rather than their proximity to an arbitrary cap.
+3.  **Trust in Governance:** Affirm that DReps are capable of fiscal discipline without artificial constraints that distort decision-making.
+
+This CAP impacts DReps, the Constitutional Committee (who currently enforce this check), and the broader Cardano Community by simplifying the treasury management framework.
+
+---
+
+## Amendment Specification
+
+The following changes are proposed to the **Cardano Blockchain Ecosystem Constitution**:
+
+### 1. Modification of Article IV, Section 3
+**Current Text:**
+> "Withdrawals from the Cardano Blockchain treasury that would cause the Cardano Blockchain treasury balance to violate the then applicable net change limit shall not be permitted. No withdrawals from the Cardano Blockchain treasury shall be permitted unless such withdrawals have been authorized and are being made pursuant to a budget for the Cardano Blockchain..."
+
+**Amended Text:**
+> "No withdrawals from the Cardano Blockchain treasury shall be permitted unless such withdrawals have been authorized and are being made pursuant to a budget for the Cardano Blockchain..."
+
+*(Note: The first sentence regarding the net change limit is deleted entirely.)*
+
+### 2. Modification of Appendix I: Cardano Blockchain Guardrails
+**Section 3. Guardrails and Guidelines on Treasury Withdrawal Actions**
+
+The following Guardrails are to be **Deprecated/Removed**:
+
+* **TREASURY-01a (x):** "A net change limit for the Cardano treasury's balance per period of time **must** be agreed by the DReps via an on-chain governance action with a threshold of greater than 50% of the active voting stake"
+* **TREASURY-02a (x):** "Withdrawals from the Cardano Blockchain treasury made pursuant to an approved Cardano Blockchain ecosystem budget **must not** exceed the net change limit for the Cardano Treasury's balance per period of time"
+
+*(Note: The remaining guardrails in this section, TREASURY-03a and TREASURY-04a, shall remain in effect and be renumbered if necessary.)*
+
+---
+
+## Rationale: How does this CAP achieve its goals?
+
+### Shifting from Limits to Budgets
+The removal of the NCL emphasizes **Article IV, Section 1**, which already requires the community to propose and approve budgets for the ecosystem. A well-constructed budget is a superior tool for financial planning than a flat "net change" metric. The budget process allows for nuanced categorization of spend, whereas the NCL is a blunt instrument that fails to distinguish between high-ROI investments and wasteful expenditure.
+
+### Behavioral Economics
+By removing the NCL, we remove the "safety net" bias. DReps can no longer abstain from deep due diligence under the assumption that "the system" (the NCL) protects the treasury. They must actively take ownership of the treasury's longevity through their voting on specific Budget and Withdrawal actions.
+
+### Trade-offs
+* **Risk:** Without an NCL, there is a theoretical risk of a malicious or negligent majority draining the treasury faster than sustainable.
+* **Mitigation:** This is mitigated by **Article IV, Section 3** (requiring an approved budget) and **Article III, Section 2**, which establishes the checks and balances between DReps, SPOs, and the Constitutional Committee. Furthermore, **Guardrail TREASURY-04a** ensures no withdrawals occur without a ratified budget.
+
+---
+
+## Path to Ratification
+
+### Acceptance Criteria
+This CAP represents a constitutional amendment. According to **Article VIII, Section 2**, it requires:
+* A collective decision-making process requiring an on-chain governance action.
+* A voting threshold of **75% of the then active voting stake of DReps**.
+* Verification by the Constitutional Committee that the amendment follows the proper process.
+
+### Implementation Plan
+1.  **Off-Chain Consensus:** Gather community sentiment and feedback via this CAP process.
+2.  **File Update:** Create a new version of the Constitution text file (`cardano-constitution-v2.txt`) incorporating the deletions specified above.
+3.  **Hashing:** Generate the Blake2b-256 hash of the new Constitution file.
+4.  **On-Chain Action:** Submit a "New Constitution" governance action referencing the new hash and the URL to the updated file.
+5.  **Enactment:** Upon ratification (passing the 65% threshold), the new Constitution takes effect, and the NCL check is effectively removed from governance procedures.
+
+---
+
+## Versioning (Optional)
+
+This amendment will supersede Version 1 of the Cardano Constitution. Future references to Treasury Guardrails should cite the Version 2 document where `TREASURY-01a` and `TREASURY-02a` are marked as deprecated or removed.
+
+---
+
+## Copyright
+
+This CAP is licensed under [CC-BY-4.0](https://creativecommons.org/licenses/by/4.0/legalcode).
