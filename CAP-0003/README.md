@@ -1,7 +1,7 @@
----
+
 CAP: XXXX
 Title: "Try Test Build"
-Category: "Meta 
+Category: "Meta" 
 Status: "Draft"
 Authors:
   - "Name <@silversoul8668>"
