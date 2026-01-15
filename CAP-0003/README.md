@@ -1,17 +1,17 @@
 ---
 CAP: XXXX
-Title: "[Title of the Constitutional Amendment Proposal]"
-Category: "Guardrails" # or Meta / Constitution / Standards
+Title: "Try Test Build"
+Category: "Meta 
 Status: "Draft"
 Authors:
-  - "Name <@GitHubHandle>"
+  - "Name <@silversoul8668>"
 Implementors:
   - "N/A"
 Solution-To:
   - "CIS-XXXX"
 Discussions:
   - "https://github.com/[org]/CAP/discussions/??"
-Created: "YYYY-MM-DD"
+Created: "2026-01-15"
 License: "CC-BY-4.0"
 ---
 
