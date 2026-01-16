@@ -7,21 +7,31 @@ body:
     attributes:
       value: |
         ### Welcome! 
-        Thank you for contributing to Cardano Governance. Filling out this form starts your **30-day deliberation period**.
+        Filling out this form starts your **mandatory 30-day deliberation period**. 
   - type: input
     id: title
     attributes:
       label: "Proposal Title"
       description: "A short, descriptive name for your proposal."
-      placeholder: "e.g., Update Guardrail Thresholds for Staking"
+    validations:
+      required: true
+  - type: dropdown
+    id: category
+    attributes:
+      label: "Category"
+      description: "Select the area of governance this proposal affects."
+      options:
+        - Constitution
+        - Guardrails
+        - Standards
+        - Meta
     validations:
       required: true
   - type: textarea
     id: abstract
     attributes:
       label: "Abstract"
-      description: "Summarize your proposal in 1-2 paragraphs."
-      placeholder: "What is this change about?"
+      description: "A short (~200 words) summary of the proposed change."
     validations:
       required: true
   - type: textarea
@@ -35,26 +45,29 @@ body:
     id: specification
     attributes:
       label: "Specification"
-      description: "Describe the exact changes. If you are changing the Constitution, provide the new text here."
+      description: "The detailed proposal—the exact rules, standards, or text being changed."
     validations:
       required: true
-  - type: dropdown
-    id: category
+  - type: textarea
+    id: rationale
     attributes:
-      label: "Category"
-      options:
-        - Constitution
-        - Guardrails
-        - Standards
-        - Meta
+      label: "Rationale"
+      description: "Explain your design choices and any alternative approaches you considered."
+    validations:
+      required: true
+  - type: textarea
+    id: ratification
+    attributes:
+      label: "Path to Ratification"
+      description: "What criteria must be met for this CAP to become Active (e.g., specific vote thresholds)?"
     validations:
       required: true
   - type: checkboxes
     id: terms
     attributes:
-      label: "Final Checks"
+      label: "Final Acknowledgements"
       options:
-        - label: "I understand that this starts a mandatory 30-day deliberation period."
+        - label: "I understand this starts a mandatory 30-day deliberation period."
           required: true
         - label: "I agree to license this proposal under CC-BY-4.0."
           required: true
