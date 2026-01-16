@@ -1,57 +1,41 @@
 ---
-CAP: XXXX
-Title: "[Title of the Constitutional Amendment Proposal]"
-Category: "Guardrails" # or Meta / Constitution / Standards
-Status: "Draft"
+CAP: "XXXX"
+Title: "Your Proposal Title"
+Category: "Meta/Constitution/Guardrails/Standards"
+Status: "Proposed"
 Authors:
-  - "Name <@GitHubHandle>"
+  - "Name <email@domain.com>"
 Implementors:
   - "N/A"
 Solution-To:
-  - "CIS-XXXX"
+  - "N/A"
 Discussions:
-  - "https://github.com/[org]/CAP/discussions/??"
+  - "URL to GitHub Issue or PR"
 Created: "YYYY-MM-DD"
 License: "CC-BY-4.0"
 ---
 
 ## Abstract
 
-A short (~200 words) summary of the proposed constitutional amendment and the governance issue it addresses.  
-This section should clearly describe the motivation for change, the nature of the amendment, and its intended outcome for Cardano’s governance system.
+[A short summary of about 200 words describing the problem and the proposed governance change. Keep it concise and clear.]
 
 ---
 
 ## Motivation: Why is this CAP necessary?
 
-Explain the purpose of this amendment and the governance problem it seeks to solve. Reference the linked [**Constitution Issue Statement (CIS)**] if applicable.  
-Clearly outline which stakeholders are impacted (e.g., DReps, SPOs, Constitutional Committee) and how the amendment improves governance outcomes.
-
-If this CAP modifies or supersedes an existing constitutional article or governance guardrail, explain why that is necessary and what shortcomings it addresses.
+[Explain the purpose of this proposal. What specific problem in Cardano governance does it solve? If this is a response to a Constitution Issue Statement (CIS), link it here.]
 
 ---
 
-## Amendment Specification
+## Specification
 
-Provide the **exact text** of the proposed constitutional change or addition. This section is considered the **canonical version** of the amendment once ratified.
+### Document Structure
 
-Include, where relevant:
+[The detailed proposal goes here. This section must contain the exact rules, standards, or wording changes you are proposing for the Constitution or governance framework.]
 
-- New or amended article text  
-- Changes to guardrails  
-- Definitions of new governance mechanisms or procedures  
-- Versioning scheme, if applicable
+### Rationale
 
----
-
-## Rationale: How does this CAP achieve its goals?
-
-Discuss the reasoning behind the proposed amendment and how it addresses the governance issue described in the CIS. Cover:
-
-- Why this solution was chosen over alternatives  
-- Key considerations and trade-offs  
-- Outcomes from community discussion and review  
-- Backward compatibility or transition considerations (if any)
+[Explain why you chose this specific design or solution. List any alternative approaches you considered and explain why your chosen path is the best option.]
 
 ---
 
@@ -59,32 +43,24 @@ Discuss the reasoning behind the proposed amendment and how it addresses the gov
 
 ### Acceptance Criteria
 
-Define the conditions under which this amendment becomes **Ratified**. Examples include:
-
-- Minimum vote thresholds and quorum requirements    
-- Required on-chain or off-chain governance actions  
-- Compatibility with existing governance processes
+[Define exactly what must happen for this CAP to become "Active." For example: "Approval by the Constitutional Committee" or "A specific on-chain voting threshold met by DReps."]
 
 ### Implementation Plan
 
-Outline the steps required to implement the amendment once ratified. This may include:
-
-- Updating the canonical constitution file (e.g., `constitution/constitution-v1.txt`)  
-- Executing an on-chain governance action  
-- Coordinating off-chain steps (e.g., publication, ecosystem communication)  
-- Updating relevant tooling, dApps, or governance dashboards
+[Detail the next steps required to achieve ratification after the 30-day deliberation period ends.]
 
 ---
 
-## Versioning (Optional)
+## Mandatory 30-Day Deliberation Period
 
-Describe how this amendment will be versioned or superseded in future governance processes, if applicable.
+> [!IMPORTANT]  
+> Submission of this document marks the start of the mandatory 30-day deliberation period. This CAP cannot be ratified or moved to "Active" status until at least 30 days of community review have passed.
 
 ---
 
 ## References (Optional)
 
-List any relevant documentation, standards, governance decisions, or previous CAPs/CISs referenced in this proposal.
+- [Link to related CIPs, legal research, or community discussions]
 
 ---
 
