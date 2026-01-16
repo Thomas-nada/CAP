@@ -1,0 +1,60 @@
+name: "New Cardano Amendment Proposal (CAP)"
+description: "Propose a change to the Constitution or Governance Rules"
+title: "[CAP-PROPOSAL]: "
+labels: ["Proposed", "Deliberation-Period"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ### Welcome! 
+        Thank you for contributing to Cardano Governance. Filling out this form starts your **30-day deliberation period**.
+  - type: input
+    id: title
+    attributes:
+      label: "Proposal Title"
+      description: "A short, descriptive name for your proposal."
+      placeholder: "e.g., Update Guardrail Thresholds for Staking"
+    validations:
+      required: true
+  - type: textarea
+    id: abstract
+    attributes:
+      label: "Abstract"
+      description: "Summarize your proposal in 1-2 paragraphs."
+      placeholder: "What is this change about?"
+    validations:
+      required: true
+  - type: textarea
+    id: motivation
+    attributes:
+      label: "Motivation"
+      description: "Why is this change necessary? What problem does it solve?"
+    validations:
+      required: true
+  - type: textarea
+    id: specification
+    attributes:
+      label: "Specification"
+      description: "Describe the exact changes. If you are changing the Constitution, provide the new text here."
+    validations:
+      required: true
+  - type: dropdown
+    id: category
+    attributes:
+      label: "Category"
+      options:
+        - Constitution
+        - Guardrails
+        - Standards
+        - Meta
+    validations:
+      required: true
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: "Final Checks"
+      options:
+        - label: "I understand that this starts a mandatory 30-day deliberation period."
+          required: true
+        - label: "I agree to license this proposal under CC-BY-4.0."
+          required: true
