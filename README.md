@@ -1,117 +1,88 @@
-The Cardano Constitution Amendment Proposals (CAP) repository contains two complementary types document:
+# Cardano Amendment Proposals (CAP) Repository
 
-- **Cardano Amendment Proposals (CAP):** Formal proposals to amend, clarify, or extend Cardano’s Constitution.
-- **Constitution Issue Statements (CIS):** Structured descriptions of Constitution problems, ambiguities, or risks that require community attention and may guide future CAPs.
+The Cardano Constitution Amendment Proposals (CAP) repository contains two complementary types of documents that form the foundation of Cardano’s off-chain governance documentation. Because these documents are stored as Markdown files in a versioned repository, their history serves as the authoritative record of Cardano’s evolving governance system.
 
-Together, **CAP and CIS form aid Cardano’s off-chain governance documentation**.  
-They provide the foundation for constitutional amendments and transparent community deliberation.  
-Because these documents are stored as Markdown files in a versioned repository, their history serves as the authoritative record of Cardano’s evolving governance system.
+* **Cardano Amendment Proposals (CAP):** Formal proposals to amend, clarify, or extend Cardano’s Constitution.
+* **Constitution Issue Statements (CIS):** Structured descriptions of Constitution problems, ambiguities, or risks that require community attention and may guide future CAPs.
+
+---
 
 ## 🧭 What is a CAP?
 
-A [Cardano Amendment Proposal (CAP)](./CAP-0001) is a governance design document proposing changes, additions, or clarifications to Cardano’s Constitution or guardrails.
+A [Cardano Amendment Proposal (CAP)](./CAPs/CAP-0001/README.md) is a governance design document proposing changes, additions, or clarifications to Cardano’s Constitution or guardrails.
 
-Each CAP:
+* **Amendment Focus:** Each CAP proposes a constitutional amendment or standard.
+* **Structure:** Describes the motivation, specification, and path to ratification.
+* **Review Process:** Undergoes open community discussion, editorial review, and eventual on-chain governance action.
 
-- Proposes a constitutional amendment or standard.
-- Describes the motivation, specification, and path to ratification.
-- Undergoes open community discussion, editorial review, and eventual on-chain governance action.
+> 📌 **Note:** CAPs do **not** themselves enact constitutional changes. They serve as the **community input layer** for governance actions that are ultimately ratified on-chain.
 
-> 📌 CAPs do **not** themselves enact constitutional changes. They serve as the **community input layer** for governance actions that are ultimately ratified on-chain.
-
-For new CAPs, a template is available here: [.github/CAP-TEMPLATE.md](.github/CAP-TEMPLATE.md)
+For new CAPs, a template is available here: [`.github/CAP-TEMPLATE.md`](.github/ISSUE_TEMPLATE/CAP-TEMPLATE.md)
 
 ---
 
 ## 🧭 What is a CIS?
 
-A [Constitution Issue Statement (CIS)](./CIS-0001) is a formal document that articulates a constitutional problem, its context, and its impact.  
-Where CAPs propose solutions, CISs **define the problems** those solutions aim to solve.
+A [Constitution Issue Statement (CIS)](./CAPs/CAP-9999/README.md) is a formal document that articulates a constitutional problem, its context, and its impact. Where CAPs propose solutions, CISs **define the problems** those solutions aim to solve.
 
-Each CIS:
-
-- Provides historical and procedural context for a constitutional challenge.  
-- Describes the problem’s scope, impact, and stakeholder relevance.  
-- Lists open questions and potential directions for future CAPs.
+* **Context:** Provides historical and procedural context for a constitutional challenge.
+* **Scope:** Describes the problem’s scope, impact, and stakeholder relevance.
+* **Future Work:** Lists open questions and potential directions for future CAPs.
 
 CISs and CAPs are complementary: a single CIS may inspire multiple CAPs, and a CAP may address multiple CISs.
 
-For more details, see [CIS-9999 – Constitution Issue Statements](./CIS-9999).
-
 ---
 
-# 📜 Constitutional Amendment Proposals (CAP)
+## 🚀 The Recipe: How to Participate
 
-<!-- BEGIN_CAP_INDEX -->
-| # | Title | Status | Addresses CIS |
-|-------|-----------------------------|----------|-----------------------------|
-| 0001 | [CAP Process](./CAP-0001) | Active | [N/A](./N/A) |
-| 0002 | [Mandatory On-Chain Coffee Breaks ☕](./CAP-0002) | Proposed | [CIS-0002](./CIS-0002) |
-| 9999 | [Constitution Issue Statements (CIS) — Process](./CAP-9999) | Active | [N/A](./N/A) |
-<p align="right"><i>Last updated on 2025-10-30</i></p>
-<!-- END_CAP_INDEX -->
+To ensure quality and transparency, all contributors must follow one of these two paths. **Every submission is subject to a mandatory 30-day deliberation period** before it can be moved to "Active" or submitted for on-chain voting.
 
----
+### Path A: The Simplified Path (Beginner Friendly)
 
-# 🧭 Constitution Issue Statements (CIS)
+1. **Open a Form:** Navigate to the **Issues** tab and click **"New Issue"**.
+2. **Select Template:** Choose the **New CAP Proposal** or **New CIS Issue** form.
+3. **Submit:** Fill out the web-based form and click submit. This officially starts your **30-day deliberation period**.
 
-<!-- BEGIN_CIS_INDEX -->
-| # | Title | Status | Proposed Solutions |
-|-------|-----------------------------|----------|-----------------------------|
-| 0001 | [Low Participation and Representation in On-Chain Governance](./CIS-0001) | Open | – |
-<p align="right"><i>Last updated on 2025-10-30</i></p>
-<!-- END_CIS_INDEX -->
+### Path B: The Standard Path (Advanced)
+
+1. **Fork & Branch:** Create a fork of this repository and a new branch for your work.
+2. **Add File:** Place your proposal in a folder (`CAPs/CAP-XXXX/` or `CISs/CIS-XXXX/`) using the provided templates.
+3. **Pull Request:** Submit a PR. The date the PR is opened marks the start of your **30-day deliberation period**.
 
 ---
 
 ## 📈 Repository Lifecycle
 
-- **Proposed:** A CAP or CIS that has been merged into the repository but not yet ratified or resolved.  
-- **Active:** A CAP that has been ratified through governance action, or a CIS that remains relevant and open.  
-- **Inactive:** A CAP or CIS that has been superseded, withdrawn, or deemed obsolete.
+* **Proposed:** A CAP or CIS merged into the repository but not yet ratified or resolved. These remain in "Proposed" for at least **30 days**.
+* **Active:** A CAP ratified through governance action, or a CIS that remains relevant and open.
+* **Inactive:** A CAP or CIS that has been superseded, withdrawn, or deemed obsolete.
 
 > ✏️ **Drafts** are not listed here. Proposals are considered drafts while they are still in open pull requests.
-
----
-
-## 🔁 Updates Under Consideration
-
-You can track proposed changes to existing CAPs and CISs here:  
-**[CAP and CIS updates under consideration](https://github.com/Thomas-nada/CAP/pulls?q=is%3Apr+is%3Aopen+label%3AUpdate+sort%3Aupdated-desc)**
-
----
-
-## ⏸️ Stalled / Waiting for Authors
-
-Some proposals are awaiting author revisions or confirmation of eligibility before review can continue:  
-
-[**Stalled CAPs and CISs**](https://github.com/Thomas-nada/CAP/pulls?q=is%3Apr+is%3Aopen+draft%3Afalse+in%3Atitle+label%3A%22State%3A+Waiting+for+Author%22%2C%22State%3A+Likely+Abandoned%22%2C%22State%3A+Likely+Deprecated%22+-label%3AUpdate%2CCorrection%2CTranslation+sort%3Aupdated-asc)
 
 ---
 
 ## ✏️ Editors
 
 | Name | GitHub |
-|------|--------|
+| --- | --- |
 | Thomas Lindseth | [@Thomas-nada](https://github.com/Thomas-nada) |
 | Larisa Mcfarlane | [@LallyMack](https://github.com/LallyMack) |
 
 ---
 
-### 📚 Recommended Reading
+## 📂 Repository Structure
 
-- [CAP-0001 – CAP Process](./CAP-0001)  
-- [CIS-9999 – Constitution Issue Statements](./CIS-9999)  
+```text
+CAPs/CAP-0001/    (Each proposal has its own folder)
+CISs/CIS-0001/    (Each issue has its own folder)
+constitution/     (The currently active Constitution)
+CAPSLOCK/         (CAP Editors Meeting records) 
+.github/          (Forms and templates)
+
+```
 
 ---
 
-### 🗺️ Repository Structure
+## 📜 License
 
-CAP-0001/  
-CAP-0002/    
-CAP-????/  
-CIS-0001/  
-CIS-0002/  
-CIS-????/
-
-Each proposal resides in its own folder with a `README.md` as the primary document. Supporting files (appendices, diagrams, translations) may also be included.
+All documents in this repository are licensed under [CC-BY-4.0](https://creativecommons.org/licenses/by/4.0/legalcode).
