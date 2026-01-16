@@ -1,5 +1,5 @@
 ---
-CIS: "000X"
+CIS: "XXXX"
 Title: "Title of the Constitutional Issue"
 Category: "Governance/Constitution/Guardrails/Standards"
 Status: "Proposed"
