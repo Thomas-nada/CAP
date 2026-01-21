@@ -1,72 +1,71 @@
-name: "Council Amendment Proposal (CAP)"
-description: "Draft a formal amendment for the Cardano Constitution."
+name: "Amendment Proposal (CAP)"
+description: "Submit a proposal to change the Constitution."
 title: "[CAP]: "
 labels: ["CAP", "Draft"]
 body:
   - type: markdown
     attributes:
       value: |
-        ### Institutional Intake: CAP
-        Thank you for contributing to the governance layer. Please ensure your abstract is concise and your motivation clear.
+        ### CAP Form
+        Fill out the details below to propose an amendment.
 
   - type: textarea
     id: abstract
     attributes:
-      label: Executive Abstract
-      description: A high-level summary of this proposal.
-      placeholder: Summarize your amendment...
+      label: Summary
+      description: A short summary of your proposal.
+      placeholder: What is this proposal about?
     validations:
       required: true
 
   - type: dropdown
     id: category
     attributes:
-      label: Working Category
-      description: Choose the classification that best fits your proposal.
+      label: Category
+      description: Pick the category that fits best.
       options:
-        - Meta (CIP process or governance framework changes)
-        - Constitution (Direct amendments to the text)
-        - Guardrails (Technical and monetary guardrail systems)
-        - Supporting (Technical guidance or supporting documentation)
-        - Other (Proposals falling outside defined categories)
+        - Meta (Process or framework changes)
+        - Constitution (Direct text changes)
+        - Guardrails (Technical or monetary limits)
+        - Supporting (Guidance or extra docs)
+        - Other (Anything else)
     validations:
       required: true
 
   - type: textarea
     id: motivation
     attributes:
-      label: Motivation
-      description: Why is this change necessary?
-      placeholder: Provide the logic and necessity behind this entry...
+      label: Why?
+      description: Why is this change needed?
+      placeholder: Explain the reasoning...
     validations:
       required: true
 
   - type: textarea
     id: specification
     attributes:
-      label: Structured Revisions (Contextual)
-      description: |
-        Please provide the specific section and text you are referencing from the Constitution, followed by your proposed change.
+      label: Revisions
+      description: List the original text and your proposed change.
       placeholder: |
         ### Section: [Article X]
         **Original Text:** [Paste here]
-        **Proposed Revision:** [Type change here]
+        **Proposed Change:** [Type change here]
     validations:
       required: true
 
   - type: textarea
     id: exhibits
     attributes:
-      label: Institutional Assets
-      description: Links to research, datasets, or external specifications.
+      label: Links and Files
+      description: Links to research, files, or extra info.
       placeholder: "https://..."
     
   - type: checkboxes
     id: acknowledgments
     attributes:
-      label: Governance Acknowledgments
+      label: Confirmations
       options:
-        - label: I understand this starts a mandatory 30-day deliberation period.
+        - label: I understand this starts a 30-day deliberation period.
           required: true
-        - label: I agree to license this document under CC-BY-4.0.
+        - label: I agree to license this under CC-BY-4.0.
           required: true
