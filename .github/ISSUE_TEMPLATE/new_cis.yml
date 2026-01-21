@@ -1,80 +1,71 @@
-name: "New Constitution Issue Statement (CIS)"
-description: "Define a constitutional problem, gap, or ambiguity that needs to be addressed."
-title: "[CIS-ISSUE]: "
-labels: ["Proposed", "Deliberation-Period"]
+name: "Issue Statement (CIS)"
+description: "Report a problem or issue."
+title: "[CIS]: "
+labels: ["CIS", "Proposed", "Deliberation-Period"]
 body:
   - type: markdown
     attributes:
       value: |
-        ### Articulating a Constitutional Problem
-        Thank you for helping define the challenges in Cardano's governance. This form starts the **mandatory 30-day deliberation period**. 
-  - type: input
-    id: title
-    attributes:
-      label: "CIS Title"
-      description: "A short, descriptive name for the issue (e.g., Ambiguity in DRep Retirement)."
-    validations:
-      required: true
-  - type: dropdown
-    id: category
-    attributes:
-      label: "Category"
-      description: "Which area does this issue primarily impact?"
-      options:
-        - Constitution
-        - Guardrails
-        - Standards
-        - Governance
-    validations:
-      required: true
+        ### CIS Form
+        Use this to report a problem that needs attention.
+
   - type: textarea
     id: abstract
     attributes:
-      label: "Abstract"
-      description: "A short (~200 words) summary of the constitutional issue."
+      label: Summary
+      description: A short summary of the issue.
+      placeholder: What is the problem?
     validations:
       required: true
-  - type: textarea
-    id: background
+
+  - type: dropdown
+    id: category
     attributes:
-      label: "Background"
-      description: "What is the history or context of this issue? Why is it appearing now?"
-    validations:
-      required: true
-  - type: textarea
-    id: problem
-    attributes:
-      label: "Problem Definition"
-      description: "Describe the gap, risk, or ambiguity in detail. Focus on the problem, not the solution."
-    validations:
-      required: true
-  - type: textarea
-    id: impact
-    attributes:
-      label: "Impact"
-      description: "How does this affect governance legitimacy, trust, or the system's resilience?"
-    validations:
-      required: true
-  - type: textarea
-    id: goals
-    attributes:
-      label: "Goals"
-      description: "What outcomes should a future solution achieve?"
-    validations:
-      required: true
-  - type: textarea
-    id: questions
-    attributes:
-      label: "Open Questions"
-      description: "What questions should a future CAP aim to answer?"
-    validations:
-      required: true
-  - type: checkboxes
-    id: terms
-    attributes:
-      label: "Final Acknowledgements"
+      label: Category
+      description: Pick the category that fits best.
       options:
-        - label: "I understand this starts a mandatory 30-day deliberation period."
+        - Meta (Process or framework issues)
+        - Constitution (Text issues)
+        - Guardrails (Technical or monetary limit issues)
+        - Supporting (Guidance or extra doc issues)
+        - Other (Anything else)
+    validations:
+      required: true
+
+  - type: textarea
+    id: statement_of_problem
+    attributes:
+      label: Explanation
+      description: Give more details on why this is an issue.
+      placeholder: Explain the problem...
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem_identification
+    attributes:
+      label: Problem Details
+      description: Cite the specific part where the problem exists.
+      placeholder: |
+        ### Section: [Article X]
+        **Original Text:** [Paste here]
+        **The Problem:** [Describe it here]
+    validations:
+      required: true
+
+  - type: textarea
+    id: exhibits
+    attributes:
+      label: Links and Files
+      description: Links to evidence or extra info.
+      placeholder: "https://..."
+
+  - type: checkboxes
+    id: acknowledgments
+    attributes:
+      label: Confirmations
+      options:
+        - label: I understand this starts a 30-day deliberation period.
           required: true
-        - label: "I agree to license this document under CC-BY-4.0."
+        - label: I agree to license this under CC-BY-4.0.
           required: true
