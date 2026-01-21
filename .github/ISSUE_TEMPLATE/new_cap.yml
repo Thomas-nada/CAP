@@ -1,73 +1,72 @@
-name: "New Cardano Amendment Proposal (CAP)"
-description: "Propose a change to the Constitution or Governance Rules"
-title: "[CAP-PROPOSAL]: "
-labels: ["Proposed", "Deliberation-Period"]
+name: "Council Amendment Proposal (CAP)"
+description: "Draft a formal amendment for the Cardano Constitution."
+title: "[CAP]: "
+labels: ["CAP", "Draft"]
 body:
   - type: markdown
     attributes:
       value: |
-        ### Welcome! 
-        Filling out this form starts your **mandatory 30-day deliberation period**. 
-  - type: input
-    id: title
-    attributes:
-      label: "Proposal Title"
-      description: "A short, descriptive name for your proposal."
-    validations:
-      required: true
-  - type: dropdown
-    id: category
-    attributes:
-      label: "Category"
-      description: "Select the area of governance this proposal affects."
-      options:
-        - Constitution
-        - Guardrails
-        - Standards
-        - Meta
-    validations:
-      required: true
+        ### Institutional Intake: CAP
+        Thank you for contributing to the governance layer. Please ensure your abstract is concise and your motivation clear.
+
   - type: textarea
     id: abstract
     attributes:
-      label: "Abstract"
-      description: "A short (~200 words) summary of the proposed change."
+      label: Executive Abstract
+      description: A high-level summary of this proposal.
+      placeholder: Summarize your amendment...
     validations:
       required: true
+
+  - type: dropdown
+    id: category
+    attributes:
+      label: Working Category
+      description: Choose the classification that best fits your proposal.
+      options:
+        - Meta (CIP process or governance framework changes)
+        - Constitution (Direct amendments to the text)
+        - Guardrails (Technical and monetary guardrail systems)
+        - Supporting (Technical guidance or supporting documentation)
+        - Other (Proposals falling outside defined categories)
+    validations:
+      required: true
+
   - type: textarea
     id: motivation
     attributes:
-      label: "Motivation"
-      description: "Why is this change necessary? What problem does it solve?"
+      label: Motivation
+      description: Why is this change necessary?
+      placeholder: Provide the logic and necessity behind this entry...
     validations:
       required: true
+
   - type: textarea
     id: specification
     attributes:
-      label: "Specification"
-      description: "The detailed proposal—the exact rules, standards, or text being changed."
+      label: Structured Revisions (Contextual)
+      description: |
+        Please provide the specific section and text you are referencing from the Constitution, followed by your proposed change.
+      placeholder: |
+        ### Section: [Article X]
+        **Original Text:** [Paste here]
+        **Proposed Revision:** [Type change here]
     validations:
       required: true
+
   - type: textarea
-    id: rationale
+    id: exhibits
     attributes:
-      label: "Rationale"
-      description: "Explain your design choices and any alternative approaches you considered."
-    validations:
-      required: true
-  - type: textarea
-    id: ratification
-    attributes:
-      label: "Path to Ratification"
-      description: "What criteria must be met for this CAP to become Active (e.g., specific vote thresholds)?"
-    validations:
-      required: true
+      label: Institutional Assets
+      description: Links to research, datasets, or external specifications.
+      placeholder: "https://..."
+    
   - type: checkboxes
-    id: terms
+    id: acknowledgments
     attributes:
-      label: "Final Acknowledgements"
+      label: Governance Acknowledgments
       options:
-        - label: "I understand this starts a mandatory 30-day deliberation period."
+        - label: I understand this starts a mandatory 30-day deliberation period.
           required: true
-        - label: "I agree to license this proposal under CC-BY-4.0."
+        - label: I agree to license this document under CC-BY-4.0.
           required: true
