@@ -1,0 +1,220 @@
+name: Create Constitution Amendment Proposal
+
+on:
+  workflow_dispatch:
+    inputs:
+      proposal_type:
+        description: 'Type of proposal'
+        required: true
+        default: 'CAP'
+        type: choice
+        options:
+          - CAP
+          - CIS
+      category:
+        description: 'Proposal Category'
+        required: true
+        type: choice
+        options:
+          - Constitution
+          - Meta
+          - Guardrails
+          - Supporting
+          - Other
+      title:
+        description: 'Proposal Title'
+        required: true
+        type: string
+      abstract:
+        description: 'Abstract or summary'
+        required: true
+        type: string
+      motivation:
+        description: 'Motivation or problem statement'
+        required: true
+        type: string
+      co_authors:
+        description: 'Co-authors (comma-separated GitHub usernames)'
+        required: false
+        type: string
+      exhibits:
+        description: 'Supporting links or resources'
+        required: false
+        type: string
+      selected_revisions:
+        description: 'JSON object of revisions {index: {text: "", revision: ""}}'
+        required: false
+        type: string
+
+permissions:
+  issues: write
+  contents: read
+
+jobs:
+  create-proposal:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Validate Inputs
+        run: |
+          if [ -z "${{ inputs.title }}" ]; then
+            echo "::error::Title is required"
+            exit 1
+          fi
+          if [ -z "${{ inputs.abstract }}" ]; then
+            echo "::error::Abstract is required"
+            exit 1
+          fi
+          if [ -z "${{ inputs.motivation }}" ]; then
+            echo "::error::Motivation is required"
+            exit 1
+          fi
+
+      - name: Parse Revisions
+        id: parse_revisions
+        run: |
+          revisions_json="${{ inputs.selected_revisions }}"
+          if [ -z "$revisions_json" ] || [ "$revisions_json" = "null" ]; then
+            echo "revisions_markdown=" >> $GITHUB_OUTPUT
+          else
+            echo "revisions_markdown=$(echo "$revisions_json" | jq -r 'to_entries | .[] | "#### Revision #\(.value.index + 1)\n**Original Text:**\n> \(.value.value.text)\n\n**Proposed Revision:**\n\(.value.value.revision)\n\n" ' | tr '\n' ' ')" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Format Co-Authors
+        id: format_authors
+        run: |
+          co_authors_input="${{ inputs.co_authors }}"
+          if [ -z "$co_authors_input" ]; then
+            echo "authors_markdown=" >> $GITHUB_OUTPUT
+          else
+            authors_section="### Co-Authors\n"
+            IFS=',' read -ra authors <<< "$co_authors_input"
+            for author in "${authors[@]}"; do
+              author=$(echo "$author" | xargs) # trim whitespace
+              authors_section="${authors_section}- @${author}\n"
+            done
+            echo "authors_markdown=$(printf "$authors_section")" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Calculate Review End Date
+        id: expiry
+        run: |
+          expiry_date=$(date -u -d "+30 days" --iso-8601=seconds)
+          expiry_date_display=$(date -u -d "+30 days" +"%B %d, %Y")
+          echo "expiry_date=$expiry_date" >> $GITHUB_OUTPUT
+          echo "expiry_date_display=$expiry_date_display" >> $GITHUB_OUTPUT
+
+      - name: Build Proposal Markdown
+        id: build_markdown
+        run: |
+          proposal_type="${{ inputs.proposal_type }}"
+          category="${{ inputs.category }}"
+          title="${{ inputs.title }}"
+          abstract="${{ inputs.abstract }}"
+          motivation="${{ inputs.motivation }}"
+          exhibits="${{ inputs.exhibits }}"
+          
+          # Build the body
+          body="### Abstract
+${abstract}
+
+### $([ "$proposal_type" = "CAP" ] && echo "Motivation" || echo "Statement of Problem")
+${motivation}
+"
+          
+          # Add revisions if provided
+          if [ -n "${{ steps.parse_revisions.outputs.revisions_markdown }}" ]; then
+            body="${body}
+### Structured Revisions (Contextual)
+${{ steps.parse_revisions.outputs.revisions_markdown }}"
+          fi
+          
+          # Add exhibits
+          body="${body}
+### Supporting Exhibits (Links)
+$([ -z "$exhibits" ] && echo "None provided." || echo "$exhibits")
+"
+          
+          # Add co-authors if provided
+          if [ -n "${{ steps.format_authors.outputs.authors_markdown }}" ]; then
+            body="${body}
+${{ steps.format_authors.outputs.authors_markdown }}"
+          fi
+          
+          # Add metadata
+          body="${body}
+### Attached Files
+Pending upload...
+
+### Proposal Details
+- **License:** CC-BY-4.0
+- **Review Ends:** ${{ steps.expiry.outputs.expiry_date_display }}
+
+<!-- DELIBERATION_END: ${{ steps.expiry.outputs.expiry_date }} -->"
+          
+          # Save to output (escape for JSON)
+          echo "body<<EOF" >> $GITHUB_OUTPUT
+          echo "$body" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Create GitHub Issue
+        id: create_issue
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const title = "${{ inputs.title }}";
+            const category = "${{ inputs.category }}";
+            const proposal_type = "${{ inputs.proposal_type }}";
+            const body = `${{ steps.build_markdown.outputs.body }}`;
+            
+            const labels = [
+              proposal_type,
+              category,
+              'Deliberation-Period'
+            ];
+            
+            const issue = await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: title,
+              body: body,
+              labels: labels
+            });
+            
+            console.log(`Created ${proposal_type} #${issue.data.number}: ${title}`);
+            core.setOutput('issue_number', issue.data.number);
+            core.setOutput('issue_url', issue.data.html_url);
+
+      - name: Generate Constitution Preview (CAP only)
+        if: inputs.proposal_type == 'CAP' && inputs.selected_revisions != ''
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const issue_number = ${{ steps.create_issue.outputs.issue_number }};
+            const title = "${{ inputs.title }}";
+            
+            const preview_comment = `
+## 📋 Constitution Preview
+A preview of the constitution with proposed changes applied will be automatically generated and stored here.
+            `;
+            
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: issue_number,
+              body: preview_comment
+            });
+
+      - name: Post Success Summary
+        run: |
+          echo "## ✅ Proposal Created Successfully"
+          echo ""
+          echo "**Type:** ${{ inputs.proposal_type }}"
+          echo "**Category:** ${{ inputs.category }}"
+          echo "**Title:** ${{ inputs.title }}"
+          echo ""
+          echo "**Issue:** #${{ steps.create_issue.outputs.issue_number }}"
+          echo "**URL:** ${{ steps.create_issue.outputs.issue_url }}"
+          echo ""
+          echo "**Review Period Ends:** ${{ steps.expiry.outputs.expiry_date_display }}"
+          echo ""
+          echo "The proposal is now open for community discussion."
