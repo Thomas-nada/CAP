@@ -34,22 +34,12 @@ body:
     validations:
       required: true
 
-  - type: textbox
-    id: title
-    attributes:
-      label: Proposal Title
-      description: Provide a clear, concise title for your proposal
-      placeholder: "e.g., Modify Article II voting thresholds"
-    validations:
-      required: true
-
   - type: textarea
     id: abstract
     attributes:
       label: Abstract
       description: Provide a brief summary of your proposal (1-2 paragraphs)
       placeholder: "Summarize the key points of your proposal..."
-      rows: 4
     validations:
       required: true
 
@@ -59,7 +49,6 @@ body:
       label: Motivation
       description: Explain why this change is needed. What problem does it solve?
       placeholder: "Explain the motivation and rationale for this proposal..."
-      rows: 6
     validations:
       required: true
 
@@ -75,7 +64,6 @@ body:
       label: "Revision #1 - Original Text"
       description: "Paste the exact constitutional text you want to change"
       placeholder: "Paste the original text from the constitution..."
-      rows: 3
 
   - type: textarea
     id: revision_1_proposed
@@ -83,7 +71,6 @@ body:
       label: "Revision #1 - Proposed Change"
       description: "Describe your proposed revision to this text"
       placeholder: "Describe how you would change this text..."
-      rows: 3
 
   - type: textarea
     id: revision_2_original
@@ -91,7 +78,6 @@ body:
       label: "Revision #2 - Original Text (optional)"
       description: "If making multiple changes, add the second original text here"
       placeholder: "Leave blank if only one change..."
-      rows: 3
 
   - type: textarea
     id: revision_2_proposed
@@ -99,7 +85,6 @@ body:
       label: "Revision #2 - Proposed Change (optional)"
       description: "Describe your proposed revision to this text"
       placeholder: "Leave blank if only one change..."
-      rows: 3
 
   - type: textarea
     id: exhibits
@@ -109,7 +94,6 @@ body:
       placeholder: |
         - [Research Paper](https://example.com/paper)
         - [Technical Analysis](https://example.com/analysis)
-      rows: 4
 
   - type: textarea
     id: co_authors
