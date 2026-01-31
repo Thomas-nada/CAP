@@ -1,220 +1,146 @@
-name: Create Constitution Amendment Proposal
+name: Create Amendment Proposal
+description: Create a new CAP or CIS using the structured wizard format
+title: "[CAP/CIS] Your proposal title here"
+labels: ["Deliberation-Period"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        # Amendment Proposal Wizard
+        Complete this form to create a new Constitution Amendment Proposal (CAP) or Constitutional Information Submission (CIS).
 
-on:
-  workflow_dispatch:
-    inputs:
-      proposal_type:
-        description: 'Type of proposal'
-        required: true
-        default: 'CAP'
-        type: choice
-        options:
-          - CAP
-          - CIS
-      category:
-        description: 'Proposal Category'
-        required: true
-        type: choice
-        options:
-          - Constitution
-          - Meta
-          - Guardrails
-          - Supporting
-          - Other
-      title:
-        description: 'Proposal Title'
-        required: true
-        type: string
-      abstract:
-        description: 'Abstract or summary'
-        required: true
-        type: string
-      motivation:
-        description: 'Motivation or problem statement'
-        required: true
-        type: string
-      co_authors:
-        description: 'Co-authors (comma-separated GitHub usernames)'
-        required: false
-        type: string
-      exhibits:
-        description: 'Supporting links or resources'
-        required: false
-        type: string
-      selected_revisions:
-        description: 'JSON object of revisions {index: {text: "", revision: ""}}'
-        required: false
-        type: string
+  - type: dropdown
+    id: proposal_type
+    attributes:
+      label: Proposal Type
+      description: Choose whether this is a CAP or CIS
+      options:
+        - CAP (Constitution Amendment Proposal)
+        - CIS (Constitutional Information Submission)
+    validations:
+      required: true
 
-permissions:
-  issues: write
-  contents: read
+  - type: dropdown
+    id: category
+    attributes:
+      label: Category
+      description: Select the category that best fits your proposal
+      options:
+        - Constitution
+        - Meta
+        - Guardrails
+        - Supporting
+        - Other
+    validations:
+      required: true
 
-jobs:
-  create-proposal:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Validate Inputs
-        run: |
-          if [ -z "${{ inputs.title }}" ]; then
-            echo "::error::Title is required"
-            exit 1
-          fi
-          if [ -z "${{ inputs.abstract }}" ]; then
-            echo "::error::Abstract is required"
-            exit 1
-          fi
-          if [ -z "${{ inputs.motivation }}" ]; then
-            echo "::error::Motivation is required"
-            exit 1
-          fi
+  - type: textbox
+    id: title
+    attributes:
+      label: Proposal Title
+      description: Provide a clear, concise title for your proposal
+      placeholder: "e.g., Modify Article II voting thresholds"
+    validations:
+      required: true
 
-      - name: Parse Revisions
-        id: parse_revisions
-        run: |
-          revisions_json="${{ inputs.selected_revisions }}"
-          if [ -z "$revisions_json" ] || [ "$revisions_json" = "null" ]; then
-            echo "revisions_markdown=" >> $GITHUB_OUTPUT
-          else
-            echo "revisions_markdown=$(echo "$revisions_json" | jq -r 'to_entries | .[] | "#### Revision #\(.value.index + 1)\n**Original Text:**\n> \(.value.value.text)\n\n**Proposed Revision:**\n\(.value.value.revision)\n\n" ' | tr '\n' ' ')" >> $GITHUB_OUTPUT
-          fi
+  - type: textarea
+    id: abstract
+    attributes:
+      label: Abstract
+      description: Provide a brief summary of your proposal (1-2 paragraphs)
+      placeholder: "Summarize the key points of your proposal..."
+      rows: 4
+    validations:
+      required: true
 
-      - name: Format Co-Authors
-        id: format_authors
-        run: |
-          co_authors_input="${{ inputs.co_authors }}"
-          if [ -z "$co_authors_input" ]; then
-            echo "authors_markdown=" >> $GITHUB_OUTPUT
-          else
-            authors_section="### Co-Authors\n"
-            IFS=',' read -ra authors <<< "$co_authors_input"
-            for author in "${authors[@]}"; do
-              author=$(echo "$author" | xargs) # trim whitespace
-              authors_section="${authors_section}- @${author}\n"
-            done
-            echo "authors_markdown=$(printf "$authors_section")" >> $GITHUB_OUTPUT
-          fi
+  - type: textarea
+    id: motivation
+    attributes:
+      label: Motivation
+      description: Explain why this change is needed. What problem does it solve?
+      placeholder: "Explain the motivation and rationale for this proposal..."
+      rows: 6
+    validations:
+      required: true
 
-      - name: Calculate Review End Date
-        id: expiry
-        run: |
-          expiry_date=$(date -u -d "+30 days" --iso-8601=seconds)
-          expiry_date_display=$(date -u -d "+30 days" +"%B %d, %Y")
-          echo "expiry_date=$expiry_date" >> $GITHUB_OUTPUT
-          echo "expiry_date_display=$expiry_date_display" >> $GITHUB_OUTPUT
+  - type: markdown
+    attributes:
+      value: |
+        ## Structured Revisions (for CAPs only)
+        If this is a CAP, add the specific constitutional text you're changing and your proposed revisions below.
 
-      - name: Build Proposal Markdown
-        id: build_markdown
-        run: |
-          proposal_type="${{ inputs.proposal_type }}"
-          category="${{ inputs.category }}"
-          title="${{ inputs.title }}"
-          abstract="${{ inputs.abstract }}"
-          motivation="${{ inputs.motivation }}"
-          exhibits="${{ inputs.exhibits }}"
-          
-          # Build the body
-          body="### Abstract
-${abstract}
+  - type: textarea
+    id: revision_1_original
+    attributes:
+      label: "Revision #1 - Original Text"
+      description: "Paste the exact constitutional text you want to change"
+      placeholder: "Paste the original text from the constitution..."
+      rows: 3
 
-### $([ "$proposal_type" = "CAP" ] && echo "Motivation" || echo "Statement of Problem")
-${motivation}
-"
-          
-          # Add revisions if provided
-          if [ -n "${{ steps.parse_revisions.outputs.revisions_markdown }}" ]; then
-            body="${body}
-### Structured Revisions (Contextual)
-${{ steps.parse_revisions.outputs.revisions_markdown }}"
-          fi
-          
-          # Add exhibits
-          body="${body}
-### Supporting Exhibits (Links)
-$([ -z "$exhibits" ] && echo "None provided." || echo "$exhibits")
-"
-          
-          # Add co-authors if provided
-          if [ -n "${{ steps.format_authors.outputs.authors_markdown }}" ]; then
-            body="${body}
-${{ steps.format_authors.outputs.authors_markdown }}"
-          fi
-          
-          # Add metadata
-          body="${body}
-### Attached Files
-Pending upload...
+  - type: textarea
+    id: revision_1_proposed
+    attributes:
+      label: "Revision #1 - Proposed Change"
+      description: "Describe your proposed revision to this text"
+      placeholder: "Describe how you would change this text..."
+      rows: 3
 
-### Proposal Details
-- **License:** CC-BY-4.0
-- **Review Ends:** ${{ steps.expiry.outputs.expiry_date_display }}
+  - type: textarea
+    id: revision_2_original
+    attributes:
+      label: "Revision #2 - Original Text (optional)"
+      description: "If making multiple changes, add the second original text here"
+      placeholder: "Leave blank if only one change..."
+      rows: 3
 
-<!-- DELIBERATION_END: ${{ steps.expiry.outputs.expiry_date }} -->"
-          
-          # Save to output (escape for JSON)
-          echo "body<<EOF" >> $GITHUB_OUTPUT
-          echo "$body" >> $GITHUB_OUTPUT
-          echo "EOF" >> $GITHUB_OUTPUT
+  - type: textarea
+    id: revision_2_proposed
+    attributes:
+      label: "Revision #2 - Proposed Change (optional)"
+      description: "Describe your proposed revision to this text"
+      placeholder: "Leave blank if only one change..."
+      rows: 3
 
-      - name: Create GitHub Issue
-        id: create_issue
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const title = "${{ inputs.title }}";
-            const category = "${{ inputs.category }}";
-            const proposal_type = "${{ inputs.proposal_type }}";
-            const body = `${{ steps.build_markdown.outputs.body }}`;
-            
-            const labels = [
-              proposal_type,
-              category,
-              'Deliberation-Period'
-            ];
-            
-            const issue = await github.rest.issues.create({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              title: title,
-              body: body,
-              labels: labels
-            });
-            
-            console.log(`Created ${proposal_type} #${issue.data.number}: ${title}`);
-            core.setOutput('issue_number', issue.data.number);
-            core.setOutput('issue_url', issue.data.html_url);
+  - type: textarea
+    id: exhibits
+    attributes:
+      label: Supporting Exhibits (Links)
+      description: "Add links to any supporting materials, research, or resources"
+      placeholder: |
+        - [Research Paper](https://example.com/paper)
+        - [Technical Analysis](https://example.com/analysis)
+      rows: 4
 
-      - name: Generate Constitution Preview (CAP only)
-        if: inputs.proposal_type == 'CAP' && inputs.selected_revisions != ''
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const issue_number = ${{ steps.create_issue.outputs.issue_number }};
-            const title = "${{ inputs.title }}";
-            
-            const preview_comment = `
-## 📋 Constitution Preview
-A preview of the constitution with proposed changes applied will be automatically generated and stored here.
-            `;
-            
-            await github.rest.issues.createComment({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: issue_number,
-              body: preview_comment
-            });
+  - type: textarea
+    id: co_authors
+    attributes:
+      label: Co-Authors
+      description: "Tag any co-authors using @username format (one per line)"
+      placeholder: |
+        @alice
+        @bob
+        @charlie
 
-      - name: Post Success Summary
-        run: |
-          echo "## ✅ Proposal Created Successfully"
-          echo ""
-          echo "**Type:** ${{ inputs.proposal_type }}"
-          echo "**Category:** ${{ inputs.category }}"
-          echo "**Title:** ${{ inputs.title }}"
-          echo ""
-          echo "**Issue:** #${{ steps.create_issue.outputs.issue_number }}"
-          echo "**URL:** ${{ steps.create_issue.outputs.issue_url }}"
-          echo ""
-          echo "**Review Period Ends:** ${{ steps.expiry.outputs.expiry_date_display }}"
-          echo ""
-          echo "The proposal is now open for community discussion."
+  - type: markdown
+    attributes:
+      value: |
+        ## Metadata
+        The following will be automatically added when you submit:
+        - **Type**: CAP or CIS (based on your selection)
+        - **Category**: Based on your selection
+        - **License**: CC-BY-4.0
+        - **Review Period**: 30 days from creation
+        - **Status**: Deliberation-Period
+
+  - type: checkboxes
+    id: acknowledgments
+    attributes:
+      label: Acknowledgments
+      description: Please confirm you've read and understand these guidelines
+      options:
+        - label: "I have read the [CAP/CIS Guidelines](../WORKFLOW_GUIDE.md)"
+          required: true
+        - label: "I understand this proposal will be open for community discussion for 30 days"
+          required: true
+        - label: "I understand I can edit this proposal after creation"
+          required: true
