@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cardano Governance Portal</title>
+    
+    <!-- Custom Styles -->
+    <link rel="stylesheet" href="styles.css">
+    
+    <!-- Tailwind CSS for styling -->
+    <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        slate: { 950: '#020617' }
+                    },
+                    animation: {
+                        'pulse-subtle': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- Marked.js for Markdown rendering -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <style>
+        .glass {
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+        }
+        .fade-in {
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        /* Hide scrollbars but keep functionality */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        /* Loading indicator */
+        .loading-spinner {
+            border: 3px solid #f3f4f6;
+            border-top: 3px solid #3b82f6;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="bg-slate-50 dark:bg-slate-950 transition-colors duration-300">
+    <div id="app">
+        <!-- Loading state -->
+        <div style="min-height: 100vh; display: flex; align-items: center; justify-content: center; flex-direction: column;">
+            <div class="loading-spinner"></div>
+            <p style="margin-top: 20px; color: #64748b; font-weight: 600;">Loading CAP Portal...</p>
+        </div>
+    </div>
+    
+    <!-- Error handler for module loading -->
+    <script>
+        window.addEventListener('error', function(e) {
+            if (e.message && e.message.includes('module')) {
+                console.error('Module loading error:', e);
+                document.getElementById('app').innerHTML = `
+                    <div style="min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 2rem;">
+                        <div style="max-width: 600px; text-align: center;">
+                            <h1 style="font-size: 2rem; font-weight: 800; color: #ef4444; margin-bottom: 1rem;">Module Loading Error</h1>
+                            <p style="color: #64748b; margin-bottom: 1rem;">The application failed to load properly. This usually happens when:</p>
+                            <ul style="text-align: left; color: #64748b; margin-bottom: 1.5rem; list-style: none; padding-left: 0;">
+                                <li style="margin-bottom: 0.5rem;">• You're opening index.html directly from the file system</li>
+                                <li style="margin-bottom: 0.5rem;">• The server is not running properly</li>
+                                <li style="margin-bottom: 0.5rem;">• JavaScript modules are not supported in your browser</li>
+                            </ul>
+                            <div style="background: #fef3c7; border: 1px solid #fbbf24; padding: 1rem; border-radius: 0.5rem; margin-bottom: 1rem;">
+                                <p style="color: #92400e; font-weight: 600; margin-bottom: 0.5rem;">Solution:</p>
+                                <p style="color: #92400e; font-size: 0.9rem;">Run a local web server. Try:<br>
+                                <code style="background: white; padding: 0.25rem 0.5rem; border-radius: 0.25rem; display: inline-block; margin-top: 0.5rem;">python -m http.server 8000</code></p>
+                            </div>
+                            <p style="color: #64748b; font-size: 0.85rem;">Error: ${e.message}</p>
+                        </div>
+                    </div>
+                `;
+            }
+        }, true);
+    </script>
+    
+    <!-- Load the main application module -->
+    <script type="module" src="js/app.js"></script>
+</body>
+</html>
