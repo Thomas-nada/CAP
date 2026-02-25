@@ -160,7 +160,7 @@ window.state = {
     expandedEventId: null, 
     theme: localStorage.getItem('theme') || 'light',
     draft: {
-        title: '', category: '', abstract: '', motivation: '', analysis: '', impact: '', exhibits: '', files: [], revisions: {}
+        title: '', category: '', abstract: '', motivation: '', analysis: '', impact: '', exhibits: '', files: [], revisions: {}, coAuthors: []
     },
     editFiles: [], 
     stats: { total: 0, draft: 0, review: 0, final: 0, cisCount: 0, capCount: 0 },
@@ -522,8 +522,11 @@ window.handleEdit = async (event) => {
     }
     body += `### Links and Files\n${exhibits || 'None provided.'}\n\n`;
 
+    // Preserve existing frontmatter, updating Title and Category if changed
+    const existingFm = extractAndUpdateFrontmatter(state.currentProposal?.body || '', title, category);
+
     try {
-        await updateGhIssueContent(p.number, title, body, category, type, state.ghToken);
+        await updateGhIssueContent(p.number, title, existingFm + body, category, type, state.ghToken);
 
         for (const file of state.editFiles) {
             const path = `institutional-exhibits/${p.number}-${file.name}`;
@@ -541,6 +544,48 @@ window.handleEdit = async (event) => {
     }
 };
 
+// --- Frontmatter Helpers ---
+
+/**
+ * Builds a CIP-style YAML frontmatter block for a CAP or CIS issue.
+ * Renders as a ```yaml code block so it displays with syntax highlighting in GitHub Issues.
+ */
+function buildFrontmatter(type, number, title, category, authorLogin, coAuthors, discussionUrl, createdDate, deliberationEnd) {
+    let fm = '```yaml\n';
+    fm += `${type}: ${number}\n`;
+    fm += `Title: ${title}\n`;
+    fm += `Category: ${category}\n`;
+    fm += `Status: ${type === 'CAP' ? 'Draft' : 'Proposed'}\n`;
+    fm += `Authors:\n    - @${authorLogin}\n`;
+    if (coAuthors && coAuthors.length > 0) {
+        fm += `Co-Authors:\n`;
+        coAuthors.forEach(a => { fm += `    - @${a.replace('@', '')}\n`; });
+    }
+    fm += `Discussions:\n    - ${discussionUrl}\n`;
+    fm += `Created: ${createdDate}\n`;
+    fm += `License: CC-BY-4.0\n`;
+    if (type === 'CAP' && deliberationEnd) {
+        fm += `Deliberation-End: ${deliberationEnd}\n`;
+    }
+    fm += '```\n\n';
+    return fm;
+}
+
+/**
+ * Extracts the ```yaml frontmatter block from an existing issue body,
+ * updates Title and Category fields, and returns the updated block.
+ * Returns '' if no frontmatter is found.
+ */
+function extractAndUpdateFrontmatter(body, newTitle, newCategory) {
+    if (!body) return '';
+    const match = body.match(/^```yaml\n[\s\S]*?```\n\n/);
+    if (!match) return '';
+    let fm = match[0];
+    fm = fm.replace(/^Title: .+$/m, `Title: ${newTitle}`);
+    fm = fm.replace(/^Category: .+$/m, `Category: ${newCategory}`);
+    return fm;
+}
+
 // --- Form Submission Logic ---
 
 window.handleForm = async (event) => {
@@ -557,6 +602,16 @@ window.handleForm = async (event) => {
 
     state.loading.submitting = true;
     window.updateUI(true);
+
+    // Pre-compute deliberation for CAP (used in both body and frontmatter)
+    let deliberationExpiry = null;
+    let deliberationEndStr = null;
+    if (type === 'CAP') {
+        const consultationDays = { Procedural: 60, Substantive: 60, Technical: 60, Interpretive: 30, Editorial: 14, Other: 30 };
+        const days = consultationDays[category] || 30;
+        deliberationExpiry = new Date(Date.now() + (days * 24 * 60 * 60 * 1000));
+        deliberationEndStr = deliberationExpiry.toISOString().split('T')[0];
+    }
 
     let body = `### Summary\n${abstract}\n\n`;
     if (type === 'CAP') {
@@ -579,11 +634,8 @@ window.handleForm = async (event) => {
 
     body += `### Links and Files\n${exhibits || 'None provided.'}\n\n`;
     if (type === 'CAP') {
-        const consultationDays = { Procedural: 60, Substantive: 60, Technical: 60, Interpretive: 30, Editorial: 14, Other: 30 };
-        const days = consultationDays[category] || 30;
-        const expiry = new Date(Date.now() + (days * 24 * 60 * 60 * 1000)).toISOString();
-        body += `### Institutional Metadata\n- **License:** CC-BY-4.0\n- **Deliberation End:** ${new Date(expiry).toLocaleDateString()}\n\n`;
-        body += `<!-- DELIBERATION_END: ${expiry} -->`;
+        body += `### Institutional Metadata\n- **License:** CC-BY-4.0\n- **Deliberation End:** ${deliberationExpiry.toLocaleDateString()}\n\n`;
+        body += `<!-- DELIBERATION_END: ${deliberationExpiry.toISOString()} -->`;
     } else {
         body += `### Institutional Metadata\n- **License:** CC-BY-4.0\n`;
     }
@@ -591,7 +643,12 @@ window.handleForm = async (event) => {
     try {
         // Create the GitHub issue
         const issue = await createGhIssue(title, body, category, type, state.ghToken);
-        
+
+        // Prepend CIP-style frontmatter header and update issue body
+        const today = new Date().toISOString().split('T')[0];
+        const fm = buildFrontmatter(type, issue.number, title, category, state.ghUser?.login || 'unknown', state.draft.coAuthors || [], issue.html_url, today, deliberationEndStr);
+        await updateGhIssueContent(issue.number, title, fm + body, state.ghToken);
+
         // Upload institutional exhibits (if any)
         for (const file of state.draft.files) {
             const path = `institutional-exhibits/${issue.number}-${file.name}`;
@@ -662,7 +719,7 @@ window.handleForm = async (event) => {
         }
 
         // Clear draft and navigate
-        state.draft = { title: '', category: '', abstract: '', motivation: '', analysis: '', impact: '', exhibits: '', files: [], revisions: {} };
+        state.draft = { title: '', category: '', abstract: '', motivation: '', analysis: '', impact: '', exhibits: '', files: [], revisions: {}, coAuthors: [] };
         state.selectedReferences = [];
         
         window.showToast('Submitted', `${type} #${issue.number} created successfully.`, 'success');
@@ -1090,7 +1147,23 @@ window.manualTextEntry = () => {
 window.copyGitHubMarkdown = () => {
     const wizard = state.wizardData;
 
-    let markdown = `### Summary\n${wizard.abstract || 'Not provided'}\n\n`;
+    // Pre-compute deliberation for CAP
+    let deliberationEndStr = null;
+    let deliberationExpiry = null;
+    if (wizard.type === 'CAP') {
+        const consultationDays = { Procedural: 60, Substantive: 60, Technical: 60, Interpretive: 30, Editorial: 14, Other: 30 };
+        const days = consultationDays[wizard.category] || 30;
+        deliberationExpiry = new Date(Date.now() + (days * 24 * 60 * 60 * 1000));
+        deliberationEndStr = deliberationExpiry.toISOString().split('T')[0];
+    }
+
+    // Build CIP-style frontmatter (number/URL filled in manually after posting)
+    const today = new Date().toISOString().split('T')[0];
+    const authorLogin = state.ghUser?.login || 'your-github-username';
+    const fm = buildFrontmatter(wizard.type, 'TBD', wizard.title || 'Your Title', wizard.category, authorLogin, wizard.coAuthors || [], 'TBD — add this issue\'s URL after posting', today, deliberationEndStr);
+
+    let markdown = fm;
+    markdown += `### Summary\n${wizard.abstract || 'Not provided'}\n\n`;
 
     if (wizard.type === 'CAP') {
         markdown += `### Why is this change needed?\n${wizard.motivation || 'Not provided'}\n\n`;
@@ -1112,18 +1185,11 @@ window.copyGitHubMarkdown = () => {
 
     markdown += `### Links and Files\n${wizard.exhibits || 'None provided.'}\n\n`;
 
-    if (wizard.coAuthors && wizard.coAuthors.length > 0) {
-        markdown += `### Co-Authors\n${wizard.coAuthors.map(a => `- @${a.replace('@', '')}`).join('\n')}\n\n`;
-    }
-
     if (wizard.type === 'CAP') {
-        const consultationDays = { Procedural: 60, Substantive: 60, Technical: 60, Interpretive: 30, Editorial: 14, Other: 30 };
-        const days = consultationDays[wizard.category] || 30;
-        const expiry = new Date(Date.now() + (days * 24 * 60 * 60 * 1000)).toISOString();
-        markdown += `### Proposal Details\n- **License:** CC-BY-4.0\n- **Category:** ${wizard.category}\n- **Review Ends:** ${new Date(expiry).toLocaleDateString()}\n\n`;
-        markdown += `<!-- DELIBERATION_END: ${expiry} -->`;
+        markdown += `### Institutional Metadata\n- **License:** CC-BY-4.0\n- **Deliberation End:** ${deliberationExpiry.toLocaleDateString()}\n\n`;
+        markdown += `<!-- DELIBERATION_END: ${deliberationExpiry.toISOString()} -->`;
     } else {
-        markdown += `### Proposal Details\n- **License:** CC-BY-4.0\n- **Category:** ${wizard.category}\n`;
+        markdown += `### Institutional Metadata\n- **License:** CC-BY-4.0\n`;
     }
 
     // Copy to clipboard
@@ -1164,7 +1230,8 @@ window.wizardSubmit = async () => {
         impact: wizard.impact || '',
         exhibits: wizard.exhibits,
         files: [],
-        revisions: {}
+        revisions: {},
+        coAuthors: wizard.coAuthors || []
     };
     
     state.createType = wizard.type;
