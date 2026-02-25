@@ -1,0 +1,113 @@
+name: Add Structured Frontmatter to New Issues
+
+on:
+  issues:
+    types: [opened]
+
+permissions:
+  issues: write
+
+jobs:
+  add-frontmatter:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Add CIP-style frontmatter
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const issue = context.payload.issue;
+            const labels = issue.labels.map(l => l.name);
+            const isCAP = labels.includes('CAP');
+            const isCIS = labels.includes('CIS');
+
+            // Only process CAP or CIS issues
+            if (!isCAP && !isCIS) return;
+
+            const type = isCAP ? 'CAP' : 'CIS';
+            const body = issue.body || '';
+
+            // Skip if frontmatter already exists (portal handles its own)
+            if (body.trimStart().startsWith('```yaml')) {
+              core.info(`Frontmatter already present on ${type} #${issue.number} — skipping.`);
+              return;
+            }
+
+            // --- Parse category from the issue body ---
+            // GitHub Issue Forms render each field as: ### Field Label\n\nValue
+            const categoryOrder = ['Procedural', 'Substantive', 'Technical', 'Interpretive', 'Editorial', 'Other'];
+            let category = 'Other';
+            const categoryMatch = body.match(/### Category\s*\n+([\s\S]*?)(?=\n###|\n*$)/);
+            if (categoryMatch) {
+              const raw = categoryMatch[1].trim();
+              for (const key of categoryOrder) {
+                if (raw.startsWith(key)) { category = key; break; }
+              }
+            }
+
+            // --- Consultation / deliberation ---
+            const consultationDays = {
+              Procedural: 60, Substantive: 60, Technical: 60,
+              Interpretive: 30, Editorial: 14, Other: 30
+            };
+            const days = consultationDays[category] || 30;
+            const createdDate = new Date(issue.created_at).toISOString().split('T')[0];
+            const deliberationExpiry = new Date(
+              new Date(issue.created_at).getTime() + days * 24 * 60 * 60 * 1000
+            );
+            const deliberationEndStr = deliberationExpiry.toISOString().split('T')[0];
+
+            // --- Clean title (strip [CAP] / [CIS] prefix) ---
+            const cleanTitle = issue.title.replace(/^\[(CAP|CIS)\]\s*/i, '').trim();
+
+            // --- Build frontmatter block (matches portal format exactly) ---
+            let fm = '```yaml\n';
+            fm += `${type}: ${issue.number}\n`;
+            fm += `Title: ${cleanTitle}\n`;
+            fm += `Category: ${category}\n`;
+            fm += `Status: ${type === 'CAP' ? 'Draft' : 'Proposed'}\n`;
+            fm += `Authors:\n    - @${issue.user.login}\n`;
+            fm += `Discussions:\n    - ${issue.html_url}\n`;
+            fm += `Created: ${createdDate}\n`;
+            fm += `License: CC-BY-4.0\n`;
+            if (type === 'CAP') {
+              fm += `Deliberation-End: ${deliberationEndStr}\n`;
+            }
+            fm += '```\n\n';
+
+            // --- Build institutional metadata footer (matches portal format) ---
+            let footer = '';
+            if (type === 'CAP' && !body.includes('DELIBERATION_END')) {
+              footer  = `\n\n### Institutional Metadata\n`;
+              footer += `- **License:** CC-BY-4.0\n`;
+              footer += `- **Deliberation End:** ${deliberationExpiry.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}\n\n`;
+              footer += `<!-- DELIBERATION_END: ${deliberationExpiry.toISOString()} -->`;
+            } else if (type === 'CIS' && !body.includes('Institutional Metadata')) {
+              footer  = `\n\n### Institutional Metadata\n`;
+              footer += `- **License:** CC-BY-4.0\n`;
+            }
+
+            // --- Add category as a label (matches what the portal does) ---
+            const existingCategoryLabel = labels.find(l => categoryOrder.includes(l));
+            if (!existingCategoryLabel) {
+              try {
+                await github.rest.issues.addLabels({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: issue.number,
+                  labels: [category]
+                });
+              } catch (labelErr) {
+                core.warning(`Could not add category label "${category}": ${labelErr.message}`);
+              }
+            }
+
+            // --- Update the issue body ---
+            await github.rest.issues.update({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: issue.number,
+              body: fm + body + footer
+            });
+
+            core.info(`Frontmatter added to ${type} #${issue.number} (category: ${category}, author: @${issue.user.login})`);

@@ -80,29 +80,7 @@ body:
     attributes:
       value: |
         ---
-        ### Structured Header & Metadata — Manual Submission Instructions
-
-        The portal generates and prepends these blocks automatically. If submitting manually, add them yourself after the issue is created.
-
-        **1. Paste this at the very top of the issue body** (update all placeholder values):
-
-            ```yaml
-            CIS: {issue number — assigned by GitHub}
-            Title: {your title}
-            Category: {your category}
-            Status: Proposed
-            Authors:
-                - @{your-github-username}
-            Discussions:
-                - {this issue's URL}
-            Created: {YYYY-MM-DD}
-            License: CC-BY-4.0
-            ```
-
-        **2. Paste this at the very bottom of the issue body**:
-
-            ### Institutional Metadata
-            - **License:** CC-BY-4.0
+        > **Note:** A structured YAML header and institutional metadata will be added to this issue automatically within seconds of submission — you don't need to do anything. This is handled by the same bot that processes portal submissions.
 
   - type: checkboxes
     id: acknowledgments
