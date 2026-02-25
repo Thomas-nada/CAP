@@ -1,20 +1,22 @@
 name: "Issue Statement (CIS)"
-description: "Report a problem or issue."
-title: "[CIS]: "
-labels: ["CIS", "Proposed", "Deliberation-Period"]
+description: "Flag a constitutional issue, gap, or ambiguity that requires community attention and may need a future amendment (CAP)."
+title: "[CIS] "
+labels: ["CIS", "Proposed"]
 body:
   - type: markdown
     attributes:
       value: |
-        ### CIS Form
-        Use this to report a problem that needs attention.
+        ## Constitution Issue Statement (CIS)
+        Use this form to flag a problem, gap, or ambiguity in the Constitution. A CIS identifies **the problem** — it does not propose a solution. Solutions come later as a CAP (Cardano Amendment Proposal).
+
+        > **Tip:** The [CAP Portal](https://thomas-nada.github.io/CAP) guides you through this process step-by-step and submits in this exact format automatically.
 
   - type: textarea
     id: abstract
     attributes:
       label: Summary
-      description: A short summary of the issue.
-      placeholder: What is the problem?
+      description: A concise summary of the constitutional issue (aim for ~200 words).
+      placeholder: What is the problem or gap in the Constitution?
     validations:
       required: true
 
@@ -22,50 +24,74 @@ body:
     id: category
     attributes:
       label: Category
-      description: Pick the category that fits best.
+      description: Select the category that best describes the nature of this issue.
       options:
-        - Meta (Process or framework issues)
-        - Constitution (Text issues)
-        - Guardrails (Technical or monetary limit issues)
-        - Supporting (Guidance or extra doc issues)
-        - Other (Anything else)
+        - "Procedural — Issue with governance processes or voting rules"
+        - "Substantive — Issue with core constitutional rights or obligations"
+        - "Technical — Issue with technical parameters or on-chain mechanisms"
+        - "Interpretive — Ambiguity or conflicting interpretation of existing text"
+        - "Editorial — Errors, formatting, or non-substantive text problems"
+        - "Other — Does not clearly fit another category"
     validations:
       required: true
 
   - type: textarea
-    id: statement_of_problem
+    id: problem
     attributes:
-      label: Explanation
-      description: Give more details on why this is an issue.
-      placeholder: Explain the problem...
+      label: Problem
+      description: Describe the constitutional issue in detail. Focus on what is wrong or unclear — not on solutions.
+      placeholder: What exactly is broken, ambiguous, or missing? Where in the Constitution does this appear?
     validations:
       required: true
 
   - type: textarea
-    id: problem_identification
+    id: context
     attributes:
-      label: Problem Details
-      description: Cite the specific part where the problem exists.
+      label: Context
+      description: "(Optional) Provide background that helps understand why this issue exists or matters."
       placeholder: |
-        ### Section: [Article X]
-        **Original Text:** [Paste here]
-        **The Problem:** [Describe it here]
-    validations:
-      required: true
+        Historical context, prior governance actions, related discussions, or relevant external factors...
+
+  - type: textarea
+    id: impact
+    attributes:
+      label: Impact
+      description: "(Optional) Describe the consequences if this issue is not resolved."
+      placeholder: |
+        How does this affect governance legitimacy, system resilience, or community trust?
+
+  - type: textarea
+    id: sections
+    attributes:
+      label: Referenced Sections
+      description: List the specific sections of the Constitution that are affected.
+      placeholder: |
+        - Article X, Section Y — [quote or paraphrase the relevant text]
+        - Article Z — [quote or paraphrase the relevant text]
 
   - type: textarea
     id: exhibits
     attributes:
       label: Links and Files
-      description: Links to evidence or extra info.
+      description: Links to supporting evidence, prior discussions, legal research, or uploaded files.
       placeholder: "https://..."
+
+  - type: markdown
+    attributes:
+      value: |
+        ---
+        ### Institutional Metadata
+        > The portal fills this in automatically. If submitting manually, add the following to your issue body after posting:
+        >
+        > `### Institutional Metadata`
+        > `- **License:** CC-BY-4.0`
 
   - type: checkboxes
     id: acknowledgments
     attributes:
       label: Confirmations
       options:
-        - label: I understand this starts a 30-day deliberation period.
+        - label: I understand this issue statement will be publicly visible and open for community discussion and review.
           required: true
-        - label: I agree to license this under CC-BY-4.0.
+        - label: I agree to license this submission under CC-BY-4.0.
           required: true

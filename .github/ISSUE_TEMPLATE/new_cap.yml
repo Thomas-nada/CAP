@@ -1,19 +1,21 @@
 name: "Amendment Proposal (CAP)"
-description: "Submit a proposal to change the Constitution."
-title: "[CAP]: "
+description: "Propose a change to the Constitution. A mandatory consultation period is determined by the category you choose."
+title: "[CAP] "
 labels: ["CAP", "Draft"]
 body:
   - type: markdown
     attributes:
       value: |
-        ### CAP Form
-        Fill out the details below to propose an amendment.
+        ## Cardano Amendment Proposal (CAP)
+        Use this form to propose a change to the Constitution. Each category carries a minimum consultation period before the proposal can be ratified.
+
+        > **Tip:** The [CAP Portal](https://thomas-nada.github.io/CAP) guides you through this process step-by-step and submits in this exact format automatically.
 
   - type: textarea
     id: abstract
     attributes:
       label: Summary
-      description: A short summary of your proposal.
+      description: A concise summary of what this proposal changes and why it matters (aim for ~200 words).
       placeholder: What is this proposal about?
     validations:
       required: true
@@ -22,50 +24,76 @@ body:
     id: category
     attributes:
       label: Category
-      description: Pick the category that fits best.
+      description: Select the category that best describes the nature of this amendment. This determines the minimum consultation period.
       options:
-        - Meta (Process or framework changes)
-        - Constitution (Direct text changes)
-        - Guardrails (Technical or monetary limits)
-        - Supporting (Guidance or extra docs)
-        - Other (Anything else)
+        - "Procedural — Changes to governance processes or voting rules (60 days)"
+        - "Substantive — Changes to core constitutional rights or obligations (60 days)"
+        - "Technical — Changes to technical parameters or on-chain mechanisms (60 days)"
+        - "Interpretive — Clarifications or reinterpretations of existing text (30 days)"
+        - "Editorial — Corrections, formatting, or non-substantive text changes (14 days)"
+        - "Other — Does not clearly fit another category (30 days)"
     validations:
       required: true
 
   - type: textarea
     id: motivation
     attributes:
-      label: Why?
-      description: Why is this change needed?
-      placeholder: Explain the reasoning...
+      label: Why is this change needed?
+      description: Explain the problem or gap this proposal addresses. If this is in response to a CIS, link it here. (500 word guideline)
+      placeholder: What specific problem does this solve? What happens if nothing changes?
     validations:
       required: true
 
   - type: textarea
-    id: specification
+    id: analysis
+    attributes:
+      label: Analysis & Test
+      description: Describe how this proposal was tested or validated. What criteria define success? How does it hold up under stress?
+      placeholder: |
+        What analysis or testing supports this proposal?
+        What edge cases or failure modes were considered?
+
+  - type: textarea
+    id: revisions
     attributes:
       label: Revisions
-      description: List the original text and your proposed change.
+      description: List each section being changed with the original text and your proposed replacement.
       placeholder: |
-        ### Section: [Article X]
-        **Original Text:** [Paste here]
-        **Proposed Change:** [Type change here]
-    validations:
-      required: true
+        #### Section: [Article X, Section Y]
+        **Original Text:**
+        > Paste the exact current text here
+
+        **Proposed Revision:**
+        Paste your replacement text here
 
   - type: textarea
     id: exhibits
     attributes:
       label: Links and Files
-      description: Links to research, files, or extra info.
+      description: Links to supporting research, reference documents, prior discussions, or uploaded files.
       placeholder: "https://..."
-    
+
+  - type: markdown
+    attributes:
+      value: |
+        ---
+        ### Institutional Metadata
+        > The portal fills this in automatically. If submitting manually, add the following to your issue body after posting:
+        >
+        > `### Institutional Metadata`
+        > `- **License:** CC-BY-4.0`
+        > `- **Deliberation End:** [calculate from category above]`
+        >
+        > `<!-- DELIBERATION_END: [ISO 8601 timestamp] -->`
+
   - type: checkboxes
     id: acknowledgments
     attributes:
       label: Confirmations
       options:
-        - label: I understand this starts a 30-day deliberation period.
+        - label: I understand this submission initiates a mandatory public consultation period, the minimum length of which is determined by the amendment category selected above.
           required: true
-        - label: I agree to license this under CC-BY-4.0.
+        - label: I agree to license this submission under CC-BY-4.0.
+          required: true
+        - label: The proposed revisions are my own original work or properly attributed.
           required: true
