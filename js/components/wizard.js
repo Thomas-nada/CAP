@@ -16,6 +16,8 @@ export function renderWizard(state) {
         title: '',
         abstract: '',
         motivation: '',
+        analysis: '',
+        impact: '',
         selectedText: [],
         revisions: {},
         exhibits: '',
@@ -42,21 +44,25 @@ export function renderWizard(state) {
             <!-- Progress Bar -->
             <div class="bg-white dark:bg-slate-900 rounded-[3rem] border border-slate-100 dark:border-slate-800 shadow-sm p-8 mb-12">
                 <div class="flex items-center justify-between mb-6">
-                    ${[1, 2, 3, 4, 5, 6].map(i => `
+                    ${[1, 2, 3, 4, 5, 6].map(i => {
+                        const isSkipped = wizard.type === 'CIS' && (i === 2 || i === 3);
+                        const connectorMuted = wizard.type === 'CIS' && (i === 1 || i === 2 || i === 3);
+                        return `
                         <div class="flex flex-col items-center gap-2 flex-1">
                             <div class="w-10 h-10 rounded-full flex items-center justify-center font-black text-sm transition-all ${
-                                i < step ? 'bg-green-500 text-white' : 
-                                i === step ? 'bg-blue-600 text-white scale-110' : 
+                                isSkipped ? 'bg-slate-100 dark:bg-slate-800/40 text-slate-300 dark:text-slate-600' :
+                                i < step ? 'bg-green-500 text-white' :
+                                i === step ? 'bg-blue-600 text-white scale-110' :
                                 'bg-slate-200 dark:bg-slate-800 text-slate-400'
                             }">
-                                ${i < step ? '<i data-lucide="check" class="w-5 h-5"></i>' : i}
+                                ${isSkipped ? '<i data-lucide="minus" class="w-4 h-4"></i>' : i < step ? '<i data-lucide="check" class="w-5 h-5"></i>' : i}
                             </div>
-                            <span class="text-[9px] font-black uppercase tracking-widest ${i === step ? 'text-blue-600' : 'text-slate-400'} hidden sm:block">
+                            <span class="text-[9px] font-black uppercase tracking-widest ${isSkipped ? 'text-slate-200 dark:text-slate-700' : i === step ? 'text-blue-600' : 'text-slate-400'} hidden sm:block">
                                 ${['Type', 'Select', 'Propose', 'Explain', 'Review', 'Submit'][i-1]}
                             </span>
                         </div>
-                        ${i < 6 ? `<div class="h-0.5 flex-1 ${i < step ? 'bg-green-500' : 'bg-slate-200 dark:bg-slate-800'} mx-2"></div>` : ''}
-                    `).join('')}
+                        ${i < 6 ? `<div class="h-0.5 flex-1 ${connectorMuted ? 'bg-slate-100 dark:bg-slate-800/40' : i < step ? 'bg-green-500' : 'bg-slate-200 dark:bg-slate-800'} mx-2"></div>` : ''}
+                    `}).join('')}
                 </div>
             </div>
 
@@ -122,11 +128,42 @@ function renderWizardStep(step, wizard, state) {
 
 function renderStep1Type(wizard) {
     const categories = [
-        { id: 'Constitution', label: 'Constitution', desc: 'Direct amendments to the text of the Cardano Constitution.' },
-        { id: 'Meta', label: 'Meta', desc: 'Adjustments to the CAP/CIS process or governance framework itself.' },
-        { id: 'Guardrails', label: 'Guardrails', desc: 'Modifications to the technical and monetary guardrail systems.' },
-        { id: 'Supporting', label: 'Supporting Documentation', desc: 'Providing technical guidance, evidence, or supporting documentation.' },
-        { id: 'Other', label: 'Other', desc: 'Proposals that don\'t fit other categories.' }
+        {
+            id: 'Procedural',
+            label: 'Procedural',
+            desc: 'Changes a governance procedure or process step within the Constitution.',
+            consultation: '60 days'
+        },
+        {
+            id: 'Substantive',
+            label: 'Substantive',
+            desc: 'Alters the foundational values of the Constitution — adding or modifying a principle, tenet, or core commitment.',
+            consultation: '60 days'
+        },
+        {
+            id: 'Technical',
+            label: 'Technical',
+            desc: 'Updates on-chain technical or economic validation scripts and guardrail parameters. Consultation time may vary based on related parameter dependencies.',
+            consultation: 'Variable'
+        },
+        {
+            id: 'Interpretive',
+            label: 'Interpretive',
+            desc: 'Clarifies or refines existing language to reduce ambiguity, without changing the underlying intent or principle.',
+            consultation: '30 days'
+        },
+        {
+            id: 'Editorial',
+            label: 'Editorial',
+            desc: 'Purely cosmetic fixes: typos, formatting, grammar, or broken cross-references. No substantive change to meaning.',
+            consultation: '14 days'
+        },
+        {
+            id: 'Other',
+            label: 'Other',
+            desc: 'Doesn\'t fit neatly into the above categories. Editors will assess and recommend an appropriate consultation period.',
+            consultation: '30 days'
+        }
     ];
 
     return `
@@ -155,13 +192,14 @@ function renderStep1Type(wizard) {
 
             <!-- Category Selection -->
             <div>
-                <label class="text-sm font-black text-slate-400 uppercase tracking-widest mb-4 block">Category</label>
+                <label class="text-sm font-black text-slate-400 uppercase tracking-widest mb-2 block">Category</label>
+                <p class="text-xs text-slate-500 mb-4">${wizard.type === 'CIS' ? 'What type of constitutional issue is this?' : 'What type of amendment is being proposed? This affects the recommended public consultation time.'}</p>
                 <div class="grid grid-cols-1 gap-4">
                     ${categories.map(cat => `
-                        <button onclick="window.updateWizard({category: '${cat.id}'}); window.updateUI(true);" 
+                        <button onclick="window.updateWizard({category: '${cat.id}'}); window.updateUI(true);"
                             class="p-6 rounded-2xl border-2 transition-all text-left ${
-                                wizard.category === cat.id ? 
-                                'border-blue-600 bg-blue-50 dark:bg-blue-900/20' : 
+                                wizard.category === cat.id ?
+                                'border-blue-600 bg-blue-50 dark:bg-blue-900/20' :
                                 'border-slate-200 dark:border-slate-800 hover:border-blue-300 dark:hover:border-blue-800'
                             }">
                             <div class="flex items-start gap-4">
@@ -169,8 +207,9 @@ function renderStep1Type(wizard) {
                                     <i data-lucide="check" class="w-5 h-5 ${wizard.category === cat.id ? 'text-white' : 'text-slate-400'}"></i>
                                 </div>
                                 <div class="flex-1">
-                                    <h3 class="font-black text-lg text-slate-900 dark:text-white mb-2">${cat.label}</h3>
-                                    <p class="text-sm text-slate-600 dark:text-slate-400">${cat.desc}</p>
+                                    <h3 class="font-black text-lg text-slate-900 dark:text-white mb-1">${cat.label}</h3>
+                                    <p class="text-sm text-slate-600 dark:text-slate-400 ${wizard.type !== 'CIS' ? 'mb-2' : ''}">${cat.desc}</p>
+                                    ${wizard.type !== 'CIS' ? `<p class="text-xs font-black text-blue-600">Min. consultation: ${cat.consultation}</p>` : ''}
                                 </div>
                             </div>
                         </button>
@@ -309,33 +348,80 @@ function renderStep4Explain(wizard) {
             <p class="text-slate-500 mb-8">Provide context and reasoning</p>
 
             <div class="space-y-8">
-                <!-- Abstract -->
+                <!-- Summary -->
                 <div>
-                    <label class="text-sm font-black text-slate-400 uppercase tracking-widest mb-3 block">Abstract</label>
+                    <label class="text-sm font-black text-slate-400 uppercase tracking-widest mb-3 block">Summary</label>
                     <p class="text-xs text-slate-500 mb-3">Brief summary of your proposal (2-3 sentences)</p>
-                    <textarea 
+                    <textarea
                         oninput="state.wizardData.abstract = this.value;"
                         placeholder="Summarize the core idea of your ${wizard.type}..."
                         class="w-full p-6 rounded-2xl border-2 border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 text-slate-900 dark:text-white focus:border-blue-600 outline-none transition-all min-h-32"
                     >${wizard.abstract || ''}</textarea>
                 </div>
 
-                <!-- Motivation -->
-                <div>
-                    <label class="text-sm font-black text-slate-400 uppercase tracking-widest mb-3 block">${wizard.type === 'CAP' ? 'Motivation' : 'Problem Statement'}</label>
-                    <p class="text-xs text-slate-500 mb-3">${wizard.type === 'CAP' ? 'Why is this change necessary?' : 'Describe the issue in detail'}</p>
-                    <textarea 
-                        oninput="state.wizardData.motivation = this.value;"
-                        placeholder="${wizard.type === 'CAP' ? 'Explain why the constitution should be changed...' : 'Describe the problem you\'ve identified...'}"
-                        class="w-full p-6 rounded-2xl border-2 border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 text-slate-900 dark:text-white focus:border-blue-600 outline-none transition-all min-h-48"
-                    >${wizard.motivation || ''}</textarea>
-                </div>
+                ${wizard.type === 'CAP' ? `
+                <!-- Why? — two sub-sections for CAP -->
+                <div class="space-y-6 p-6 bg-slate-50 dark:bg-slate-800/30 rounded-2xl border border-slate-200 dark:border-slate-700">
+                    <h3 class="text-xs font-black uppercase tracking-widest text-blue-600">Why?</h3>
 
-                <!-- Supporting Exhibits -->
+                    <div>
+                        <label class="text-sm font-black text-slate-400 uppercase tracking-widest mb-2 block">Why is this change needed?</label>
+                        <p class="text-xs text-slate-500 mb-3">A clear, concise statement of the specific problem or opportunity this amendment addresses. Define the high-level objective and rationale. Limited to 500 words.</p>
+                        <textarea
+                            oninput="state.wizardData.motivation = this.value;"
+                            placeholder="Explain why the constitution should be changed and what problem or opportunity this amendment addresses..."
+                            class="w-full p-6 rounded-2xl border-2 border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 text-slate-900 dark:text-white focus:border-blue-600 outline-none transition-all min-h-40"
+                        >${wizard.motivation || ''}</textarea>
+                    </div>
+
+                    <div>
+                        <label class="text-sm font-black text-slate-400 uppercase tracking-widest mb-2 block">Analysis &amp; Test</label>
+                        <p class="text-xs text-slate-500 mb-3">Provide a detailed analysis of the amendment's expected consequences across relevant stakeholders and the Cardano ecosystem. Define a measurable "Test"—criteria or metrics to assess success, failure, or unintended consequences once implemented.</p>
+                        <textarea
+                            oninput="state.wizardData.analysis = this.value;"
+                            placeholder="Describe the expected impact on stakeholders, potential consequences, and define measurable criteria to evaluate this amendment..."
+                            class="w-full p-6 rounded-2xl border-2 border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 text-slate-900 dark:text-white focus:border-blue-600 outline-none transition-all min-h-48"
+                        >${wizard.analysis || ''}</textarea>
+                    </div>
+                </div>
+                ` : `
+                <!-- Problem / Context / Impact for CIS -->
+                <div class="space-y-6">
+                    <div>
+                        <label class="text-sm font-black text-slate-400 uppercase tracking-widest mb-2 block">Problem</label>
+                        <p class="text-xs text-slate-500 mb-3">What specific constitutional issue have you identified? Be clear and precise.</p>
+                        <textarea
+                            oninput="state.wizardData.motivation = this.value;"
+                            placeholder="Describe the constitutional issue..."
+                            class="w-full p-6 rounded-2xl border-2 border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 text-slate-900 dark:text-white focus:border-blue-600 outline-none transition-all min-h-36"
+                        >${wizard.motivation || ''}</textarea>
+                    </div>
+                    <div>
+                        <label class="text-sm font-black text-slate-400 uppercase tracking-widest mb-2 block">Context <span class="text-slate-300 dark:text-slate-600 font-medium normal-case tracking-normal">(optional)</span></label>
+                        <p class="text-xs text-slate-500 mb-3">What is the background? When and how does this issue arise?</p>
+                        <textarea
+                            oninput="state.wizardData.analysis = this.value;"
+                            placeholder="Provide background and context for the issue..."
+                            class="w-full p-6 rounded-2xl border-2 border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 text-slate-900 dark:text-white focus:border-blue-600 outline-none transition-all min-h-36"
+                        >${wizard.analysis || ''}</textarea>
+                    </div>
+                    <div>
+                        <label class="text-sm font-black text-slate-400 uppercase tracking-widest mb-2 block">Impact <span class="text-slate-300 dark:text-slate-600 font-medium normal-case tracking-normal">(optional)</span></label>
+                        <p class="text-xs text-slate-500 mb-3">What are the consequences if this issue goes unaddressed? Who or what is affected?</p>
+                        <textarea
+                            oninput="state.wizardData.impact = this.value;"
+                            placeholder="Describe the impact of this constitutional issue..."
+                            class="w-full p-6 rounded-2xl border-2 border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 text-slate-900 dark:text-white focus:border-blue-600 outline-none transition-all min-h-36"
+                        >${wizard.impact || ''}</textarea>
+                    </div>
+                </div>
+                `}
+
+                <!-- Links and Files -->
                 <div>
-                    <label class="text-sm font-black text-slate-400 uppercase tracking-widest mb-3 block">Supporting Links (Optional)</label>
-                    <p class="text-xs text-slate-500 mb-3">Links to research, discussions, or related documents</p>
-                    <textarea 
+                    <label class="text-sm font-black text-slate-400 uppercase tracking-widest mb-3 block">Links and Files (Optional)</label>
+                    <p class="text-xs text-slate-500 mb-3">Links to research, files, or extra info</p>
+                    <textarea
                         oninput="state.wizardData.exhibits = this.value;"
                         placeholder="- Link 1
 - Link 2"
@@ -347,7 +433,7 @@ function renderStep4Explain(wizard) {
                 <div>
                     <label class="text-sm font-black text-slate-400 uppercase tracking-widest mb-3 block">Co-Authors (Optional)</label>
                     <p class="text-xs text-slate-500 mb-3">GitHub usernames of co-authors (comma separated)</p>
-                    <input type="text" 
+                    <input type="text"
                         oninput="state.wizardData.coAuthors = this.value.split(',').map(s => s.trim()).filter(Boolean);"
                         value="${wizard.coAuthors ? wizard.coAuthors.join(', ') : ''}"
                         placeholder="@username1, @username2"
@@ -432,7 +518,7 @@ function renderStep6Submit(wizard) {
                             </li>
                             <li class="flex items-start gap-2">
                                 <span class="text-blue-600 font-bold">2.</span>
-                                <span>The proposal will be open for discussion for 30 days</span>
+                                <span>${wizard.type === 'CIS' ? 'The issue will be open for community discussion and review' : `The proposal will be open for public consultation based on the category selected${wizard.category ? ` (${wizard.category}: ${{ Procedural: '60 days', Substantive: '60 days', Technical: 'variable', Interpretive: '30 days', Editorial: '14 days', Other: '30 days' }[wizard.category] || '30 days'} minimum)` : ''}`}</span>
                             </li>
                             ${wizard.type === 'CAP' && wizard.selectedText && wizard.selectedText.length > 0 ? `
                                 <li class="flex items-start gap-2">
@@ -459,29 +545,42 @@ function renderStep6Submit(wizard) {
 }
 
 function generateGitHubMarkdown(wizard) {
-    let markdown = `### Abstract\n${wizard.abstract || 'Not provided'}\n\n`;
-    markdown += `### ${wizard.type === 'CAP' ? 'Motivation' : 'Statement of Problem'}\n${wizard.motivation || 'Not provided'}\n\n`;
-    
+    let markdown = `### Summary\n${wizard.abstract || 'Not provided'}\n\n`;
+
+    if (wizard.type === 'CAP') {
+        markdown += `### Why is this change needed?\n${wizard.motivation || 'Not provided'}\n\n`;
+        markdown += `### Analysis & Test\n${wizard.analysis || 'Not provided'}\n\n`;
+    } else {
+        markdown += `### Problem\n${wizard.motivation || 'Not provided'}\n\n`;
+        if (wizard.analysis) markdown += `### Context\n${wizard.analysis}\n\n`;
+        if (wizard.impact) markdown += `### Impact\n${wizard.impact}\n\n`;
+    }
+
     if (wizard.type === 'CAP' && wizard.selectedText && wizard.selectedText.length > 0) {
-        markdown += `### Structured Revisions (Contextual)\n\n`;
+        markdown += `### Revisions\n\n`;
         wizard.selectedText.forEach((sel, idx) => {
             markdown += `#### Revision #${idx + 1}: ${sel.section || 'General'}\n`;
             markdown += `**Original Text:**\n> ${sel.text}\n\n`;
             markdown += `**Proposed Revision:**\n${wizard.revisions[idx] || 'Not provided'}\n\n`;
         });
     }
-    
-    markdown += `### Supporting Exhibits (Links)\n${wizard.exhibits || 'None provided.'}\n\n`;
-    
+
+    markdown += `### Links and Files\n${wizard.exhibits || 'None provided.'}\n\n`;
+
     if (wizard.coAuthors && wizard.coAuthors.length > 0) {
         markdown += `### Co-Authors\n${wizard.coAuthors.map(a => `- @${a.replace('@', '')}`).join('\n')}\n\n`;
     }
-    
-    markdown += `### Attached Files\nPending upload...\n\n`;
-    const expiry = new Date(Date.now() + (30 * 24 * 60 * 60 * 1000)).toISOString();
-    markdown += `### Proposal Details\n- **License:** CC-BY-4.0\n- **Review Ends:** ${new Date(expiry).toLocaleDateString()}\n\n`;
-    markdown += `<!-- DELIBERATION_END: ${expiry} -->`;
-    
+
+    if (wizard.type === 'CAP') {
+        const consultationDays = { Procedural: 60, Substantive: 60, Technical: 60, Interpretive: 30, Editorial: 14, Other: 30 };
+        const days = consultationDays[wizard.category] || 30;
+        const expiry = new Date(Date.now() + (days * 24 * 60 * 60 * 1000)).toISOString();
+        markdown += `### Proposal Details\n- **License:** CC-BY-4.0\n- **Category:** ${wizard.category}\n- **Review Ends:** ${new Date(expiry).toLocaleDateString()}\n\n`;
+        markdown += `<!-- DELIBERATION_END: ${expiry} -->`;
+    } else {
+        markdown += `### Proposal Details\n- **License:** CC-BY-4.0\n- **Category:** ${wizard.category}\n`;
+    }
+
     return markdown;
 }
 

@@ -44,11 +44,42 @@ export function renderEdit(state) {
     };
 
     const categories = [
-        { id: 'Meta', label: 'Meta', desc: 'Adjustments to the CIP process or governance framework itself.' },
-        { id: 'Constitution', label: 'Constitution', desc: 'Direct amendments to the text of the Cardano Constitution.' },
-        { id: 'Guardrails', label: 'Guardrails', desc: 'Modifications to the technical and monetary guardrail systems.' },
-        { id: 'Supporting', label: 'Supporting Documentation', desc: 'Providing technical guidance, evidence, or supporting documentation.' },
-        { id: 'Other', label: 'Other', desc: 'Proposals that fall outside the defined institutional categories.' }
+        {
+            id: 'Procedural',
+            label: 'Procedural',
+            desc: 'Changes a governance procedure or process step within the Constitution.',
+            consultation: '60 days'
+        },
+        {
+            id: 'Substantive',
+            label: 'Substantive',
+            desc: 'Alters the foundational values of the Constitution — adding or modifying a principle, tenet, or core commitment.',
+            consultation: '60 days'
+        },
+        {
+            id: 'Technical',
+            label: 'Technical',
+            desc: 'Updates on-chain technical or economic validation scripts and guardrail parameters. Consultation time may vary based on related parameter dependencies.',
+            consultation: 'Variable'
+        },
+        {
+            id: 'Interpretive',
+            label: 'Interpretive',
+            desc: 'Clarifies or refines existing language to reduce ambiguity, without changing the underlying intent or principle.',
+            consultation: '30 days'
+        },
+        {
+            id: 'Editorial',
+            label: 'Editorial',
+            desc: 'Purely cosmetic fixes: typos, formatting, grammar, or broken cross-references. No substantive change to meaning.',
+            consultation: '14 days'
+        },
+        {
+            id: 'Other',
+            label: 'Other',
+            desc: 'Doesn\'t fit neatly into the above categories. Editors will assess and recommend an appropriate consultation period.',
+            consultation: '30 days'
+        }
     ];
 
     const currentCatLabel = p.labels.find(l => categories.some(c => c.id === l.name))?.name || '';
@@ -82,27 +113,27 @@ export function renderEdit(state) {
                         </div>
 
                         <div class="space-y-6">
-                            <label class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 ml-4">Working Category</label>
+                            <label class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 ml-4">Category</label>
                             <div class="relative">
-                                <select id="category-select" name="category" required 
-                                    onchange="document.getElementById('cat-desc').innerText = this.options[this.selectedIndex].dataset.desc"
+                                <select id="category-select" name="category" required
+                                    onchange="var o=this.options[this.selectedIndex]; document.getElementById('cat-desc').innerHTML=o.dataset.desc+'<span class=&quot;block mt-2 font-black not-italic text-blue-600&quot;>Recommended minimum consultation time: '+o.dataset.consultation+'</span>';"
                                     class="w-full bg-slate-50 dark:bg-slate-950 p-6 rounded-3xl font-bold outline-none border-2 border-transparent focus:border-blue-600 appearance-none text-slate-900 dark:text-white cursor-pointer">
-                                    ${categories.map(c => `<option value="${c.id}" data-desc="${c.desc}" ${currentCatLabel === c.id ? 'selected' : ''}>${c.label}</option>`).join('')}
+                                    ${categories.map(c => `<option value="${c.id}" data-desc="${c.desc}" data-consultation="${c.consultation}" ${currentCatLabel === c.id ? 'selected' : ''}>${c.label}</option>`).join('')}
                                 </select>
                                 <i data-lucide="chevron-down" class="absolute right-6 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 pointer-events-none"></i>
                             </div>
                             <div class="mx-4 p-4 bg-slate-50 dark:bg-slate-950/50 rounded-2xl border border-slate-100 dark:border-slate-800">
                                 <p id="cat-desc" class="text-xs font-medium text-slate-400 italic leading-relaxed">
-                                    ${currentCatLabel ? categories.find(c => c.id === currentCatLabel).desc : 'Classification determines the internal working group.'}
+                                    ${currentCatLabel ? (() => { const c = categories.find(c => c.id === currentCatLabel); return c ? `${c.desc}<span class="block mt-2 font-black not-italic text-blue-600">Recommended minimum consultation time: ${c.consultation}</span>` : 'Select a category to see its description.'; })() : 'Select a category to see its description.'}
                                 </p>
                             </div>
                         </div>
 
                         <div class="space-y-3">
-                            <label class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 ml-4">Executive Abstract</label>
+                            <label class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 ml-4">Summary</label>
                             ${renderToolbar('edit-abstract')}
-                            <textarea name="abstract" id="edit-abstract" required 
-                                class="w-full bg-slate-50 dark:bg-slate-950 p-6 rounded-3xl min-h-[120px] font-medium text-lg outline-none border-2 border-transparent focus:border-blue-600 transition-all text-slate-900 dark:text-white resize-none">${getSection('Abstract')}</textarea>
+                            <textarea name="abstract" id="edit-abstract" required
+                                class="w-full bg-slate-50 dark:bg-slate-950 p-6 rounded-3xl min-h-[120px] font-medium text-lg outline-none border-2 border-transparent focus:border-blue-600 transition-all text-slate-900 dark:text-white resize-none">${getSection('Summary') || getSection('Abstract')}</textarea>
                         </div>
                     </div>
                 </div>
@@ -119,30 +150,67 @@ export function renderEdit(state) {
                         class="w-full bg-slate-50 dark:bg-slate-950 p-8 rounded-[3rem] min-h-[300px] font-mono text-sm outline-none border-2 border-transparent focus:border-blue-600 transition-all text-slate-900 dark:text-white shadow-inner">${getSection('Structured Revisions (Contextual)')}</textarea>
                 </div>
 
-                <!-- Section 3: Motivation & Assets -->
+                <!-- Section 3: Why? / Motivation & Assets -->
                 <div class="bg-white dark:bg-slate-900 p-10 sm:p-14 rounded-[4rem] border border-slate-100 dark:border-slate-800 shadow-sm space-y-12">
-                    <div class="space-y-3">
-                        <label class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 ml-4">
-                            ${isCIS ? 'Statement of Problem' : 'Motivation'}
-                        </label>
-                        ${renderToolbar('edit-motivation')}
-                        <textarea name="motivation" id="edit-motivation" required 
-                            class="w-full bg-slate-50 dark:bg-slate-950 p-8 rounded-3xl min-h-[200px] font-medium text-lg outline-none border-2 border-transparent focus:border-blue-600 transition-all text-slate-900 dark:text-white">${getSection(isCIS ? 'Statement of Problem' : 'Motivation')}</textarea>
+                    ${isCIS ? `
+                    <div class="space-y-8">
+                        <div class="space-y-3">
+                            <label class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 ml-4">Problem</label>
+                            <p class="text-[10px] text-slate-400 ml-4">What specific constitutional issue have you identified?</p>
+                            ${renderToolbar('edit-motivation')}
+                            <textarea name="motivation" id="edit-motivation" required
+                                class="w-full bg-slate-50 dark:bg-slate-950 p-8 rounded-3xl min-h-[160px] font-medium text-lg outline-none border-2 border-transparent focus:border-blue-600 transition-all text-slate-900 dark:text-white">${getSection('Problem') || getSection('Statement of Problem')}</textarea>
+                        </div>
+                        <div class="space-y-3">
+                            <label class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 ml-4">Context</label>
+                            <p class="text-[10px] text-slate-400 ml-4">Background and circumstances surrounding the issue.</p>
+                            ${renderToolbar('edit-analysis')}
+                            <textarea name="analysis" id="edit-analysis"
+                                class="w-full bg-slate-50 dark:bg-slate-950 p-8 rounded-3xl min-h-[160px] font-medium text-lg outline-none border-2 border-transparent focus:border-blue-600 transition-all text-slate-900 dark:text-white">${getSection('Context')}</textarea>
+                        </div>
+                        <div class="space-y-3">
+                            <label class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 ml-4">Impact</label>
+                            <p class="text-[10px] text-slate-400 ml-4">Consequences if this issue goes unaddressed.</p>
+                            ${renderToolbar('edit-impact')}
+                            <textarea name="impact" id="edit-impact"
+                                class="w-full bg-slate-50 dark:bg-slate-950 p-8 rounded-3xl min-h-[160px] font-medium text-lg outline-none border-2 border-transparent focus:border-blue-600 transition-all text-slate-900 dark:text-white">${getSection('Impact')}</textarea>
+                        </div>
                     </div>
+                    ` : `
+                    <div class="space-y-2">
+                        <h3 class="text-[10px] font-black uppercase tracking-[0.3em] text-blue-600 ml-4">Why?</h3>
+                        <div class="space-y-8 pt-2">
+                            <div class="space-y-3">
+                                <label class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 ml-4">Why is this change needed?</label>
+                                <p class="text-[10px] text-slate-400 ml-4">High-level objective and rationale. Limited to 500 words.</p>
+                                ${renderToolbar('edit-motivation')}
+                                <textarea name="motivation" id="edit-motivation" required
+                                    class="w-full bg-slate-50 dark:bg-slate-950 p-8 rounded-3xl min-h-[180px] font-medium text-lg outline-none border-2 border-transparent focus:border-blue-600 transition-all text-slate-900 dark:text-white">${getSection('Why is this change needed?') || getSection('Motivation')}</textarea>
+                            </div>
+                            <div class="space-y-3">
+                                <label class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 ml-4">Analysis &amp; Test</label>
+                                <p class="text-[10px] text-slate-400 ml-4">Expected consequences across stakeholders and the Cardano ecosystem, plus measurable "Test" criteria.</p>
+                                ${renderToolbar('edit-analysis')}
+                                <textarea name="analysis" id="edit-analysis"
+                                    class="w-full bg-slate-50 dark:bg-slate-950 p-8 rounded-3xl min-h-[200px] font-medium text-lg outline-none border-2 border-transparent focus:border-blue-600 transition-all text-slate-900 dark:text-white">${getSection('Analysis & Test')}</textarea>
+                            </div>
+                        </div>
+                    </div>
+                    `}
 
                     <!-- Asset Block -->
                     <div class="pt-10 border-t border-slate-50 dark:border-slate-800 space-y-10">
                         <div class="flex items-center gap-3">
                             <i data-lucide="paperclip" class="w-4 h-4 text-blue-600"></i>
-                            <h3 class="text-[10px] font-black uppercase tracking-[0.4em] text-slate-400">Institutional Assets</h3>
+                            <h3 class="text-[10px] font-black uppercase tracking-[0.4em] text-slate-400">Links and Files</h3>
                         </div>
-                        
+
                         <div class="space-y-3">
-                            <label class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 ml-4 italic">External References & Links</label>
+                            <label class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 ml-4 italic">Links to research, files, or extra info</label>
                             ${renderToolbar('edit-exhibits')}
                             <textarea name="specification_extra" id="edit-exhibits"
                                 placeholder="Edit existing or add new URLs..."
-                                class="w-full bg-slate-50 dark:bg-slate-950 p-6 rounded-3xl min-h-[120px] font-medium text-lg outline-none border-2 border-transparent focus:border-blue-600 text-slate-900 dark:text-white resize-none">${getSection('Supporting Exhibits (Links)')}</textarea>
+                                class="w-full bg-slate-50 dark:bg-slate-950 p-6 rounded-3xl min-h-[120px] font-medium text-lg outline-none border-2 border-transparent focus:border-blue-600 text-slate-900 dark:text-white resize-none">${getSection('Links and Files') || getSection('Supporting Exhibits (Links)')}</textarea>
                         </div>
 
                         <!-- Existing Files Display -->
@@ -191,7 +259,7 @@ ${getSection('Institutional Assets')}
                                 <i data-lucide="check" class="absolute w-4 h-4 text-white opacity-0 peer-checked:opacity-100 pointer-events-none"></i>
                             </div>
                             <span class="text-sm font-bold text-slate-600 dark:text-slate-400 group-hover:text-slate-900 dark:group-hover:text-white transition-colors leading-relaxed">
-                                I verify these modifications comply with the 30-day deliberation requirements and that I have documented all version changes.
+                                I verify these modifications comply with the public consultation requirements for the amendment category and that I have documented all version changes.
                             </span>
                         </label>
                     </div>

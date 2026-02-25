@@ -160,7 +160,7 @@ window.state = {
     expandedEventId: null, 
     theme: localStorage.getItem('theme') || 'light',
     draft: {
-        title: '', category: '', abstract: '', motivation: '', exhibits: '', files: [], revisions: {}
+        title: '', category: '', abstract: '', motivation: '', analysis: '', impact: '', exhibits: '', files: [], revisions: {}
     },
     editFiles: [], 
     stats: { total: 0, draft: 0, review: 0, final: 0, cisCount: 0, capCount: 0 },
@@ -179,6 +179,8 @@ window.state = {
         title: '',
         abstract: '',
         motivation: '',
+        analysis: '',
+        impact: '',
         selectedText: [],
         revisions: {},
         exhibits: '',
@@ -444,7 +446,7 @@ window.updateDraftField = (field, value) => {
 };
 
 window.syncDraft = () => {
-    ['title', 'category', 'abstract', 'motivation', 'exhibits'].forEach(field => {
+    ['title', 'category', 'abstract', 'motivation', 'analysis', 'impact', 'exhibits'].forEach(field => {
         const el = document.querySelector(`[name="${field}"]`);
         if (el) state.draft[field] = el.value;
     });
@@ -493,6 +495,8 @@ window.handleEdit = async (event) => {
     const abstract = form.querySelector('[name="abstract"]').value;
     const revisions = form.querySelector('[name="revisions"]')?.value || '';
     const motivation = form.querySelector('[name="motivation"]').value;
+    const analysis = form.querySelector('[name="analysis"]')?.value || '';
+    const impact = form.querySelector('[name="impact"]')?.value || '';
     const exhibits = form.querySelector('[name="specification_extra"]')?.value || '';
     const p = state.currentProposal;
     const isCIS = p.labels.some(l => l.name === 'CIS');
@@ -506,11 +510,17 @@ window.handleEdit = async (event) => {
     state.loading.submitting = true;
     window.updateUI(true);
 
-    let body = `### Abstract\n${abstract}\n\n`;
+    let body = `### Summary\n${abstract}\n\n`;
     if (revisions) body += `### Structured Revisions (Contextual)\n${revisions}\n\n`;
-    body += `### ${isCIS ? 'Statement of Problem' : 'Motivation'}\n${motivation}\n\n`;
-    body += `### Supporting Exhibits (Links)\n${exhibits || 'None provided.'}\n\n`;
-    body += `### Institutional Assets\nPending synthesis...\n\n`;
+    if (isCIS) {
+        body += `### Problem\n${motivation}\n\n`;
+        if (analysis) body += `### Context\n${analysis}\n\n`;
+        if (impact) body += `### Impact\n${impact}\n\n`;
+    } else {
+        body += `### Why is this change needed?\n${motivation}\n\n`;
+        if (analysis) body += `### Analysis & Test\n${analysis}\n\n`;
+    }
+    body += `### Links and Files\n${exhibits || 'None provided.'}\n\n`;
 
     try {
         await updateGhIssueContent(p.number, title, body, category, type, state.ghToken);
@@ -537,7 +547,7 @@ window.handleForm = async (event) => {
     event.preventDefault();
     window.syncDraft();
 
-    const { title, category, abstract, motivation, exhibits } = state.draft;
+    const { title, category, abstract, motivation, analysis, impact, exhibits } = state.draft;
     const type = state.createType;
 
     if (!title || !category || !abstract || !motivation) {
@@ -548,22 +558,35 @@ window.handleForm = async (event) => {
     state.loading.submitting = true;
     window.updateUI(true);
 
-    let body = `### Abstract\n${abstract}\n\n### ${type === 'CAP' ? 'Motivation' : 'Statement of Problem'}\n${motivation}\n\n`;
+    let body = `### Summary\n${abstract}\n\n`;
+    if (type === 'CAP') {
+        body += `### Why is this change needed?\n${motivation}\n\n`;
+        if (analysis) body += `### Analysis & Test\n${analysis}\n\n`;
+    } else {
+        body += `### Problem\n${motivation}\n\n`;
+        if (analysis) body += `### Context\n${analysis}\n\n`;
+        if (impact) body += `### Impact\n${impact}\n\n`;
+    }
 
     // CAP-specific revision section
     if (type === 'CAP' && state.selectedReferences.length > 0) {
-        body += `### Structured Revisions (Contextual)\n\n`;
+        body += `### Revisions\n\n`;
         state.selectedReferences.forEach(ref => {
             const revision = state.draft.revisions[ref.id] || '';
             body += `#### ${ref.section}\n**Original Text:**\n> ${ref.text}\n\n**Proposed Revision:**\n${revision}\n\n`;
         });
     }
 
-    body += `### Supporting Exhibits (Links)\n${exhibits || 'None provided.'}\n\n`;
-    body += `### Institutional Assets\nPending synthesis...\n\n`;
-    const expiry = new Date(Date.now() + (30 * 24 * 60 * 60 * 1000)).toISOString();
-    body += `### Institutional Metadata\n- **License:** CC-BY-4.0\n- **Deliberation End:** ${new Date(expiry).toLocaleDateString()}\n\n`;
-    body += `<!-- DELIBERATION_END: ${expiry} -->`;
+    body += `### Links and Files\n${exhibits || 'None provided.'}\n\n`;
+    if (type === 'CAP') {
+        const consultationDays = { Procedural: 60, Substantive: 60, Technical: 60, Interpretive: 30, Editorial: 14, Other: 30 };
+        const days = consultationDays[category] || 30;
+        const expiry = new Date(Date.now() + (days * 24 * 60 * 60 * 1000)).toISOString();
+        body += `### Institutional Metadata\n- **License:** CC-BY-4.0\n- **Deliberation End:** ${new Date(expiry).toLocaleDateString()}\n\n`;
+        body += `<!-- DELIBERATION_END: ${expiry} -->`;
+    } else {
+        body += `### Institutional Metadata\n- **License:** CC-BY-4.0\n`;
+    }
 
     try {
         // Create the GitHub issue
@@ -639,7 +662,7 @@ window.handleForm = async (event) => {
         }
 
         // Clear draft and navigate
-        state.draft = { title: '', category: '', abstract: '', motivation: '', exhibits: '', files: [], revisions: {} };
+        state.draft = { title: '', category: '', abstract: '', motivation: '', analysis: '', impact: '', exhibits: '', files: [], revisions: {} };
         state.selectedReferences = [];
         
         window.showToast('Submitted', `${type} #${issue.number} created successfully.`, 'success');
@@ -963,7 +986,12 @@ window.wizardNextStep = () => {
 
     if (state.wizardStep === 4) {
         if (!state.wizardData.abstract.trim() || !state.wizardData.motivation.trim()) {
-            window.showToast('Missing Fields', 'Please provide both an abstract and motivation.', 'warning');
+            const requiredField = state.wizardData.type === 'CAP' ? 'Why is this change needed?' : 'Problem';
+            window.showToast('Missing Fields', `Please fill in the Summary and "${requiredField}" fields.`, 'warning');
+            return;
+        }
+        if (state.wizardData.type === 'CAP' && !state.wizardData.analysis.trim()) {
+            window.showToast('Missing Fields', 'Please complete the Analysis & Test field.', 'warning');
             return;
         }
     }
@@ -1006,6 +1034,8 @@ window.wizardReset = () => {
             title: '',
             abstract: '',
             motivation: '',
+            analysis: '',
+            impact: '',
             selectedText: [],
             revisions: {},
             exhibits: '',
@@ -1059,30 +1089,43 @@ window.manualTextEntry = () => {
 
 window.copyGitHubMarkdown = () => {
     const wizard = state.wizardData;
-    const expiry = new Date(Date.now() + (30 * 24 * 60 * 60 * 1000)).toISOString();
-    
-    let markdown = `### Abstract\n${wizard.abstract || 'Not provided'}\n\n`;
-    markdown += `### ${wizard.type === 'CAP' ? 'Motivation' : 'Statement of Problem'}\n${wizard.motivation || 'Not provided'}\n\n`;
-    
+
+    let markdown = `### Summary\n${wizard.abstract || 'Not provided'}\n\n`;
+
+    if (wizard.type === 'CAP') {
+        markdown += `### Why is this change needed?\n${wizard.motivation || 'Not provided'}\n\n`;
+        markdown += `### Analysis & Test\n${wizard.analysis || 'Not provided'}\n\n`;
+    } else {
+        markdown += `### Problem\n${wizard.motivation || 'Not provided'}\n\n`;
+        if (wizard.analysis) markdown += `### Context\n${wizard.analysis}\n\n`;
+        if (wizard.impact) markdown += `### Impact\n${wizard.impact}\n\n`;
+    }
+
     if (wizard.type === 'CAP' && wizard.selectedText && wizard.selectedText.length > 0) {
-        markdown += `### Structured Revisions (Contextual)\n\n`;
+        markdown += `### Revisions\n\n`;
         wizard.selectedText.forEach((sel, idx) => {
             markdown += `#### Revision #${idx + 1}: ${sel.section || 'General'}\n`;
             markdown += `**Original Text:**\n> ${sel.text}\n\n`;
             markdown += `**Proposed Revision:**\n${wizard.revisions[idx] || 'Not provided'}\n\n`;
         });
     }
-    
-    markdown += `### Supporting Exhibits (Links)\n${wizard.exhibits || 'None provided.'}\n\n`;
-    
+
+    markdown += `### Links and Files\n${wizard.exhibits || 'None provided.'}\n\n`;
+
     if (wizard.coAuthors && wizard.coAuthors.length > 0) {
         markdown += `### Co-Authors\n${wizard.coAuthors.map(a => `- @${a.replace('@', '')}`).join('\n')}\n\n`;
     }
-    
-    markdown += `### Institutional Assets\nPending synthesis...\n\n`;
-    markdown += `### Institutional Metadata\n- **License:** CC-BY-4.0\n- **Deliberation End:** ${new Date(expiry).toLocaleDateString()}\n\n`;
-    markdown += `<!-- DELIBERATION_END: ${expiry} -->`;
-    
+
+    if (wizard.type === 'CAP') {
+        const consultationDays = { Procedural: 60, Substantive: 60, Technical: 60, Interpretive: 30, Editorial: 14, Other: 30 };
+        const days = consultationDays[wizard.category] || 30;
+        const expiry = new Date(Date.now() + (days * 24 * 60 * 60 * 1000)).toISOString();
+        markdown += `### Proposal Details\n- **License:** CC-BY-4.0\n- **Category:** ${wizard.category}\n- **Review Ends:** ${new Date(expiry).toLocaleDateString()}\n\n`;
+        markdown += `<!-- DELIBERATION_END: ${expiry} -->`;
+    } else {
+        markdown += `### Proposal Details\n- **License:** CC-BY-4.0\n- **Category:** ${wizard.category}\n`;
+    }
+
     // Copy to clipboard
     navigator.clipboard.writeText(markdown).then(() => {
         window.showToast('Copied to Clipboard', 'Paste into a new GitHub Issue and add labels: ' + wizard.type + ', Draft, ' + wizard.category, 'success');
@@ -1117,6 +1160,8 @@ window.wizardSubmit = async () => {
         category: wizard.category,
         abstract: wizard.abstract,
         motivation: wizard.motivation,
+        analysis: wizard.analysis || '',
+        impact: wizard.impact || '',
         exhibits: wizard.exhibits,
         files: [],
         revisions: {}
@@ -1152,6 +1197,7 @@ window.wizardSubmit = async () => {
                 title: '',
                 abstract: '',
                 motivation: '',
+                analysis: '',
                 selectedText: [],
                 revisions: {},
                 exhibits: '',

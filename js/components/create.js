@@ -34,11 +34,42 @@ export function renderCreate(state) {
     const draft = state.draft;
 
     const categories = [
-        { id: 'Meta', label: 'Meta', desc: 'Adjustments to the CIP process or governance framework itself.' },
-        { id: 'Constitution', label: 'Constitution', desc: 'Direct amendments to the text of the Cardano Constitution.' },
-        { id: 'Guardrails', label: 'Guardrails', desc: 'Modifications to the technical and monetary guardrail systems.' },
-        { id: 'Supporting', label: 'Supporting Documentation', desc: 'Providing technical guidance, evidence, or supporting documentation.' },
-        { id: 'Other', label: 'Other', desc: 'Proposals that fall outside the defined institutional categories.' }
+        {
+            id: 'Procedural',
+            label: 'Procedural',
+            desc: 'Changes a governance procedure or process step within the Constitution.',
+            consultation: '60 days'
+        },
+        {
+            id: 'Substantive',
+            label: 'Substantive',
+            desc: 'Alters the foundational values of the Constitution — adding or modifying a principle, tenet, or core commitment.',
+            consultation: '60 days'
+        },
+        {
+            id: 'Technical',
+            label: 'Technical',
+            desc: 'Updates on-chain technical or economic validation scripts and guardrail parameters. Consultation time may vary based on related parameter dependencies.',
+            consultation: 'Variable'
+        },
+        {
+            id: 'Interpretive',
+            label: 'Interpretive',
+            desc: 'Clarifies or refines existing language to reduce ambiguity, without changing the underlying intent or principle.',
+            consultation: '30 days'
+        },
+        {
+            id: 'Editorial',
+            label: 'Editorial',
+            desc: 'Purely cosmetic fixes: typos, formatting, grammar, or broken cross-references. No substantive change to meaning.',
+            consultation: '14 days'
+        },
+        {
+            id: 'Other',
+            label: 'Other',
+            desc: 'Doesn\'t fit neatly into the above categories. Editors will assess and recommend an appropriate consultation period.',
+            consultation: '30 days'
+        }
     ];
 
     return `
@@ -124,29 +155,30 @@ export function renderCreate(state) {
 
                         <!-- Category Selection -->
                         <div class="space-y-6">
-                            <label class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 ml-4">Working Category</label>
+                            <label class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 ml-4">Category</label>
+                            <p class="text-[10px] text-slate-400 ml-4 -mt-4">${isCIS ? 'What type of constitutional issue is this?' : 'What type of amendment to the Cardano Constitution is being proposed? This affects the recommended public consultation time.'}</p>
                             <div class="relative">
-                                <select id="category-select" name="category" required 
-                                    onchange="window.updateDraftField('category', this.value); document.getElementById('cat-desc').innerText = this.options[this.selectedIndex].dataset.desc"
+                                <select id="category-select" name="category" required data-is-cis="${isCIS}"
+                                    onchange="window.updateDraftField('category', this.value); var o=this.options[this.selectedIndex]; var desc=o.dataset.desc; if(this.dataset.isCis!=='true'){desc+='<span class=&quot;block mt-2 font-black not-italic text-blue-600&quot;>Recommended minimum consultation time: '+o.dataset.consultation+'</span>';} document.getElementById('cat-desc').innerHTML=desc;"
                                     class="w-full bg-slate-50 dark:bg-slate-950 p-6 rounded-3xl font-bold outline-none border-2 border-transparent focus:border-blue-600 appearance-none text-slate-900 dark:text-white cursor-pointer">
-                                    <option value="" disabled ${!draft.category ? 'selected' : ''}>Select a classification...</option>
-                                    ${categories.map(c => `<option value="${c.id}" data-desc="${c.desc}" ${draft.category === c.id ? 'selected' : ''}>${c.label}</option>`).join('')}
+                                    <option value="" disabled ${!draft.category ? 'selected' : ''}>Select a category...</option>
+                                    ${categories.map(c => `<option value="${c.id}" data-desc="${c.desc.replace(/"/g, '&quot;')}" data-consultation="${c.consultation}" ${draft.category === c.id ? 'selected' : ''}>${c.label}</option>`).join('')}
                                 </select>
                                 <i data-lucide="chevron-down" class="absolute right-6 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 pointer-events-none"></i>
                             </div>
                             <div class="mx-4 p-4 bg-slate-50 dark:bg-slate-950/50 rounded-2xl border border-slate-100 dark:border-slate-800">
                                 <p id="cat-desc" class="text-xs font-medium text-slate-400 italic leading-relaxed">
-                                    ${draft.category ? categories.find(c => c.id === draft.category).desc : 'Select a category to see its institutional purpose.'}
+                                    ${draft.category ? (() => { const c = categories.find(c => c.id === draft.category); return c ? (isCIS ? c.desc : `${c.desc}<span class="block mt-2 font-black not-italic text-blue-600">Recommended minimum consultation time: ${c.consultation}</span>`) : 'Select a category to see its description.'; })() : 'Select a category to see its description.'}
                                 </p>
                             </div>
                         </div>
 
-                        <!-- Abstract -->
+                        <!-- Summary -->
                         <div class="space-y-3">
-                            <label class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 ml-4">Executive Abstract</label>
+                            <label class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 ml-4">Summary</label>
                             ${renderToolbar('create-abstract')}
                             <textarea name="abstract" id="create-abstract" required oninput="window.updateDraftField('abstract', this.value)"
-                                placeholder="A high-level summary of the entry..." 
+                                placeholder="A high-level summary of the entry..."
                                 class="w-full bg-slate-50 dark:bg-slate-950 p-6 rounded-3xl min-h-[120px] font-medium text-lg outline-none border-2 border-transparent focus:border-blue-600 transition-all text-slate-900 dark:text-white resize-none">${draft.abstract || ''}</textarea>
                         </div>
                     </div>
@@ -157,7 +189,7 @@ export function renderCreate(state) {
                     <div class="flex items-center justify-between px-8">
                         <div class="flex items-center gap-3">
                             <div class="w-2 h-8 bg-blue-600 rounded-full"></div>
-                            <h2 class="text-xs font-black uppercase tracking-[0.3em] text-slate-400">Contextual Revisions</h2>
+                            <h2 class="text-xs font-black uppercase tracking-[0.3em] text-slate-400">${isCIS ? 'Referenced Sections' : 'Contextual Revisions'}</h2>
                         </div>
                         <button type="button" onclick="window.setView('constitution')" class="text-[10px] font-black uppercase tracking-widest text-blue-600 hover:underline">
                             + Reference Constitution
@@ -166,7 +198,7 @@ export function renderCreate(state) {
 
                     ${refs.length === 0 ? `
                         <div class="bg-white/50 dark:bg-slate-900/50 border-2 border-dashed border-slate-200 dark:border-slate-800 p-16 rounded-[4rem] text-center">
-                            <p class="text-slate-400 font-bold text-sm italic">No segments selected. Highlight text in the Constitution to begin.</p>
+                            <p class="text-slate-400 font-bold text-sm italic">${isCIS ? 'No sections referenced. Highlight text in the Constitution to flag problem areas.' : 'No segments selected. Highlight text in the Constitution to begin.'}</p>
                         </div>
                     ` : refs.map((ref, idx) => `
                         <div class="bg-white dark:bg-slate-900 p-8 sm:p-12 rounded-[4rem] border border-slate-100 dark:border-slate-800 shadow-sm space-y-8 relative group">
@@ -187,15 +219,61 @@ export function renderCreate(state) {
                     `).join('')}
                 </div>
 
-                <!-- Section 3: Motivation & Institutional Exhibits -->
+                <!-- Section 3: Why? / Motivation & Institutional Exhibits -->
                 <div class="bg-white dark:bg-slate-900 p-10 sm:p-14 rounded-[4rem] border border-slate-100 dark:border-slate-800 shadow-sm space-y-12">
-                    <div class="space-y-3">
-                        <label class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 ml-4">${isCIS ? 'Statement of Problem' : 'Motivation'}</label>
-                        ${renderToolbar('create-motivation')}
-                        <textarea name="motivation" id="create-motivation" required oninput="window.updateDraftField('motivation', this.value)"
-                            placeholder="The logic and necessity behind this record..."
-                            class="w-full bg-slate-50 dark:bg-slate-950 p-8 rounded-3xl min-h-[200px] font-medium text-lg outline-none border-2 border-transparent focus:border-blue-600 transition-all text-slate-900 dark:text-white">${draft.motivation || ''}</textarea>
+                    ${isCIS ? `
+                    <div class="space-y-8">
+                        <div class="space-y-3">
+                            <label class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 ml-4">Problem</label>
+                            <p class="text-[10px] text-slate-400 ml-4">What specific constitutional issue have you identified? Be clear and precise.</p>
+                            ${renderToolbar('create-motivation')}
+                            <textarea name="motivation" id="create-motivation" required oninput="window.updateDraftField('motivation', this.value)"
+                                placeholder="Describe the constitutional issue..."
+                                class="w-full bg-slate-50 dark:bg-slate-950 p-8 rounded-3xl min-h-[160px] font-medium text-lg outline-none border-2 border-transparent focus:border-blue-600 transition-all text-slate-900 dark:text-white">${draft.motivation || ''}</textarea>
+                        </div>
+                        <div class="space-y-3">
+                            <label class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 ml-4">Context <span class="font-normal normal-case tracking-normal opacity-60">(optional)</span></label>
+                            <p class="text-[10px] text-slate-400 ml-4">What is the background? When and how does this issue arise? Include any relevant history or observations.</p>
+                            ${renderToolbar('create-analysis')}
+                            <textarea name="analysis" id="create-analysis" oninput="window.updateDraftField('analysis', this.value)"
+                                placeholder="Provide background and context for the issue..."
+                                class="w-full bg-slate-50 dark:bg-slate-950 p-8 rounded-3xl min-h-[160px] font-medium text-lg outline-none border-2 border-transparent focus:border-blue-600 transition-all text-slate-900 dark:text-white">${draft.analysis || ''}</textarea>
+                        </div>
+                        <div class="space-y-3">
+                            <label class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 ml-4">Impact <span class="font-normal normal-case tracking-normal opacity-60">(optional)</span></label>
+                            <p class="text-[10px] text-slate-400 ml-4">What are the consequences if this issue goes unaddressed? Who or what is affected, and how?</p>
+                            ${renderToolbar('create-impact')}
+                            <textarea name="impact" id="create-impact" oninput="window.updateDraftField('impact', this.value)"
+                                placeholder="Describe the impact of this constitutional issue..."
+                                class="w-full bg-slate-50 dark:bg-slate-950 p-8 rounded-3xl min-h-[160px] font-medium text-lg outline-none border-2 border-transparent focus:border-blue-600 transition-all text-slate-900 dark:text-white">${draft.impact || ''}</textarea>
+                        </div>
                     </div>
+                    ` : `
+                    <div class="space-y-2">
+                        <h3 class="text-[10px] font-black uppercase tracking-[0.3em] text-blue-600 ml-4">Why?</h3>
+                        <div class="space-y-8 pt-2">
+                            <div class="space-y-3">
+                                <div class="flex items-baseline justify-between ml-4 mr-4">
+                                    <label class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Why is this change needed?</label>
+                                    <span id="motivation-word-count" class="text-[10px] font-black ${(() => { const w = draft.motivation ? draft.motivation.trim().split(/\s+/).filter(Boolean).length : 0; return w > 500 ? 'text-red-500' : w > 400 ? 'text-amber-500' : 'text-slate-300 dark:text-slate-600'; })()}">${draft.motivation ? draft.motivation.trim().split(/\s+/).filter(Boolean).length : 0} / 500 words</span>
+                                </div>
+                                <p class="text-[10px] text-slate-400 ml-4">Explain with a clear, concise statement that articulates the specific problem or opportunity the amendment addresses. Define the amendment's high-level objective and rationale. Limited to 500 words.</p>
+                                ${renderToolbar('create-motivation')}
+                                <textarea name="motivation" id="create-motivation" required oninput="window.updateDraftField('motivation', this.value); var w=this.value.trim()?this.value.trim().split(/\s+/).filter(Boolean).length:0; var el=document.getElementById('motivation-word-count'); if(el){el.textContent=w+' / 500 words'; el.className='text-[10px] font-black '+(w>500?'text-red-500':w>400?'text-amber-500':'text-slate-300 dark:text-slate-600');}"
+                                    placeholder="Explain why the constitution should be changed and what problem or opportunity this amendment addresses..."
+                                    class="w-full bg-slate-50 dark:bg-slate-950 p-8 rounded-3xl min-h-[180px] font-medium text-lg outline-none border-2 border-transparent focus:border-blue-600 transition-all text-slate-900 dark:text-white">${draft.motivation || ''}</textarea>
+                            </div>
+                            <div class="space-y-3">
+                                <label class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 ml-4">Analysis &amp; Test</label>
+                                <p class="text-[10px] text-slate-400 ml-4">Provide a detailed analysis of the amendment's expected consequences across relevant stakeholders and the Cardano ecosystem. Define a measurable "Test"—a set of criteria or metrics—that will allow the community and governance bodies to assess the success, failure, or unintended consequences of the change once implemented.</p>
+                                ${renderToolbar('create-analysis')}
+                                <textarea name="analysis" id="create-analysis" required oninput="window.updateDraftField('analysis', this.value)"
+                                    placeholder="Describe the expected impact on stakeholders, potential consequences, and define measurable criteria to evaluate this amendment..."
+                                    class="w-full bg-slate-50 dark:bg-slate-950 p-8 rounded-3xl min-h-[200px] font-medium text-lg outline-none border-2 border-transparent focus:border-blue-600 transition-all text-slate-900 dark:text-white">${draft.analysis || ''}</textarea>
+                            </div>
+                        </div>
+                    </div>
+                    `}
 
                     <!-- Assets Block -->
                     <div class="pt-10 border-t border-slate-50 dark:border-slate-800 space-y-10">
@@ -254,7 +332,9 @@ export function renderCreate(state) {
                                 <i data-lucide="check" class="absolute w-4 h-4 text-white opacity-0 peer-checked:opacity-100 pointer-events-none"></i>
                             </div>
                             <span class="text-sm font-bold text-slate-600 dark:text-slate-400 group-hover:text-slate-900 dark:group-hover:text-white transition-colors leading-relaxed">
-                                I understand this submission initiates a mandatory 30-day deliberation cycle as defined by the Constitution.
+                                ${isCIS
+                                    ? 'I understand this issue statement will be publicly visible and open for community discussion and review.'
+                                    : 'I understand this submission initiates a mandatory public consultation period, the minimum length of which is determined by the amendment category selected above.'}
                             </span>
                         </label>
 
@@ -274,8 +354,8 @@ export function renderCreate(state) {
                 <button type="submit" ${state.loading.submitting ? 'disabled' : ''} 
                     class="w-full group bg-slate-950 dark:bg-white text-white dark:text-slate-950 p-10 rounded-[3rem] text-3xl font-black shadow-2xl hover:-translate-y-2 active:scale-95 transition-all flex items-center justify-center gap-6 disabled:opacity-50">
                     ${state.loading.submitting ? 
-                        `<div class="w-8 h-8 border-4 border-slate-400 border-t-white dark:border-slate-200 dark:border-t-slate-950 rounded-full animate-spin"></div> Syncing Entry...` : 
-                        `Sync Governance Entry <i data-lucide="send" class="w-8 h-8 group-hover:translate-x-3 transition-transform"></i>`
+                        `<div class="w-8 h-8 border-4 border-slate-400 border-t-white dark:border-slate-200 dark:border-t-slate-950 rounded-full animate-spin"></div> Syncing Entry...` :
+                        `${isCIS ? 'Flag Issue' : 'Submit Proposal'} <i data-lucide="send" class="w-8 h-8 group-hover:translate-x-3 transition-transform"></i>`
                     }
                 </button>
             </form>
