@@ -9,7 +9,7 @@ body:
         ## Constitution Issue Statement (CIS)
         Use this form to flag a problem, gap, or ambiguity in the Constitution. A CIS identifies **the problem** — it does not propose a solution. Solutions come later as a CAP (Cardano Amendment Proposal).
 
-        > **Tip:** The [CAP Portal](https://thomas-nada.github.io/CAP) guides you through this process step-by-step and submits in this exact format automatically.
+        > **Tip:** The [CAP Portal](https://thomas-nada.github.io/CAP) guides you through this process step-by-step and automatically prepends a structured YAML header (modelled on the CIP format) to every submission. Manual submissions should add this header themselves — see the instructions at the bottom of this form.
 
   - type: textarea
     id: abstract
@@ -80,11 +80,29 @@ body:
     attributes:
       value: |
         ---
-        ### Institutional Metadata
-        > The portal fills this in automatically. If submitting manually, add the following to your issue body after posting:
-        >
-        > `### Institutional Metadata`
-        > `- **License:** CC-BY-4.0`
+        ### Structured Header & Metadata — Manual Submission Instructions
+
+        The portal generates and prepends these blocks automatically. If submitting manually, add them yourself after the issue is created.
+
+        **1. Paste this at the very top of the issue body** (update all placeholder values):
+
+            ```yaml
+            CIS: {issue number — assigned by GitHub}
+            Title: {your title}
+            Category: {your category}
+            Status: Proposed
+            Authors:
+                - @{your-github-username}
+            Discussions:
+                - {this issue's URL}
+            Created: {YYYY-MM-DD}
+            License: CC-BY-4.0
+            ```
+
+        **2. Paste this at the very bottom of the issue body**:
+
+            ### Institutional Metadata
+            - **License:** CC-BY-4.0
 
   - type: checkboxes
     id: acknowledgments

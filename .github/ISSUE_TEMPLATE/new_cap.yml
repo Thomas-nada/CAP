@@ -9,7 +9,7 @@ body:
         ## Cardano Amendment Proposal (CAP)
         Use this form to propose a change to the Constitution. Each category carries a minimum consultation period before the proposal can be ratified.
 
-        > **Tip:** The [CAP Portal](https://thomas-nada.github.io/CAP) guides you through this process step-by-step and submits in this exact format automatically.
+        > **Tip:** The [CAP Portal](https://thomas-nada.github.io/CAP) guides you through this process step-by-step and automatically prepends a structured YAML header (modelled on the CIP format) to every submission. Manual submissions should add this header themselves — see the instructions at the bottom of this form.
 
   - type: textarea
     id: abstract
@@ -77,14 +77,33 @@ body:
     attributes:
       value: |
         ---
-        ### Institutional Metadata
-        > The portal fills this in automatically. If submitting manually, add the following to your issue body after posting:
-        >
-        > `### Institutional Metadata`
-        > `- **License:** CC-BY-4.0`
-        > `- **Deliberation End:** [calculate from category above]`
-        >
-        > `<!-- DELIBERATION_END: [ISO 8601 timestamp] -->`
+        ### Structured Header & Metadata — Manual Submission Instructions
+
+        The portal generates and prepends these blocks automatically. If submitting manually, add them yourself after the issue is created.
+
+        **1. Paste this at the very top of the issue body** (update all placeholder values):
+
+            ```yaml
+            CAP: {issue number — assigned by GitHub}
+            Title: {your title}
+            Category: {your category}
+            Status: Draft
+            Authors:
+                - @{your-github-username}
+            Discussions:
+                - {this issue's URL}
+            Created: {YYYY-MM-DD}
+            License: CC-BY-4.0
+            Deliberation-End: {YYYY-MM-DD — based on category above}
+            ```
+
+        **2. Paste this at the very bottom of the issue body**:
+
+            ### Institutional Metadata
+            - **License:** CC-BY-4.0
+            - **Deliberation End:** {human-readable date}
+
+            <!-- DELIBERATION_END: {ISO 8601 timestamp} -->
 
   - type: checkboxes
     id: acknowledgments
