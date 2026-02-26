@@ -54,7 +54,7 @@ export function renderDetail(state) {
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-12">
                 <button onclick="window.setView('list')" class="group flex items-center gap-2 text-slate-400 hover:text-blue-600 transition-colors font-bold uppercase text-xs tracking-widest">
                     <i data-lucide="arrow-left" class="w-4 h-4 group-hover:-translate-x-1 transition-transform"></i>
-                    Registry Index
+                    Back to Registry
                 </button>
                 
                 <a href="${githubUrl}" target="_blank" rel="noopener noreferrer" 
@@ -96,7 +96,7 @@ export function renderDetail(state) {
                             </div>
                             <div class="w-px h-8 bg-slate-100 dark:bg-slate-800"></div>
                             <div class="flex flex-col">
-                                <span class="text-[9px] font-black uppercase text-slate-400 tracking-widest leading-none mb-1">Initialized</span>
+                                <span class="text-[9px] font-black uppercase text-slate-400 tracking-widest leading-none mb-1">Submitted</span>
                                 <span class="text-sm font-bold text-slate-900 dark:text-slate-100">${createdDate.toLocaleDateString()}</span>
                             </div>
                         </div>
@@ -110,8 +110,8 @@ export function renderDetail(state) {
                     <!-- Comments and Discussion -->
                     <section class="space-y-12 pt-16 border-t border-slate-100 dark:border-slate-800">
                         <div class="flex items-center justify-between px-4">
-                            <h2 class="text-[10px] font-black uppercase tracking-[0.4em] text-slate-400">Community Comments</h2>
-                            <span class="text-[10px] font-black text-blue-600 uppercase tracking-widest">${state.comments.length} Contributions</span>
+                            <h2 class="text-[10px] font-black uppercase tracking-[0.4em] text-slate-400">Discussion</h2>
+                            <span class="text-[10px] font-black text-blue-600 uppercase tracking-widest">${state.comments.length} ${state.comments.length === 1 ? 'Comment' : 'Comments'}</span>
                         </div>
                         
                         <div class="space-y-8">
@@ -270,12 +270,12 @@ export function renderDetail(state) {
                     <!-- Author Administration Card -->
                     ${isAuthor ? `
                         <div class="bg-white dark:bg-slate-900 p-8 rounded-[2.5rem] border-2 border-blue-100 dark:border-blue-900/20 shadow-xl space-y-6">
-                            <h3 class="text-[10px] font-black uppercase tracking-[0.2em] text-blue-600">Administrative Suite</h3>
+                            <h3 class="text-[10px] font-black uppercase tracking-[0.2em] text-blue-600">Author Controls</h3>
                             <div class="space-y-3">
                                 <button onclick="window.startEdit()" class="w-full flex items-center justify-between p-5 rounded-2xl bg-blue-50 dark:bg-blue-900/10 hover:bg-blue-100 dark:hover:bg-blue-900/20 transition-all group">
                                     <div class="flex items-center gap-3">
                                         <i data-lucide="edit-3" class="w-4 h-4 text-blue-600"></i>
-                                        <span class="text-xs font-bold text-blue-600">Refine Document</span>
+                                        <span class="text-xs font-bold text-blue-600">Edit Proposal</span>
                                     </div>
                                     <i data-lucide="chevron-right" class="w-4 h-4 text-blue-300 group-hover:translate-x-1 transition-transform"></i>
                                 </button>
@@ -283,15 +283,15 @@ export function renderDetail(state) {
                                 <button onclick="window.closeProposal(${p.number})" class="w-full flex items-center justify-between p-5 rounded-2xl bg-slate-50 dark:bg-slate-950 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all group border border-slate-100 dark:border-slate-800">
                                     <div class="flex items-center gap-3">
                                         <i data-lucide="archive" class="w-4 h-4 text-slate-400 group-hover:text-slate-900 transition-colors"></i>
-                                        <span class="text-xs font-bold text-slate-600 dark:text-slate-400">Archive Record</span>
+                                        <span class="text-xs font-bold text-slate-600 dark:text-slate-400">Close Proposal</span>
                                     </div>
                                     <i data-lucide="chevron-right" class="w-4 h-4 text-slate-300"></i>
                                 </button>
-                                
+
                                 <button onclick="window.deleteProposal(${p.number})" class="w-full flex items-center justify-between p-5 rounded-2xl bg-red-50 dark:bg-red-900/10 hover:bg-red-100 dark:hover:bg-red-900/20 transition-all group border border-red-100/50 dark:border-red-900/20">
                                     <div class="flex items-center gap-3">
                                         <i data-lucide="trash-2" class="w-4 h-4 text-red-500"></i>
-                                        <span class="text-xs font-bold text-red-600">Destroy Record</span>
+                                        <span class="text-xs font-bold text-red-600">Delete</span>
                                     </div>
                                     <i data-lucide="alert-triangle" class="w-4 h-4 text-red-300"></i>
                                 </button>

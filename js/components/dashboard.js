@@ -61,7 +61,7 @@ export function renderDashboard(state) {
                 <h1 class="text-4xl font-black tracking-tighter text-slate-900 dark:text-white">
                     Welcome, <span class="text-blue-600">${state.ghUser?.login}</span>.
                 </h1>
-                <p class="text-slate-500 text-xl font-bold mt-2 italic">Please put your CAP on!</p>
+                <p class="text-slate-400 text-sm font-black mt-2 uppercase tracking-[0.2em]">Cardano Amendment Process</p>
             </header>
 
             <!-- Stats Grid -->
@@ -163,7 +163,7 @@ export function renderDashboard(state) {
                             <div class="w-10 h-10 bg-blue-600 rounded-2xl flex items-center justify-center text-white">
                                 <i data-lucide="user" class="w-5 h-5"></i>
                             </div>
-                            <h2 class="text-2xl font-black italic tracking-tighter text-slate-900 dark:text-white uppercase">Your CAPs</h2>
+                            <h2 class="text-2xl font-black italic tracking-tighter text-slate-900 dark:text-white uppercase">Your Submissions</h2>
                         </div>
                         <span class="text-xs font-black text-slate-400 uppercase tracking-widest">${yourCAPs.length} Total</span>
                     </div>
@@ -171,9 +171,9 @@ export function renderDashboard(state) {
                     ${yourCAPs.length === 0 ? `
                         <div class="text-center py-12">
                             <i data-lucide="file-plus" class="w-16 h-16 text-slate-300 dark:text-slate-700 mx-auto mb-4"></i>
-                            <p class="text-slate-400 font-bold text-sm mb-4">You haven't created any CAPs yet</p>
+                            <p class="text-slate-400 font-bold text-sm mb-4">You haven't submitted anything yet</p>
                             <button onclick="window.setView('wizard')" class="px-6 py-3 bg-blue-600 text-white rounded-2xl text-xs font-black uppercase tracking-widest hover:-translate-y-1 transition-all">
-                                Create Your First CAP
+                                Start an Amendment
                             </button>
                         </div>
                     ` : `
