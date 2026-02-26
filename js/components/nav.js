@@ -16,9 +16,9 @@ export function renderNav(state) {
         <nav class="sticky top-6 z-50 mx-6 bg-white/70 dark:bg-slate-900/70 glass border border-slate-200/50 dark:border-slate-800/50 p-3 rounded-[2.5rem] shadow-2xl flex justify-between items-center transition-all duration-300">
             <!-- Brand Section with Logo -->
             <div class="flex items-center gap-4 px-4 cursor-pointer group" onclick="window.setView('dashboard')">
-                <div class="w-10 h-10 rounded-2xl overflow-hidden flex-shrink-0 shadow-sm ring-1 ring-black/10 dark:ring-white/10">
+                <div class="w-10 h-10 p-1.5 bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 flex items-center justify-center flex-shrink-0">
                     <img src="CAP.png" alt="CAP Logo"
-                        class="w-full h-full object-cover transition-all duration-300">
+                        class="w-full h-full object-contain transition-all duration-300">
                 </div>
                 <div class="hidden sm:block text-left">
                     <h1 class="font-extrabold text-lg leading-none tracking-tighter text-slate-900 dark:text-white">CAP Portal</h1>
