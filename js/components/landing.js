@@ -11,8 +11,8 @@ export function renderLanding() {
             
             <div class="relative z-10">
                 <!-- Logo -->
-                <div class="w-28 h-28 p-5 bg-white dark:bg-slate-900 rounded-[2rem] shadow-2xl border border-slate-100 dark:border-slate-800 mx-auto mb-10 flex items-center justify-center">
-                    <img src="CAP.png" alt="CAP Logo" class="w-full h-full object-contain dark:invert">
+                <div class="w-28 h-28 rounded-[2rem] overflow-hidden shadow-2xl mx-auto mb-10 ring-1 ring-black/10 dark:ring-white/10">
+                    <img src="CAP.png" alt="CAP Logo" class="w-full h-full object-cover">
                 </div>
 
                 <h1 class="text-6xl sm:text-8xl font-black tracking-tighter mb-6 italic text-slate-900 dark:text-white">
