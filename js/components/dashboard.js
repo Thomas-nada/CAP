@@ -61,7 +61,7 @@ export function renderDashboard(state) {
                 <h1 class="text-4xl font-black tracking-tighter text-slate-900 dark:text-white">
                     Welcome, <span class="text-blue-600">${state.ghUser?.login}</span>.
                 </h1>
-                <p class="text-slate-400 text-sm font-black mt-2 uppercase tracking-[0.2em]">Cardano Amendment Process</p>
+                <p class="text-slate-400 text-sm font-black mt-2 uppercase tracking-[0.2em]">Put your CAP on!</p>
             </header>
 
             <!-- Stats Grid -->
