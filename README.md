@@ -1,88 +1,109 @@
 # Cardano Amendment Proposals (CAP) Repository
 
-The Cardano Constitution Amendment Proposals (CAP) repository contains two complementary types of documents that form the foundation of Cardano’s off-chain governance documentation. Because these documents are stored as Markdown files in a versioned repository, their history serves as the authoritative record of Cardano’s evolving governance system.
-
-* **Cardano Amendment Proposals (CAP):** Formal proposals to amend, clarify, or extend Cardano’s Constitution.
-* **Constitution Issue Statements (CIS):** Structured descriptions of Constitution problems, ambiguities, or risks that require community attention and may guide future CAPs.
+This repository is the authoritative record of Cardano's off-chain governance process. It stores two complementary document types — **CAPs** and **CISs** — as versioned Markdown files, forming a transparent and community-driven history of Cardano's constitutional evolution.
 
 ---
 
-## 🧭 What is a CAP?
+## What is a CAP?
 
-A [Cardano Amendment Proposal (CAP)](./CAPs/CAP-0001/README.md) is a governance design document proposing changes, additions, or clarifications to Cardano’s Constitution or guardrails.
+A [Cardano Amendment Proposal (CAP)](./CAPs/CAP-0001/README.md) is a formal governance document proposing changes, additions, or clarifications to Cardano's Constitution or governance processes.
 
-* **Amendment Focus:** Each CAP proposes a constitutional amendment or standard.
-* **Structure:** Describes the motivation, specification, and path to ratification.
-* **Review Process:** Undergoes open community discussion, editorial review, and eventual on-chain governance action.
+- **Amendment Focus:** Each CAP proposes a specific constitutional change or governance standard.
+- **Structure:** Includes motivation, specification, rationale, and a path to ratification.
+- **Review Process:** Undergoes open community discussion, editorial review, and a category-based deliberation period before it can be ratified or submitted as an on-chain governance action.
 
-> 📌 **Note:** CAPs do **not** themselves enact constitutional changes. They serve as the **community input layer** for governance actions that are ultimately ratified on-chain.
-
-For new CAPs, a template is available here: [`.github/CAP-TEMPLATE.md`](.github/ISSUE_TEMPLATE/CAP-TEMPLATE.md)
+> **Note:** CAPs do not themselves enact constitutional changes. They are the community input layer — proposals are debated and refined here before entering the on-chain governance pipeline.
 
 ---
 
-## 🧭 What is a CIS?
+## What is a CIS?
 
-A [Constitution Issue Statement (CIS)](./CAPs/CAP-9999/README.md) is a formal document that articulates a constitutional problem, its context, and its impact. Where CAPs propose solutions, CISs **define the problems** those solutions aim to solve.
+A [Constitution Issue Statement (CIS)](./CAPs/CAP-9999/README.md) is a formal document that defines a constitutional problem — an ambiguity, procedural gap, or governance risk — without proposing a specific solution.
 
-* **Context:** Provides historical and procedural context for a constitutional challenge.
-* **Scope:** Describes the problem’s scope, impact, and stakeholder relevance.
-* **Future Work:** Lists open questions and potential directions for future CAPs.
-
-CISs and CAPs are complementary: a single CIS may inspire multiple CAPs, and a CAP may address multiple CISs.
+- **Problem-first:** CISs define the problem; CAPs propose the fix.
+- **Complementary:** A single CIS may inspire multiple CAPs, and a CAP may resolve multiple CISs.
 
 ---
 
-## 🚀 The Recipe: How to Participate
+## How to Participate
 
-To ensure quality and transparency, all contributors must follow one of these two paths. **Every submission is subject to a mandatory 30-day deliberation period** before it can be moved to "Active" or submitted for on-chain voting.
+All submissions are made via GitHub Issues. Two paths are available.
 
-### Path A: The Simplified Path (Beginner Friendly)
+### Path A — CAP Portal (Recommended)
 
-1. **Open a Form:** Navigate to the **Issues** tab and click **"New Issue"**.
-2. **Select Template:** Choose the **New CAP Proposal** or **New CIS Issue** form.
-3. **Submit:** Fill out the web-based form and click submit. This officially starts your **30-day deliberation period**.
+The [CAP Portal](https://thomas-nada.github.io/CAP) provides a guided wizard for drafting and submitting proposals. It formats your document automatically and submits directly to GitHub on your behalf.
 
-### Path B: The Standard Path (Advanced)
+1. Go to the portal and sign in with GitHub.
+2. Select **Amendment Wizard** from the dashboard.
+3. Choose your proposal type (CAP or CIS) and category.
+4. Optionally select the exact constitutional text you are amending.
+5. Write your motivation and proposed revisions, review, and submit.
 
-1. **Fork & Branch:** Create a fork of this repository and a new branch for your work.
-2. **Add File:** Place your proposal in a folder (`CAPs/CAP-XXXX/` or `CISs/CIS-XXXX/`) using the provided templates.
-3. **Pull Request:** Submit a PR. The date the PR is opened marks the start of your **30-day deliberation period**.
+Submission creates a GitHub Issue and officially starts your **deliberation period**.
+
+### Path B — GitHub Issue Form
+
+Submit directly via the GitHub Issues tab without using the portal.
+
+1. Navigate to the **Issues** tab and click **New Issue**.
+2. Select the **Amendment Proposal (CAP)** or **Constitution Issue Statement (CIS)** template.
+3. Fill in all required fields and submit.
+
+A bot automatically prepends structured YAML frontmatter to your issue body on submission.
 
 ---
 
-## 📈 Repository Lifecycle
+## Deliberation Periods
 
-* **Proposed:** A CAP or CIS merged into the repository but not yet ratified or resolved. These remain in "Proposed" for at least **30 days**.
-* **Active:** A CAP ratified through governance action, or a CIS that remains relevant and open.
-* **Inactive:** A CAP or CIS that has been superseded, withdrawn, or deemed obsolete.
+The category of a proposal determines its mandatory minimum deliberation period — the time that must pass before a CAP can be ratified or moved to Active.
 
-> ✏️ **Drafts** are not listed here. Proposals are considered drafts while they are still in open pull requests.
+| Category | Minimum Period |
+| :--- | :---: |
+| Procedural | 60 days |
+| Substantive | 60 days |
+| Technical | 60 days |
+| Interpretive | 30 days |
+| Other | 30 days |
+| Editorial | 14 days |
+
+The deliberation period begins the moment a GitHub Issue is submitted.
 
 ---
 
-## ✏️ Editors
+## Proposal Statuses
+
+| Status | Meaning |
+| :--- | :--- |
+| **Draft** | Submitted and under community discussion. Deliberation period in progress. |
+| **Proposed** | Deliberation period complete. Under formal editorial review. |
+| **Active** | Ratified via on-chain governance action or editorial consensus. |
+| **Inactive** | Withdrawn, rejected, or superseded. |
+
+---
+
+## Editors
+
+CAP Editors are facilitators who protect the integrity of the process without encroaching on an author's ownership of their proposal. See [`CAP-Editors/README.md`](./CAP-Editors/README.md) for the full editor role, eligibility criteria, governance, and ethics.
 
 | Name | GitHub |
-| --- | --- |
+| :--- | :--- |
 | Thomas Lindseth | [@Thomas-nada](https://github.com/Thomas-nada) |
 | Larisa Mcfarlane | [@LallyMack](https://github.com/LallyMack) |
 
 ---
 
-## 📂 Repository Structure
+## Repository Structure
 
-```text
-CAPs/CAP-0001/    (Each proposal has its own folder)
-CISs/CIS-0001/    (Each issue has its own folder)
-constitution/     (The currently active Constitution)
-CAPSLOCK/         (CAP Editors Meeting records) 
-.github/          (Forms and templates)
-
+```
+CAPs/                 Cardano Amendment Proposals (one folder per CAP)
+CISs/                 Constitution Issue Statements (one folder per CIS)
+constitution/         The active Cardano Constitution and CAP preview versions
+CAP-Editors/          Editor role, guidelines, and meeting records (CAPSLOCK)
+.github/              Issue templates, forms, and automation workflows
 ```
 
 ---
 
-## 📜 License
+## License
 
 All documents in this repository are licensed under [CC-BY-4.0](https://creativecommons.org/licenses/by/4.0/legalcode).

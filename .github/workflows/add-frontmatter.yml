@@ -80,7 +80,7 @@ jobs:
             if (type === 'CAP' && !body.includes('DELIBERATION_END')) {
               footer  = `\n\n### Institutional Metadata\n`;
               footer += `- **License:** CC-BY-4.0\n`;
-              footer += `- **Deliberation End:** ${deliberationExpiry.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}\n\n`;
+              footer += `- **Deliberation End:** ${deliberationEndStr}\n\n`;
               footer += `<!-- DELIBERATION_END: ${deliberationExpiry.toISOString()} -->`;
             } else if (type === 'CIS' && !body.includes('Institutional Metadata')) {
               footer  = `\n\n### Institutional Metadata\n`;
