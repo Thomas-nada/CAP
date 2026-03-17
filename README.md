@@ -87,8 +87,9 @@ CAP Editors are facilitators who protect the integrity of the process without en
 
 | Name | GitHub |
 | :--- | :--- |
-| Thomas Lindseth | [@Thomas-nada](https://github.com/Thomas-nada) |
-| Larisa Mcfarlane | [@LallyMack](https://github.com/LallyMack) |
+|  | [@username](https://github.com/username) |
+|  | [@username](https://github.com/username) |
+|  | [@username](https://github.com/username) |
 
 ---
 
