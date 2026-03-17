@@ -93,7 +93,7 @@ The category of a proposal determines its **minimum consultation period** — th
 | **Editorial** | Corrections, formatting, or non-substantive text changes | 14 days |
 | **Other** | Does not clearly fit another category | 30 days |
 
-The consultation period begins the moment a GitHub Issue is submitted. A CAP cannot be ratified or submitted as an on-chain governance action until this window has passed.
+The consultation period begins the moment a GitHub Issue is submitted. A CAP cannot be ratified or submitted as an on-chain governance action through the CAP process until this window has passed.
 
 ---
 
