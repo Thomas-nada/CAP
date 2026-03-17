@@ -88,7 +88,7 @@ The category of a proposal determines its **minimum consultation period** — th
 | :--- | :--- | :---: |
 | **Procedural** | Changes to governance processes or voting rules | 60 days |
 | **Substantive** | Changes to core constitutional rights or obligations | 60 days |
-| **Technical** | Changes to technical parameters or on-chain mechanisms | 60 days |
+| **Technical** | Changes to technical parameters or on-chain mechanisms | Variable |
 | **Interpretive** | Clarifications or reinterpretations of existing text | 30 days |
 | **Editorial** | Corrections, formatting, or non-substantive text changes | 14 days |
 | **Other** | Does not clearly fit another category | 30 days |
