@@ -61,7 +61,7 @@ The category of a proposal determines its mandatory minimum deliberation period 
 | :--- | :---: |
 | Procedural | 60 days |
 | Substantive | 60 days |
-| Technical | 60 days |
+| Technical | Variable |
 | Interpretive | 30 days |
 | Other | 30 days |
 | Editorial | 14 days |
