@@ -20,7 +20,20 @@
                     },
                     animation: {
                         'pulse-subtle': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-                    }
+                    },
+                    typography: {
+                        DEFAULT: {
+                            css: {
+                                'pre code': {
+                                    backgroundColor: 'transparent',
+                                    color: '#e2e8f0',
+                                    fontSize: '0.9rem',
+                                    borderWidth: '0',
+                                    padding: '0',
+                                },
+                            },
+                        },
+                    },
                 }
             }
         }
@@ -47,6 +60,16 @@
         /* Hide scrollbars but keep functionality */
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        /* Code block overrides — must come after Tailwind */
+        .prose pre code {
+            background-color: transparent !important;
+            color: #e2e8f0 !important;
+            font-size: 0.9rem !important;
+            border: none !important;
+            padding: 0 !important;
+            line-height: 1.7 !important;
+        }
         
         /* Loading indicator */
         .loading-spinner {
@@ -103,5 +126,17 @@
     
     <!-- Load the main application module -->
     <script type="module" src="js/app.js"></script>
+    <script>
+        window.fixPreCode = function() {
+            document.querySelectorAll('pre code').forEach(el => {
+                el.style.setProperty('background-color', 'transparent', 'important');
+                el.style.setProperty('color', '#e2e8f0', 'important');
+                el.style.setProperty('font-size', '0.9rem', 'important');
+                el.style.setProperty('border', 'none', 'important');
+                el.style.setProperty('padding', '0', 'important');
+                el.style.setProperty('line-height', '1.7', 'important');
+            });
+        };
+    </script>
 </body>
 </html>

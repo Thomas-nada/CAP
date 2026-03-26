@@ -35,19 +35,6 @@ export function renderLearnHub(state) {
                 </div>
             </header>
 
-            <!-- Notice -->
-            <div class="bg-amber-50 dark:bg-amber-900/10 p-8 rounded-[3rem] border border-amber-100 dark:border-amber-900/30 mb-12">
-                <div class="flex items-start gap-4">
-                    <i data-lucide="construction" class="w-6 h-6 text-amber-600 mt-1 flex-shrink-0"></i>
-                    <div>
-                        <h3 class="text-lg font-black text-slate-900 dark:text-white mb-2">Under Development</h3>
-                        <p class="text-slate-600 dark:text-slate-300 text-sm leading-relaxed">
-                            This learning hub is being developed alongside the governance process itself. Content will be added as best practices emerge and the process matures. Check back regularly for updates!
-                        </p>
-                    </div>
-                </div>
-            </div>
-
             <!-- Main Grid -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                 
@@ -147,12 +134,27 @@ export function renderLearnHub(state) {
                         ${[
                             { label: 'What is a CAP?', slug: 'faq-what-is-a-cap' },
                             { label: 'What is a CIS?', slug: 'faq-what-is-a-cis' },
-                            { label: 'How long is deliberation?', slug: 'faq-how-long-is-deliberation' },
                             { label: 'Who can create a CAP?', slug: 'faq-who-can-create-a-cap' },
-                            { label: 'How do I vote?', slug: 'faq-how-do-i-vote' },
+                            { label: 'How long is deliberation?', slug: 'faq-how-long-is-deliberation' },
+                            { label: 'What CAP categories exist?', slug: 'faq-what-are-the-categories' },
+                            { label: 'Procedural vs Substantive?', slug: 'faq-difference-procedural-substantive' },
                             { label: 'Can I edit my CAP?', slug: 'faq-can-i-edit-my-cap' },
-                            { label: 'What happens after 30 days?', slug: 'faq-what-happens-after-30-days' },
-                            { label: 'How are CAPs approved?', slug: 'faq-how-are-caps-approved' }
+                            { label: 'Can a CIS become a CAP?', slug: 'faq-can-a-cis-become-a-cap' },
+                            { label: 'What happens after deliberation?', slug: 'faq-what-happens-after-30-days' },
+                            { label: 'My CAP was accepted — what now?', slug: 'faq-my-cap-was-accepted' },
+                            { label: 'How are CAPs approved?', slug: 'faq-how-are-caps-approved' },
+                            { label: 'How do I vote?', slug: 'faq-how-do-i-vote' },
+                            { label: 'What is a governance action?', slug: 'faq-what-is-a-governance-action' },
+                            { label: 'What is the Constitutional Committee?', slug: 'faq-what-is-the-constitutional-committee' },
+                            { label: 'What is a DRep?', slug: 'faq-what-is-a-drep' },
+                            { label: 'What are the Guardrails?', slug: 'faq-what-are-guardrails' },
+                            { label: 'Can I propose Guardrail changes?', slug: 'faq-can-i-propose-guardrail-changes' },
+                            { label: 'What is a CAP Editor?', slug: 'faq-what-is-a-cap-editor' },
+                            { label: 'What if the Editor disagrees?', slug: 'faq-what-if-editor-disagrees' },
+                            { label: 'What if my CAP gets no engagement?', slug: 'faq-what-if-my-cap-gets-no-engagement' },
+                            { label: 'Do I need a GitHub account?', slug: 'faq-do-i-need-a-github-account' },
+                            { label: 'Can I submit anonymously?', slug: 'faq-can-i-submit-anonymously' },
+                            { label: 'What is the Amendment Wizard?', slug: 'faq-what-is-the-amendment-wizard' }
                         ].map(q => `
                             <button onclick="window.openGuide('${q.slug}')" class="w-full p-4 rounded-2xl border-2 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white text-sm font-bold text-left hover:-translate-y-0.5 transition-all">
                                 ${q.label}

@@ -10,6 +10,11 @@ export const GITHUB_CONFIG = {
     API_BASE: "https://api.github.com"
 };
 
+// Set to a local server URL (e.g. "http://localhost:8766") to load
+// constitution files from a local copy of the repo instead of GitHub.
+// Set to null to use GitHub (production default).
+export const LOCAL_CONSTITUTION_BASE = null;
+
 // Firebase Configuration
 // These values are used to initialize the governance backend and audit logging.
 export const FIREBASE_CONFIG = {

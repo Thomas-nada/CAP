@@ -346,6 +346,7 @@ window.updateUI = async function(force = false) {
             </div>`;
     }
     if (window.lucide) window.lucide.createIcons();
+    if (window.fixPreCode) window.fixPreCode();
 };
 
 function renderActiveView() {
@@ -634,7 +635,7 @@ window.handleForm = async (event) => {
 
     body += `### Links and Files\n${exhibits || 'None provided.'}\n\n`;
     if (type === 'CAP') {
-        body += `### Institutional Metadata\n- **License:** CC-BY-4.0\n- **Deliberation End:** ${deliberationExpiry.toLocaleDateString()}\n\n`;
+        body += `### Institutional Metadata\n- **License:** CC-BY-4.0\n- **Deliberation End:** ${deliberationEndStr}\n\n`;
         body += `<!-- DELIBERATION_END: ${deliberationExpiry.toISOString()} -->`;
     } else {
         body += `### Institutional Metadata\n- **License:** CC-BY-4.0\n`;

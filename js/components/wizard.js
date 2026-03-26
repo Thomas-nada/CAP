@@ -209,7 +209,7 @@ function renderStep1Type(wizard) {
                                 <div class="flex-1">
                                     <h3 class="font-black text-lg text-slate-900 dark:text-white mb-1">${cat.label}</h3>
                                     <p class="text-sm text-slate-600 dark:text-slate-400 ${wizard.type !== 'CIS' ? 'mb-2' : ''}">${cat.desc}</p>
-                                    ${wizard.type !== 'CIS' ? `<p class="text-xs font-black text-blue-600">Min. consultation: ${cat.consultation}</p>` : ''}
+                                    ${wizard.type !== 'CIS' ? `<p class="text-xs font-black text-blue-600">Recommended consultation: ${cat.consultation}</p>` : ''}
                                 </div>
                             </div>
                         </button>
@@ -518,7 +518,7 @@ function renderStep6Submit(wizard) {
                             </li>
                             <li class="flex items-start gap-2">
                                 <span class="text-blue-600 font-bold">2.</span>
-                                <span>${wizard.type === 'CIS' ? 'The issue will be open for community discussion and review' : `The proposal will be open for public consultation based on the category selected${wizard.category ? ` (${wizard.category}: ${{ Procedural: '60 days', Substantive: '60 days', Technical: 'variable', Interpretive: '30 days', Editorial: '14 days', Other: '30 days' }[wizard.category] || '30 days'} minimum)` : ''}`}</span>
+                                <span>${wizard.type === 'CIS' ? 'The issue will be open for community discussion and review' : `The proposal will be open for public consultation based on the category selected${wizard.category ? ` (${wizard.category}: ${{ Procedural: '60 days', Substantive: '60 days', Technical: 'variable', Interpretive: '30 days', Editorial: '14 days', Other: '30 days' }[wizard.category] || '30 days'} recommended)` : ''}`}</span>
                             </li>
                             ${wizard.type === 'CAP' && wizard.selectedText && wizard.selectedText.length > 0 ? `
                                 <li class="flex items-start gap-2">
@@ -575,7 +575,7 @@ function generateGitHubMarkdown(wizard) {
         const consultationDays = { Procedural: 60, Substantive: 60, Technical: 60, Interpretive: 30, Editorial: 14, Other: 30 };
         const days = consultationDays[wizard.category] || 30;
         const expiry = new Date(Date.now() + (days * 24 * 60 * 60 * 1000)).toISOString();
-        markdown += `### Proposal Details\n- **License:** CC-BY-4.0\n- **Category:** ${wizard.category}\n- **Review Ends:** ${new Date(expiry).toLocaleDateString()}\n\n`;
+        markdown += `### Proposal Details\n- **License:** CC-BY-4.0\n- **Category:** ${wizard.category}\n- **Recommended Review Date:** ${new Date(expiry).toLocaleDateString()}\n\n`;
         markdown += `<!-- DELIBERATION_END: ${expiry} -->`;
     } else {
         markdown += `### Proposal Details\n- **License:** CC-BY-4.0\n- **Category:** ${wizard.category}\n`;

@@ -28,3 +28,6 @@ build/
 # Testing
 coverage/
 .nyc_output/
+
+# Claude Code internals
+.claude/

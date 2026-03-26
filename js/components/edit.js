@@ -116,7 +116,7 @@ export function renderEdit(state) {
                             <label class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 ml-4">Category</label>
                             <div class="relative">
                                 <select id="category-select" name="category" required
-                                    onchange="var o=this.options[this.selectedIndex]; document.getElementById('cat-desc').innerHTML=o.dataset.desc+'<span class=&quot;block mt-2 font-black not-italic text-blue-600&quot;>Recommended minimum consultation time: '+o.dataset.consultation+'</span>';"
+                                    onchange="var o=this.options[this.selectedIndex]; document.getElementById('cat-desc').innerHTML=o.dataset.desc+'<span class=&quot;block mt-2 font-black not-italic text-blue-600&quot;>Recommended consultation time: '+o.dataset.consultation+'</span>';"
                                     class="w-full bg-slate-50 dark:bg-slate-950 p-6 rounded-3xl font-bold outline-none border-2 border-transparent focus:border-blue-600 appearance-none text-slate-900 dark:text-white cursor-pointer">
                                     ${categories.map(c => `<option value="${c.id}" data-desc="${c.desc}" data-consultation="${c.consultation}" ${currentCatLabel === c.id ? 'selected' : ''}>${c.label}</option>`).join('')}
                                 </select>
@@ -124,7 +124,7 @@ export function renderEdit(state) {
                             </div>
                             <div class="mx-4 p-4 bg-slate-50 dark:bg-slate-950/50 rounded-2xl border border-slate-100 dark:border-slate-800">
                                 <p id="cat-desc" class="text-xs font-medium text-slate-400 italic leading-relaxed">
-                                    ${currentCatLabel ? (() => { const c = categories.find(c => c.id === currentCatLabel); return c ? `${c.desc}<span class="block mt-2 font-black not-italic text-blue-600">Recommended minimum consultation time: ${c.consultation}</span>` : 'Select a category to see its description.'; })() : 'Select a category to see its description.'}
+                                    ${currentCatLabel ? (() => { const c = categories.find(c => c.id === currentCatLabel); return c ? `${c.desc}<span class="block mt-2 font-black not-italic text-blue-600">Recommended consultation time: ${c.consultation}</span>` : 'Select a category to see its description.'; })() : 'Select a category to see its description.'}
                                 </p>
                             </div>
                         </div>

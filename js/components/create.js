@@ -159,7 +159,7 @@ export function renderCreate(state) {
                             <p class="text-[10px] text-slate-400 ml-4 -mt-4">${isCIS ? 'What type of constitutional issue is this?' : 'What type of amendment to the Cardano Constitution is being proposed? This affects the recommended public consultation time.'}</p>
                             <div class="relative">
                                 <select id="category-select" name="category" required data-is-cis="${isCIS}"
-                                    onchange="window.updateDraftField('category', this.value); var o=this.options[this.selectedIndex]; var desc=o.dataset.desc; if(this.dataset.isCis!=='true'){desc+='<span class=&quot;block mt-2 font-black not-italic text-blue-600&quot;>Recommended minimum consultation time: '+o.dataset.consultation+'</span>';} document.getElementById('cat-desc').innerHTML=desc;"
+                                    onchange="window.updateDraftField('category', this.value); var o=this.options[this.selectedIndex]; var desc=o.dataset.desc; if(this.dataset.isCis!=='true'){desc+='<span class=&quot;block mt-2 font-black not-italic text-blue-600&quot;>Recommended consultation time: '+o.dataset.consultation+'</span>';} document.getElementById('cat-desc').innerHTML=desc;"
                                     class="w-full bg-slate-50 dark:bg-slate-950 p-6 rounded-3xl font-bold outline-none border-2 border-transparent focus:border-blue-600 appearance-none text-slate-900 dark:text-white cursor-pointer">
                                     <option value="" disabled ${!draft.category ? 'selected' : ''}>Select a category...</option>
                                     ${categories.map(c => `<option value="${c.id}" data-desc="${c.desc.replace(/"/g, '&quot;')}" data-consultation="${c.consultation}" ${draft.category === c.id ? 'selected' : ''}>${c.label}</option>`).join('')}
@@ -168,7 +168,7 @@ export function renderCreate(state) {
                             </div>
                             <div class="mx-4 p-4 bg-slate-50 dark:bg-slate-950/50 rounded-2xl border border-slate-100 dark:border-slate-800">
                                 <p id="cat-desc" class="text-xs font-medium text-slate-400 italic leading-relaxed">
-                                    ${draft.category ? (() => { const c = categories.find(c => c.id === draft.category); return c ? (isCIS ? c.desc : `${c.desc}<span class="block mt-2 font-black not-italic text-blue-600">Recommended minimum consultation time: ${c.consultation}</span>`) : 'Select a category to see its description.'; })() : 'Select a category to see its description.'}
+                                    ${draft.category ? (() => { const c = categories.find(c => c.id === draft.category); return c ? (isCIS ? c.desc : `${c.desc}<span class="block mt-2 font-black not-italic text-blue-600">Recommended consultation time: ${c.consultation}</span>`) : 'Select a category to see its description.'; })() : 'Select a category to see its description.'}
                                 </p>
                             </div>
                         </div>
@@ -334,7 +334,7 @@ export function renderCreate(state) {
                             <span class="text-sm font-bold text-slate-600 dark:text-slate-400 group-hover:text-slate-900 dark:group-hover:text-white transition-colors leading-relaxed">
                                 ${isCIS
                                     ? 'I understand this issue statement will be publicly visible and open for community discussion and review.'
-                                    : 'I understand this submission initiates a mandatory public consultation period, the minimum length of which is determined by the amendment category selected above.'}
+                                    : 'I understand this submission includes a recommended public consultation period based on the amendment category selected above.'}
                             </span>
                         </label>
 

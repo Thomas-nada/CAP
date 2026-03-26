@@ -1,27 +1,88 @@
-# Creating a CAP in GitHub
+# Creating a CAP or CIS via GitHub
 
-This quick guide explains the recommended workflow for creating a CAP using the portal.
+You can submit a Cardano Amendment Proposal (CAP) or Constitution Issue Statement (CIS) directly through GitHub Issues — no portal required. This guide walks you through the process step by step.
 
-1. Open the Amendment Wizard
-   - Use the "New CAP" entry in the top navigation or the "Amendment Wizard" button on the Dashboard.
+---
 
-2. Draft the CAP
-   - Fill the title, abstract, motivation and add structured revisions using the selection tools.
-   - Attach supporting exhibits (files) if needed.
-   - The wizard helps you gather contextual revisions by selecting text from the constitution.
+## Before You Begin
 
-3. Submit to GitHub
-   - When you submit, the portal will create the GitHub Issue, upload any exhibits, and (if relevant) generate a preview constitution file under `constitution/CAP Constructions`.
-   - The portal shows a local preview immediately; GitHub may take a few seconds to list the uploaded preview file.
+You will need a GitHub account. If you don't have one, create one at [github.com](https://github.com).
 
-4. After submission
-   - The CAP issue holds the canonical discussion thread. Share the issue link with stakeholders.
-   - If you need to update the CAP draft, edit the issue or create a follow-up CAP revision.
+---
 
-Tips
-- Use the selection preview in the sidebar to confirm selected text before adding it.
-- Provide short, clear motivation and expected outcomes in the abstract.
+## Step 1 — Go to the Repository Issues Tab
 
-Security / etiquette
-- Avoid including private keys or credentials in exhibits or issue text.
-- Keep submissions respectful and focused on governance improvements.
+Navigate to the [CAP repository](https://github.com/Thomas-nada/CAP) and click the **Issues** tab at the top.
+
+---
+
+## Step 2 — Click "New Issue"
+
+You will see two templates available:
+
+- **Amendment Proposal (CAP)** — use this to propose a change, clarification, or addition to the Constitution
+- **Constitution Issue Statement (CIS)** — use this to formally describe a constitutional problem without proposing a specific fix
+
+Click **Get started** next to the appropriate template.
+
+---
+
+## Step 3 — Fill In the Form
+
+The issue form has clearly labelled fields. Fill in all required sections:
+
+**For a CAP:**
+- **Title** — a short, clear description of the proposed change
+- **Category** — select the category that best fits your proposal (this determines your deliberation period)
+- **Summary** — a ~200 word abstract of what you are proposing
+- **Why is this change needed** — the motivation and problem being solved
+- **Revisions** — the specific text changes you are proposing, with original and proposed wording
+- **Analysis & Test** — any evidence, testing, or analysis supporting the change
+
+**For a CIS:**
+- **Title** — a short description of the constitutional problem
+- **Category** — the category that best fits the issue
+- **Summary** — a brief description of the problem
+- **Problem** — a detailed explanation of the issue
+- **Context** — background and history
+- **Impact** — who is affected and how
+
+---
+
+## Step 4 — Submit
+
+Click **Submit new issue**.
+
+Within seconds, a GitHub Action will automatically:
+
+- Prepend a structured **YAML frontmatter block** to the top of your issue body
+- Add a **category label** to the issue
+- Calculate your **deliberation end date** and append it as an Institutional Metadata footer
+
+You do not need to add frontmatter manually. The bot handles it.
+
+---
+
+## Step 5 — Your Deliberation Period Begins
+
+The moment you submit, your mandatory deliberation period starts. The length depends on your category:
+
+| Category | Deliberation Period |
+| :--- | :---: |
+| Procedural | 60 days |
+| Substantive | 60 days |
+| Technical | Variable |
+| Interpretive | 30 days |
+| Other | 30 days |
+| Editorial | 14 days |
+
+During this period the community discusses your proposal in the issue comments. You can respond, make clarifications, and update your proposal.
+
+---
+
+## After Submission
+
+- Share the issue link with stakeholders to invite discussion
+- Monitor the comments and respond to questions
+- If you need to make substantive edits, you can edit the issue body directly
+- Once the deliberation period ends, a CAP Editor will review your proposal and may apply the **Proposed** label to indicate it is ready for formal review
