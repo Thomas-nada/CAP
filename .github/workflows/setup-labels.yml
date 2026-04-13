@@ -1,0 +1,65 @@
+name: Setup Labels
+
+# Run this once manually from the Actions tab to create all CAP/CIS labels.
+# Re-running is safe — --force updates existing labels without deleting others.
+
+on:
+  workflow_dispatch:
+
+jobs:
+  labels:
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+
+    steps:
+      - name: Create all CAP labels
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          REPO="${{ github.repository }}"
+
+          lbl() {
+            gh label create "$1" --color "$2" --description "$3" --repo "$REPO" --force
+          }
+
+          echo "── Lifecycle ──────────────────────────────"
+          lbl "draft"         "94a3b8" "Initial authoring stage"
+          lbl "submitted"     "3b82f6" "Author has submitted for review"
+          lbl "review"        "f59e0b" "Under editorial review"
+          lbl "consultation"  "a855f7" "Open for community deliberation"
+          lbl "revision"      "f97316" "Author is revising based on feedback"
+          lbl "finalizing"    "06b6d4" "Editor is preparing final version"
+          lbl "ready"         "22c55e" "Ready for on-chain submission"
+          lbl "onchain"       "6366f1" "Submitted to the blockchain"
+          lbl "done"          "10b981" "Process complete"
+          lbl "withdrawn"     "ef4444" "Author has withdrawn the proposal"
+
+          echo "── Editor Signals ──────────────────────────"
+          lbl "editor-ok"         "16a34a" "Editor approved"
+          lbl "editor-concern"    "dc2626" "Editor flagged concerns"
+          lbl "editor-suggested"  "d97706" "Editor suggested changes"
+
+          echo "── Status ─────────────────────────────────"
+          lbl "needs-feedback"  "fbbf24" "Community feedback requested"
+          lbl "needs-update"    "fb923c" "Author needs to update"
+          lbl "blocked"         "f87171" "Blocked by external dependency"
+
+          echo "── Special Handling ────────────────────────"
+          lbl "pause"       "9ca3af" "Temporarily paused"
+          lbl "fast-track"  "4ade80" "Expedited review"
+          lbl "bundle"      "60a5fa" "Grouped with related proposals"
+          lbl "minor"       "cbd5e1" "Low-impact change"
+          lbl "major"       "b91c1c" "Significant-impact change"
+
+          echo "── Proposal Types ──────────────────────────"
+          lbl "CAP"          "1d4ed8" "Constitutional Amendment Proposal"
+          lbl "CIS"          "7c3aed" "Cardano Improvement Suggestion"
+          lbl "procedural"   "2563eb" "Governance procedures"
+          lbl "substantive"  "9333ea" "Constitutional substance"
+          lbl "technical"    "0891b2" "Technical or protocol changes"
+          lbl "interpretive" "d97706" "Clarifications of existing text"
+          lbl "editorial"    "64748b" "Formatting or typo fixes"
+          lbl "other"        "6b7280" "Uncategorized"
+
+          echo "✅ All labels created/updated."
