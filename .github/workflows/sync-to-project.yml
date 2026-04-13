@@ -1,0 +1,140 @@
+name: Sync Lifecycle Label → Kanban Board
+
+# Whenever a lifecycle label is applied to an issue, this workflow
+# automatically moves that issue to the matching column in your
+# GitHub Projects (v2) Kanban board.
+#
+# SETUP (one-time):
+#   1. Create a GitHub Project (board) with these exact column names:
+#      Draft | Submitted | Review | Consultation | Revision |
+#      Finalizing | Ready | On-Chain | Done | Withdrawn
+#   2. Link the project to this repository.
+#   3. Note the project number (visible in the project URL: /projects/N).
+#   4. Go to repo Settings → Secrets and variables → Actions → Variables
+#      and add: KANBAN_PROJECT_NUMBER = N
+#   5. Create a Personal Access Token (PAT) with scopes: repo + project
+#      Add it as a secret named: PROJECT_TOKEN
+
+on:
+  issues:
+    types: [labeled]
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    # Only run for lifecycle labels
+    if: |
+      contains(
+        '["draft","submitted","review","consultation","revision","finalizing","ready","onchain","done","withdrawn"]',
+        github.event.label.name
+      )
+
+    steps:
+      - name: Move issue to project column
+        uses: actions/github-script@v7
+        env:
+          PROJECT_NUMBER: ${{ vars.KANBAN_PROJECT_NUMBER }}
+        with:
+          github-token: ${{ secrets.PROJECT_TOKEN }}
+          script: |
+            const COLUMN_MAP = {
+              draft:        'Draft',
+              submitted:    'Submitted',
+              review:       'Review',
+              consultation: 'Consultation',
+              revision:     'Revision',
+              finalizing:   'Finalizing',
+              ready:        'Ready',
+              onchain:      'On-Chain',
+              done:         'Done',
+              withdrawn:    'Withdrawn',
+            };
+
+            const label      = context.payload.label.name;
+            const targetCol  = COLUMN_MAP[label];
+            if (!targetCol) return;
+
+            const owner       = context.repo.owner;
+            const contentId   = context.payload.issue.node_id;
+            const issueNumber = context.payload.issue.number;
+            const projectNum  = parseInt(process.env.PROJECT_NUMBER);
+
+            if (!projectNum) {
+              core.setFailed('KANBAN_PROJECT_NUMBER variable is not set. See workflow comments for setup.');
+              return;
+            }
+
+            // ── Fetch project (try user account first, then org) ──────────────
+            const PROJECT_QUERY = `
+              query($login: String!, $number: Int!) {
+                OWNER_TYPE(login: $login) {
+                  projectV2(number: $number) {
+                    id
+                    field(name: "Status") {
+                      ... on ProjectV2SingleSelectField {
+                        id
+                        options { id name }
+                      }
+                    }
+                  }
+                }
+              }`;
+
+            let project;
+            for (const ownerType of ['user', 'organization']) {
+              try {
+                const q = PROJECT_QUERY.replace('OWNER_TYPE', ownerType);
+                const data = await github.graphql(q, { login: owner, number: projectNum });
+                project = data[ownerType].projectV2;
+                break;
+              } catch { /* try next */ }
+            }
+
+            if (!project) {
+              core.setFailed(`Project #${projectNum} not found for ${owner}. Check KANBAN_PROJECT_NUMBER.`);
+              return;
+            }
+
+            const statusField = project.field;
+            if (!statusField) {
+              core.setFailed('Project has no "Status" field. Rename your board\'s column field to "Status".');
+              return;
+            }
+
+            const option = statusField.options.find(
+              o => o.name.toLowerCase() === targetCol.toLowerCase()
+            );
+            if (!option) {
+              core.warning(`Column "${targetCol}" not found in project. Add it to your board and re-run.`);
+              return;
+            }
+
+            // ── Add issue to project (idempotent) ─────────────────────────────
+            const addResult = await github.graphql(`
+              mutation($projectId: ID!, $contentId: ID!) {
+                addProjectV2ItemById(input: { projectId: $projectId, contentId: $contentId }) {
+                  item { id }
+                }
+              }
+            `, { projectId: project.id, contentId });
+
+            const itemId = addResult.addProjectV2ItemById.item.id;
+
+            // ── Set the Status column ─────────────────────────────────────────
+            await github.graphql(`
+              mutation($projectId: ID!, $itemId: ID!, $fieldId: ID!, $optionId: String!) {
+                updateProjectV2ItemFieldValue(input: {
+                  projectId: $projectId,
+                  itemId:    $itemId,
+                  fieldId:   $fieldId,
+                  value:     { singleSelectOptionId: $optionId }
+                }) { projectV2Item { id } }
+              }
+            `, {
+              projectId: project.id,
+              itemId,
+              fieldId:  statusField.id,
+              optionId: option.id,
+            });
+
+            console.log(`✅ Issue #${issueNumber} moved to "${targetCol}"`);
