@@ -1051,6 +1051,28 @@ window.editorToggleSpecial = async (label) => {
 
 // --- Authentication & Theme ---
 
+window.submitToken = async () => {
+    const input = document.getElementById('token-input');
+    const error = document.getElementById('token-error');
+    const token = input?.value?.trim();
+    if (!token) return;
+    try {
+        const user = await ghFetch('/user', token);
+        state.ghToken = token;
+        localStorage.setItem('gh_token', token);
+        state.ghUser = user;
+        const editorsList = await fetchEditors();
+        const editors = editorsList.length > 0 ? editorsList : EDITORS_FALLBACK;
+        state.isEditor = editors.includes(user.login);
+        window.handleRouting();
+    } catch (e) {
+        if (error) {
+            error.textContent = 'Invalid token or insufficient permissions. Make sure it has repo scope.';
+            error.classList.remove('hidden');
+        }
+    }
+};
+
 window.logout = () => {
     state.ghToken = null;
     state.ghUser = null;
@@ -1369,6 +1391,10 @@ if (document.readyState === 'loading') {
 // --- Lifecycle Initialization ---
 
 (async () => {
+    // Token priority: env.js (dev) → localStorage (production)
+    if (!state.ghToken) {
+        state.ghToken = localStorage.getItem('gh_token') || null;
+    }
     if (state.ghToken) {
         try {
             state.ghUser = await ghFetch('/user', state.ghToken);
@@ -1378,6 +1404,7 @@ if (document.readyState === 'loading') {
             window.handleRouting();
         } catch (e) {
             state.ghToken = null;
+            localStorage.removeItem('gh_token');
         }
     }
     state.loading.init = false;

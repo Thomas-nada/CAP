@@ -1,6 +1,6 @@
 /**
  * Landing Component
- * Shown when no token is configured in js/env.js.
+ * Shown when no token is configured. Lets users paste their GitHub PAT directly.
  */
 export function renderLanding() {
     return `
@@ -20,18 +20,34 @@ export function renderLanding() {
                     Cardano Amendment Process
                 </p>
 
-                <div class="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700 rounded-3xl p-8 text-left">
-                    <div class="flex items-center gap-3 mb-4">
-                        <i data-lucide="key" class="w-5 h-5 text-amber-600 dark:text-amber-400 flex-shrink-0"></i>
-                        <span class="font-black text-amber-800 dark:text-amber-300 uppercase tracking-widest text-sm">Setup required</span>
+                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-3xl p-8 text-left shadow-xl">
+                    <div class="flex items-center gap-3 mb-2">
+                        <i data-lucide="github" class="w-5 h-5 text-slate-700 dark:text-slate-300 flex-shrink-0"></i>
+                        <span class="font-black text-slate-800 dark:text-slate-200 uppercase tracking-widest text-sm">Sign in with GitHub</span>
                     </div>
-                    <p class="text-slate-700 dark:text-slate-300 mb-5 leading-relaxed">
-                        Open <code class="bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded font-mono text-sm">.env</code> and set your GitHub Personal Access Token:
+                    <p class="text-slate-500 dark:text-slate-400 text-sm leading-relaxed mb-6">
+                        Enter a GitHub Personal Access Token with <strong>repo</strong> scope.
+                        <a href="https://github.com/settings/tokens/new?scopes=repo&description=CAP+Portal" target="_blank"
+                           class="text-blue-600 hover:underline ml-1">Generate one here →</a>
                     </p>
-                    <pre class="bg-slate-950 text-green-400 rounded-2xl p-5 text-sm font-mono overflow-x-auto mb-5">GITHUB_TOKEN=ghp_your_token_here</pre>
-                    <p class="text-slate-500 dark:text-slate-400 text-xs leading-relaxed">
-                        Generate a token at <span class="font-mono">github.com/settings/tokens</span> with <strong>repo</strong> scope, then reload this page.
-                    </p>
+
+                    <div class="flex gap-2">
+                        <input
+                            id="token-input"
+                            type="password"
+                            placeholder="ghp_••••••••••••••••••••••"
+                            class="flex-1 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl px-4 py-3 text-sm font-mono text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            onkeydown="if(event.key==='Enter') window.submitToken()"
+                        />
+                        <button
+                            onclick="window.submitToken()"
+                            class="px-5 py-3 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-2xl text-sm font-black uppercase tracking-wider hover:opacity-80 transition-opacity flex items-center gap-2 flex-shrink-0">
+                            <i data-lucide="log-in" class="w-4 h-4"></i>
+                            Enter
+                        </button>
+                    </div>
+
+                    <p id="token-error" class="hidden mt-3 text-red-500 text-xs font-bold"></p>
                 </div>
 
                 <p class="mt-10 text-slate-300 dark:text-slate-600 font-bold text-xs uppercase tracking-[0.3em]">
