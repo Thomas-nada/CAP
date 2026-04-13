@@ -3,7 +3,12 @@
  * GitHub API-based full-text search
  */
 
+import { renderKanban } from './kanban.js?v=5';
+
 export function renderRegistry(state) {
+    if (state.registryView === 'kanban') {
+        return renderKanban(state);
+    }
     const searchQuery = state.searchQuery || '';
     const statusFilter = state.statusFilter || 'all';
     const typeFilter = state.docTypeFilter || 'ALL';
@@ -35,12 +40,22 @@ export function renderRegistry(state) {
     return `
         <div class="space-y-12 fade-in text-left">
             <!-- Header -->
-            <header class="flex flex-col md:flex-row justify-between items-start md:items-end gap-8">
-                <div>
-                    <h1 class="text-7xl font-black italic tracking-tighter text-slate-900 dark:text-white uppercase leading-none">Registry</h1>
-                    <p class="text-slate-500 text-xl font-medium mt-4">Browse and search all governance proposals.</p>
+            <div>
+                <div class="flex items-center gap-4 mb-4">
+                    <div class="flex bg-white dark:bg-slate-800 p-1 rounded-xl border border-slate-200 dark:border-slate-700">
+                        <button onclick="state.registryView = 'list'; updateUI(true)"
+                            class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all bg-slate-900 dark:bg-white text-white dark:text-slate-900">
+                            <i data-lucide="list" class="w-3.5 h-3.5"></i> List
+                        </button>
+                        <button onclick="state.registryView = 'kanban'; updateUI(true)"
+                            class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all text-slate-400 hover:text-slate-900 dark:hover:text-white">
+                            <i data-lucide="columns" class="w-3.5 h-3.5"></i> Kanban
+                        </button>
+                    </div>
                 </div>
-            </header>
+                <h1 class="text-7xl font-black italic tracking-tighter text-slate-900 dark:text-white uppercase leading-none">Registry</h1>
+                <p class="text-slate-500 text-xl font-medium mt-4">Browse and search all governance proposals.</p>
+            </div>
 
             <!-- Search and Filters -->
             <div class="bg-white dark:bg-slate-900 p-8 rounded-[3rem] border border-slate-100 dark:border-slate-800 shadow-sm">

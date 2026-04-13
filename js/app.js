@@ -1,22 +1,10 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+import { APP_ID, EDITORS_FALLBACK } from './config.js?v=3';
+import { GITHUB_TOKEN } from './env.js';
 import { 
-    getAuth, 
-    signInAnonymously, 
-    onAuthStateChanged, 
-    GithubAuthProvider, 
-    signInWithPopup, 
-    signOut 
-} from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-import { 
-    getFirestore 
-} from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-
-import { FIREBASE_CONFIG, APP_ID } from './config.js';
-import { 
-    ghFetch, 
-    fetchAllProposals, 
-    fetchProposalDetail, 
-    fetchProposalComments, 
+    ghFetch,
+    fetchAllProposals,
+    fetchProposalDetail,
+    fetchProposalComments,
     fetchProposalEvents,
     createGhIssue,
     updateGhIssueContent,
@@ -27,25 +15,25 @@ import {
     uploadFileToRepo,
     fetchConstitutionVersions,
     generateCapConstitution,
-    uploadCapConstitution
-} from './api.js';
+    uploadCapConstitution,
+    addLabel,
+    removeLabel,
+    fetchEditors
+} from './api.js?v=3';
 
 // Import UI Components
-import { renderNav } from './components/nav.js';
+import { renderNav } from './components/nav.js?v=2';
 import { renderLanding } from './components/landing.js';
 import { renderDashboard } from './components/dashboard.js';
-import { renderRegistry } from './components/registry.js';
-import { renderDetail } from './components/detail.js';
+import { renderRegistry } from './components/registry.js?v=4';
+import { renderDetail } from './components/detail.js?v=2';
 import { renderCreate } from './components/create.js';
 import { renderEdit } from './components/edit.js';
 import { renderConstitution } from './components/constitution.js';
 import { renderWizard } from './components/wizard.js';
 import { renderLearnHub } from './components/learn.js';
+import { initKanbanHandlers } from './components/kanban.js?v=3';
 
-// --- Initialize Firebase Services ---
-const app = initializeApp(FIREBASE_CONFIG);
-const auth = getAuth(app);
-const db = getFirestore(app);
 
 // --- Toast Notification System ---
 window.showToast = (title, message, type = 'info') => {
@@ -144,9 +132,9 @@ window.state = {
     detailTab: 'discussion', 
     docTypeFilter: 'ALL', 
     createType: 'CAP',
-    user: null,
     ghUser: null,
-    ghToken: localStorage.getItem('gh_token'),
+    isEditor: false,
+    ghToken: GITHUB_TOKEN || null,
     proposals: [],
     currentProposal: null,
     comments: [],
@@ -189,10 +177,21 @@ window.state = {
     
     // Search and filter state
     searchQuery: '',
-    statusFilter: 'all'  // 'all', 'open', 'closed'
+    statusFilter: 'all',  // 'all', 'open', 'closed'
+    registryView: 'list', // 'list' or 'kanban'
+
+    // Kanban state
+    kanbanCollapsed: [],
+    kanbanTagPanelOpen: false,
+    kanbanTypeFilter: 'ALL',
+    kanbanSearch: '',
+    kanbanPreviewProposal: null
 };
 
 const state = window.state;
+
+// --- Initialize Kanban Handlers ---
+initKanbanHandlers(state);
 
 // --- Markdown Formatting Logic ---
 
@@ -296,10 +295,10 @@ window.handleRouting = async () => {
 
 window.setView = (view) => {
     if (state.view === 'create') window.syncDraft();
-    const routes = { 
-        'dashboard': '#/home', 
-        'list': '#/registry', 
-        'constitution': '#/constitution', 
+    const routes = {
+        'dashboard': '#/home',
+        'list': '#/registry',
+        'constitution': '#/constitution',
         'create': '#/create',
         'wizard': '#/wizard',
         'learn': '#/learn'
@@ -331,22 +330,41 @@ window.updateUI = async function(force = false) {
 
     state.lastRenderedView = state.view;
     state.lastRenderedTheme = state.theme;
+
+    const isKanban = state.view === 'list' && state.registryView === 'kanban';
+
+    // Clean up detail overlay if leaving kanban view
+    if (!isKanban) {
+        const overlay = document.getElementById('kanban-detail-overlay');
+        if (overlay) overlay.remove();
+        root.classList.remove('kanban-preview-active');
+        state.kanbanPreviewProposal = null;
+    }
     document.documentElement.className = state.theme;
 
     if (!state.ghToken) {
         root.innerHTML = renderLanding();
     } else {
+        const mainCls = isKanban
+            ? 'flex-grow overflow-hidden px-4 pt-4 pb-2'
+            : 'flex-grow container mx-auto px-6 py-12 max-w-7xl';
         root.innerHTML = `
             <div id="toast-container" class="fixed top-24 right-8 z-[300] space-y-3" style="max-width: 400px;"></div>
             <div class="flex flex-col min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-white transition-colors duration-300 text-left">
                 ${renderNav(state)}
-                <main id="main-content" class="flex-grow container mx-auto px-6 py-12 max-w-7xl">
+                <main id="main-content" class="${mainCls}">
                     ${renderActiveView()}
                 </main>
             </div>`;
     }
     if (window.lucide) window.lucide.createIcons();
     if (window.fixPreCode) window.fixPreCode();
+    if (isKanban && window.kanbanInitScroll) window.kanbanInitScroll();
+    if (isKanban && window.kanbanInitCollapseAnimations) window.kanbanInitCollapseAnimations();
+    if (isKanban && window.kanbanStartPolling) window.kanbanStartPolling();
+    if (!isKanban && window.kanbanStopPolling) window.kanbanStopPolling();
+    if (!isKanban && window.kanbanCloseTagPanel) window.kanbanCloseTagPanel();
+    if (!isKanban && window.kanbanClosePreview) window.kanbanClosePreview();
 };
 
 function renderActiveView() {
@@ -964,24 +982,79 @@ window.deleteProposal = async (n) => {
     } catch (e) { state.error = e.message; }
 };
 
-// --- Authentication & Theme ---
+// --- Editor Actions ---
 
-window.login = async () => {
-    const provider = new GithubAuthProvider();
-    provider.addScope('repo');
+const LIFECYCLE_LABELS = ['draft','submitted','review','consultation','revision','finalizing','ready','onchain','done','withdrawn'];
+const EDITOR_SIGNAL_LABELS = ['editor-ok','editor-concern','editor-suggested'];
+const SPECIAL_HANDLING_LABELS = ['bundle','minor','major','pause','fast-track'];
+
+window.editorSetLifecycle = async (stage) => {
+    if (!state.isEditor || !state.currentProposal) return;
+    const number = state.currentProposal.number;
+    const token = state.ghToken;
     try {
-        const res = await signInWithPopup(auth, provider);
-        const credential = GithubAuthProvider.credentialFromResult(res);
-        localStorage.setItem('gh_token', credential.accessToken);
-        state.ghToken = credential.accessToken;
-        window.location.hash = '#/home';
-    } catch (error) { state.error = error.message; window.updateUI(true); }
+        // Remove all existing lifecycle labels, then add new one
+        const existing = state.currentProposal.labels.map(l => l.name);
+        for (const lbl of LIFECYCLE_LABELS) {
+            if (existing.includes(lbl)) await removeLabel(number, lbl, token);
+        }
+        await addLabel(number, stage, token);
+        // Refresh
+        state.currentProposal = await fetchProposalDetail(number, token);
+        updateUI(true);
+        window.showToast('Stage Updated', `Moved to: ${stage}`, 'success');
+    } catch (e) {
+        window.showToast('Error', e.message, 'error');
+    }
 };
 
-window.logout = async () => {
-    await signOut(auth);
-    localStorage.removeItem('gh_token');
+window.editorToggleSignal = async (label) => {
+    if (!state.isEditor || !state.currentProposal) return;
+    const number = state.currentProposal.number;
+    const token = state.ghToken;
+    try {
+        const existing = state.currentProposal.labels.map(l => l.name);
+        const isOn = existing.includes(label);
+        // Remove all signal labels (mutually exclusive)
+        for (const lbl of EDITOR_SIGNAL_LABELS) {
+            if (existing.includes(lbl)) await removeLabel(number, lbl, token);
+        }
+        // If it wasn't already on, set it
+        if (!isOn) await addLabel(number, label, token);
+        state.currentProposal = await fetchProposalDetail(number, token);
+        updateUI(true);
+        window.showToast('Signal Updated', isOn ? `Removed: ${label}` : `Set: ${label}`, 'success');
+    } catch (e) {
+        window.showToast('Error', e.message, 'error');
+    }
+};
+
+window.editorToggleSpecial = async (label) => {
+    if (!state.isEditor || !state.currentProposal) return;
+    const number = state.currentProposal.number;
+    const token = state.ghToken;
+    try {
+        const existing = state.currentProposal.labels.map(l => l.name);
+        const isOn = existing.includes(label);
+        if (isOn) {
+            await removeLabel(number, label, token);
+        } else {
+            await addLabel(number, label, token);
+        }
+        state.currentProposal = await fetchProposalDetail(number, token);
+        updateUI(true);
+        window.showToast('Label Updated', isOn ? `Removed: ${label}` : `Added: ${label}`, 'success');
+    } catch (e) {
+        window.showToast('Error', e.message, 'error');
+    }
+};
+
+// --- Authentication & Theme ---
+
+window.logout = () => {
     state.ghToken = null;
+    state.ghUser = null;
+    state.isEditor = false;
     window.location.hash = '';
     window.updateUI(true);
 };
@@ -1295,21 +1368,20 @@ if (document.readyState === 'loading') {
 
 // --- Lifecycle Initialization ---
 
-onAuthStateChanged(auth, async (user) => {
-    state.user = user;
+(async () => {
     if (state.ghToken) {
         try {
             state.ghUser = await ghFetch('/user', state.ghToken);
+            const editorsList = await fetchEditors();
+            const editors = editorsList.length > 0 ? editorsList : EDITORS_FALLBACK;
+            state.isEditor = editors.includes(state.ghUser.login);
             window.handleRouting();
-        } catch (e) { 
-            localStorage.removeItem('gh_token'); 
-            state.ghToken = null; 
+        } catch (e) {
+            state.ghToken = null;
         }
-    } else {
-        await signInAnonymously(auth);
     }
     state.loading.init = false;
     window.updateUI(true);
-});
+})();
 
 window.onhashchange = window.handleRouting;

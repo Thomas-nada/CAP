@@ -451,6 +451,41 @@ export async function deleteIssue(number, token) {
 }
 
 /**
+ * Fetches the editors list from editors.json in the repo root.
+ * Falls back to an empty array if the file doesn't exist or can't be read.
+ */
+export async function fetchEditors() {
+    try {
+        const url = `https://raw.githubusercontent.com/${GITHUB_CONFIG.REPO_OWNER}/${GITHUB_CONFIG.REPO_NAME}/main/editors.json`;
+        const res = await fetch(url);
+        if (!res.ok) return [];
+        return await res.json();
+    } catch {
+        return [];
+    }
+}
+
+/**
+ * Adds a label to an issue.
+ */
+export async function addLabel(number, label, token) {
+    return await ghFetch(`/repos/${GITHUB_CONFIG.REPO_OWNER}/${GITHUB_CONFIG.REPO_NAME}/issues/${number}/labels`, token, {
+        method: 'POST',
+        body: JSON.stringify({ labels: [label] })
+    });
+}
+
+/**
+ * Removes a label from an issue.
+ */
+export async function removeLabel(number, label, token) {
+    const encoded = encodeURIComponent(label);
+    return await ghFetch(`/repos/${GITHUB_CONFIG.REPO_OWNER}/${GITHUB_CONFIG.REPO_NAME}/issues/${number}/labels/${encoded}`, token, {
+        method: 'DELETE'
+    });
+}
+
+/**
  * Posts a comment to an issue deliberation.
  */
 export async function postProposalComment(number, body, token) {

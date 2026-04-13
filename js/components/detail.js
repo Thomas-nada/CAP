@@ -20,6 +20,7 @@ export function renderDetail(state) {
     }
 
     const isAuthor = state.ghUser?.login === p.user.login;
+    const isEditor = state.isEditor === true;
     const createdDate = new Date(p.created_at);
     const expiryDate = new Date(createdDate.getTime() + (30 * 24 * 60 * 60 * 1000));
     const githubUrl = p.html_url;
@@ -298,6 +299,98 @@ export function renderDetail(state) {
                             </div>
                         </div>
                     ` : ''}
+
+                    ${isEditor ? (() => {
+                        const labels = p.labels.map(l => l.name);
+                        const currentLifecycle = ['draft','submitted','review','consultation','revision','finalizing','ready','onchain','done','withdrawn'].find(s => labels.includes(s)) || null;
+                        const currentSignal = ['editor-ok','editor-concern','editor-suggested'].find(s => labels.includes(s)) || null;
+
+                        const lifecycleColors = {
+                            draft: 'slate', submitted: 'blue', review: 'amber', consultation: 'purple',
+                            revision: 'orange', finalizing: 'cyan', ready: 'green', onchain: 'indigo',
+                            done: 'emerald', withdrawn: 'red'
+                        };
+                        const lifecycleIcons = {
+                            draft: 'file-edit', submitted: 'send', review: 'search', consultation: 'messages-square',
+                            revision: 'pencil', finalizing: 'check-square', ready: 'check-circle', onchain: 'link',
+                            done: 'archive', withdrawn: 'x-circle'
+                        };
+                        const signalConfig = {
+                            'editor-ok':       { color: 'green',  icon: 'check-circle',  label: 'OK' },
+                            'editor-concern':   { color: 'red',    icon: 'alert-circle',   label: 'Concern' },
+                            'editor-suggested': { color: 'amber',  icon: 'lightbulb',      label: 'Suggested' },
+                        };
+                        const specialConfig = {
+                            'pause':      { color: 'slate', icon: 'pause-circle', label: 'Pause' },
+                            'fast-track': { color: 'green', icon: 'zap',          label: 'Fast-Track' },
+                            'bundle':     { color: 'blue',  icon: 'layers',       label: 'Bundle' },
+                            'minor':      { color: 'slate', icon: 'minus-circle', label: 'Minor' },
+                            'major':      { color: 'red',   icon: 'alert-triangle',label: 'Major' },
+                        };
+
+                        return `
+                        <div class="bg-white dark:bg-slate-900 p-8 rounded-[2.5rem] border-2 border-amber-100 dark:border-amber-900/20 shadow-xl space-y-8">
+                            <h3 class="text-[10px] font-black uppercase tracking-[0.2em] text-amber-600 flex items-center gap-2">
+                                <i data-lucide="shield" class="w-3.5 h-3.5"></i> Editor Controls
+                            </h3>
+
+                            <!-- Lifecycle Stage -->
+                            <div class="space-y-3">
+                                <p class="text-[9px] font-black uppercase tracking-[0.18em] text-slate-400">Lifecycle Stage</p>
+                                <div class="grid grid-cols-2 gap-2">
+                                    ${['draft','submitted','review','consultation','revision','finalizing','ready','onchain','done','withdrawn'].map(stage => {
+                                        const isActive = currentLifecycle === stage;
+                                        const color = lifecycleColors[stage];
+                                        const icon = lifecycleIcons[stage];
+                                        const activeCls = isActive
+                                            ? `bg-${color}-600 text-white border-${color}-600`
+                                            : `bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:border-${color}-400 hover:text-${color}-600`;
+                                        return `<button onclick="window.editorSetLifecycle('${stage}')"
+                                            class="flex items-center gap-2 px-3 py-2.5 rounded-xl border text-[10px] font-bold uppercase tracking-wider transition-all ${activeCls}">
+                                            <i data-lucide="${icon}" class="w-3 h-3 flex-shrink-0"></i>
+                                            ${stage}
+                                        </button>`;
+                                    }).join('')}
+                                </div>
+                            </div>
+
+                            <!-- Editor Signals -->
+                            <div class="space-y-3">
+                                <p class="text-[9px] font-black uppercase tracking-[0.18em] text-slate-400">Editor Signal <span class="text-slate-300 font-normal">(pick one)</span></p>
+                                <div class="flex flex-col gap-2">
+                                    ${Object.entries(signalConfig).map(([lbl, cfg]) => {
+                                        const isActive = currentSignal === lbl;
+                                        const activeCls = isActive
+                                            ? `bg-${cfg.color}-600 text-white border-${cfg.color}-600`
+                                            : `bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:border-${cfg.color}-400 hover:text-${cfg.color}-600`;
+                                        return `<button onclick="window.editorToggleSignal('${lbl}')"
+                                            class="flex items-center gap-3 px-4 py-3 rounded-xl border text-xs font-bold uppercase tracking-wider transition-all ${activeCls}">
+                                            <i data-lucide="${cfg.icon}" class="w-3.5 h-3.5 flex-shrink-0"></i>
+                                            ${cfg.label}
+                                        </button>`;
+                                    }).join('')}
+                                </div>
+                            </div>
+
+                            <!-- Special Handling -->
+                            <div class="space-y-3">
+                                <p class="text-[9px] font-black uppercase tracking-[0.18em] text-slate-400">Special Handling <span class="text-slate-300 font-normal">(toggles)</span></p>
+                                <div class="flex flex-wrap gap-2">
+                                    ${Object.entries(specialConfig).map(([lbl, cfg]) => {
+                                        const isActive = labels.includes(lbl);
+                                        const activeCls = isActive
+                                            ? `bg-${cfg.color}-600 text-white border-${cfg.color}-600`
+                                            : `bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:border-${cfg.color}-400 hover:text-${cfg.color}-600`;
+                                        return `<button onclick="window.editorToggleSpecial('${lbl}')"
+                                            class="flex items-center gap-2 px-3 py-2 rounded-xl border text-[10px] font-bold uppercase tracking-wider transition-all ${activeCls}">
+                                            <i data-lucide="${cfg.icon}" class="w-3 h-3 flex-shrink-0"></i>
+                                            ${cfg.label}
+                                        </button>`;
+                                    }).join('')}
+                                </div>
+                            </div>
+                        </div>`;
+                    })() : ''}
                 </aside>
             </div>
         </div>`;
