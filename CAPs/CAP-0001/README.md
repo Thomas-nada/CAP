@@ -2,7 +2,7 @@
 CAP: "0001"
 Title: "CAP Process"
 Category: "Procedural"
-Status: "Active"
+Status: "Done"
 Authors:
   - "Thomas Lindseth <thomas@kryptolabs.no>"
 Implementors:
