@@ -84,7 +84,7 @@ Every CAP must contain the following sections to be considered complete:
 
 The category of a proposal determines its **minimum consultation period** — the time that must pass before a CAP can be moved to the finalising stage.
 
-| Category | Description | Minimum Period |
+| Category | Description | Recommended Minimum Period |
 | :--- | :--- | :---: |
 | **Procedural** | Changes to governance processes or voting rules | 60 days |
 | **Substantive** | Changes to core constitutional rights or obligations | 60 days |
