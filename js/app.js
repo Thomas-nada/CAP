@@ -1051,6 +1051,17 @@ window.editorToggleSpecial = async (label) => {
 
 // --- Authentication & Theme ---
 
+// --- GitHub OAuth ---
+
+const GITHUB_CLIENT_ID  = 'Ov23liqj7BQRN5PwhEGV';
+const GATEKEEPER_URL    = 'https://cap-portal-auth.onrender.com';
+
+window.loginWithGitHub = () => {
+    const redirect = window.location.origin + window.location.pathname;
+    window.location.href =
+        `https://github.com/login/oauth/authorize?client_id=${GITHUB_CLIENT_ID}&scope=repo&redirect_uri=${encodeURIComponent(redirect)}`;
+};
+
 window.submitToken = async () => {
     const input = document.getElementById('token-input');
     const error = document.getElementById('token-error');
@@ -1391,6 +1402,24 @@ if (document.readyState === 'loading') {
 // --- Lifecycle Initialization ---
 
 (async () => {
+    // Check for GitHub OAuth callback code in URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const oauthCode = urlParams.get('code');
+    if (oauthCode) {
+        // Remove code from URL immediately so it can't be replayed
+        window.history.replaceState({}, document.title, window.location.pathname);
+        try {
+            const res = await fetch(`${GATEKEEPER_URL}/authenticate/${oauthCode}`);
+            const data = await res.json();
+            if (data.access_token) {
+                state.ghToken = data.access_token;
+                localStorage.setItem('gh_token', data.access_token);
+            }
+        } catch (e) {
+            console.error('OAuth exchange failed:', e);
+        }
+    }
+
     // Token priority: env.js (dev) → localStorage (production)
     if (!state.ghToken) {
         state.ghToken = localStorage.getItem('gh_token') || null;
