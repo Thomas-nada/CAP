@@ -1,0 +1,74 @@
+name: CIS – Cardano Improvement Suggestion
+description: Submit a new Cardano Improvement Suggestion for community deliberation.
+title: "[CIS] "
+labels: ["CIS", "submitted"]
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Cardano Improvement Suggestion (CIS)
+        CIS proposals go directly to community deliberation. Complete all required fields.
+
+  - type: dropdown
+    id: category
+    attributes:
+      label: Proposal Category
+      options:
+        - Procedural – Governance procedures
+        - Substantive – Constitutional substance
+        - Technical – Technical or protocol changes
+        - Interpretive – Clarifications of existing text
+        - Editorial – Formatting or typo fixes
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: abstract
+    attributes:
+      label: Abstract
+      description: A concise summary of what this suggestion proposes (1–3 sentences).
+      placeholder: This suggestion proposes that...
+    validations:
+      required: true
+
+  - type: textarea
+    id: motivation
+    attributes:
+      label: Motivation
+      description: Why is this suggestion valuable to the community?
+    validations:
+      required: true
+
+  - type: textarea
+    id: analysis
+    attributes:
+      label: Analysis
+      description: Detailed examination of the suggestion, trade-offs, and alternatives.
+    validations:
+      required: true
+
+  - type: textarea
+    id: impact
+    attributes:
+      label: Impact Assessment
+      description: What are the expected consequences if this suggestion is adopted?
+    validations:
+      required: true
+
+  - type: textarea
+    id: discussion
+    attributes:
+      label: Discussion Points
+      description: Specific questions or areas where you'd like community input.
+      placeholder: |
+        1. Should this apply to all governance bodies or only...
+        2. What transition period would be appropriate...
+
+  - type: input
+    id: coauthors
+    attributes:
+      label: Co-Authors
+      description: GitHub usernames of co-authors (optional), comma-separated.
+      placeholder: "@username1, @username2"
