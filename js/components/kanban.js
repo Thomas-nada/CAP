@@ -253,62 +253,67 @@ function renderTagWithTooltip(label) {
 // ──────────────────────────────────────────────
 
 function renderCard(proposal, stage) {
+    const col = LIFECYCLE_COLUMNS.find(c => c.key === stage);
+    const c = col?.color || 'slate';
     const labels = (proposal.labels || []).filter(l => {
         const lc = l.name.toLowerCase();
-        return !LIFECYCLE_COLUMNS.some(c => c.key === lc);
+        return !LIFECYCLE_COLUMNS.some(col => col.key === lc);
     });
     const isCIS = proposal.labels.some(l => l.name === 'CIS');
     const type = isCIS ? 'CIS' : 'CAP';
-    const typeColor = isCIS ? 'bg-teal-500' : 'bg-blue-600';
+    const typeCls = isCIS
+        ? 'text-teal-600 bg-teal-50 dark:bg-teal-900/30 dark:text-teal-400'
+        : 'text-blue-600 bg-blue-50 dark:bg-blue-900/30 dark:text-blue-400';
     const action = getCardAction(proposal, stage);
 
     return `
-    <div class="kanban-card group" draggable="true" data-number="${proposal.number}"
+    <div class="kanban-card group border-l-[3px] border-l-${c}-400 dark:border-l-${c}-500"
+         draggable="true" data-number="${proposal.number}"
          ondragstart="window.kanbanDragStart(event, ${proposal.number})"
          ondragend="window.kanbanDragEnd(event)"
          ${IS_TOUCH ? 'ontouchstart="window.kanbanTouchStart(event, ' + proposal.number + ')" ontouchmove="window.kanbanTouchMove(event)" ontouchend="window.kanbanTouchEnd(event)"' : ''}>
-        <!-- Mobile drag handle -->
+
         ${IS_TOUCH ? `<div class="kanban-drag-handle" aria-label="Drag to reorder">
             <i data-lucide="grip-vertical" class="w-4 h-4"></i>
         </div>` : ''}
-        <!-- Top row: type + number + comments -->
-        <div class="flex items-center justify-between mb-1.5">
+
+        <!-- Top row: type badge + number + comments -->
+        <div class="flex items-center justify-between mb-2.5">
             <div class="flex items-center gap-1.5">
-                <span class="text-[9px] font-black px-1.5 py-0.5 rounded text-white ${typeColor} leading-none">${type}</span>
-                <span class="text-[11px] font-mono text-slate-400 dark:text-slate-500">#${proposal.number}</span>
+                <span class="text-[9px] font-black px-2 py-0.5 rounded-full ${typeCls} leading-none tracking-widest uppercase">${type}</span>
+                <span class="text-[11px] font-mono font-bold text-slate-400 dark:text-slate-500">#${proposal.number}</span>
             </div>
             ${proposal.comments > 0 ? `
-            <span class="flex items-center gap-0.5 text-[10px] text-slate-400" title="${proposal.comments} comments">
+            <span class="flex items-center gap-1 text-[10px] text-slate-400 bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded-full" title="${proposal.comments} comments">
                 <i data-lucide="message-square" class="w-3 h-3"></i>${proposal.comments}
             </span>` : ''}
         </div>
 
-        <!-- Clickable title row: arrow + title -->
-        <div class="kanban-card-title-row" onclick="event.stopPropagation(); window.kanbanOpenPreview(${proposal.number})">
-            <i data-lucide="move-right" class="w-4 h-4 flex-shrink-0"></i>
-            <span class="text-[13px] font-semibold text-slate-900 dark:text-white leading-snug line-clamp-2">
+        <!-- Title — clickable -->
+        <div class="mb-2.5 cursor-pointer" onclick="event.stopPropagation(); window.kanbanOpenPreview(${proposal.number})">
+            <p class="text-[13px] font-bold text-slate-800 dark:text-slate-100 leading-snug line-clamp-2 group-hover:text-${c}-700 dark:group-hover:text-${c}-300 transition-colors duration-150">
                 ${escapeHtml(proposal.title)}
-            </span>
+            </p>
         </div>
 
-        <!-- Tags row -->
-        ${labels.length > 0 ? `<div class="flex flex-wrap gap-1 mb-2">${labels.map(l => renderTagWithTooltip(l)).join('')}</div>` : ''}
+        <!-- Tags -->
+        ${labels.length > 0 ? `<div class="flex flex-wrap gap-1 mb-2.5">${labels.map(l => renderTagWithTooltip(l)).join('')}</div>` : ''}
 
         <!-- Next-action callout -->
         ${action ? `
-        <div class="flex items-start gap-1.5 p-2 rounded-lg border text-[10px] leading-tight mb-2 ${action.cls}">
+        <div class="flex items-start gap-1.5 p-2 rounded-xl border text-[10px] leading-tight mb-2.5 ${action.cls}">
             <i data-lucide="${action.icon}" class="w-3 h-3 flex-shrink-0 mt-0.5"></i>
             <div>
                 <span class="font-bold">${escapeHtml(action.text)}</span>
-                ${action.who ? `<span class="opacity-70 ml-1">-- ${escapeHtml(action.who)}</span>` : ''}
+                ${action.who ? `<span class="opacity-60 ml-1">· ${escapeHtml(action.who)}</span>` : ''}
             </div>
         </div>` : ''}
 
-        <!-- Footer: author + time -->
-        <div class="flex items-center justify-between text-[10px] text-slate-400 dark:text-slate-500 pt-1 border-t border-slate-100 dark:border-slate-800">
-            <span class="flex items-center gap-1 truncate">
-                ${proposal.user?.avatar_url ? `<img src="${escapeHtml(proposal.user.avatar_url)}" class="w-4 h-4 rounded-full ring-1 ring-white dark:ring-slate-800"/>` : ''}
-                <span class="truncate">${escapeHtml(proposal.user?.login || 'unknown')}</span>
+        <!-- Footer: avatar + author + time -->
+        <div class="flex items-center justify-between text-[10px] text-slate-400 dark:text-slate-500 pt-2 border-t border-slate-100 dark:border-slate-700/50">
+            <span class="flex items-center gap-1.5 truncate">
+                ${proposal.user?.avatar_url ? `<img src="${escapeHtml(proposal.user.avatar_url)}" class="w-4 h-4 rounded-full ring-1 ring-white dark:ring-slate-700 flex-shrink-0"/>` : ''}
+                <span class="truncate font-semibold">${escapeHtml(proposal.user?.login || 'unknown')}</span>
             </span>
             <span class="whitespace-nowrap ml-2">${timeAgo(proposal.updated_at || proposal.created_at)}</span>
         </div>
@@ -326,27 +331,31 @@ function renderColumn(col, cards) {
     <div class="kanban-col" data-col-key="${col.key}" data-card-count="${cards.length}">
         <!-- Collapsed overlay (visible when is-collapsed) -->
         <div class="kanban-col-collapsed-view">
-            <div class="flex flex-col items-center gap-1.5 py-4 px-1">
+            <div class="flex flex-col items-center gap-2 py-5 px-1">
+                <div class="w-8 h-8 rounded-xl bg-${c}-100 dark:bg-${c}-900/40 flex items-center justify-center">
+                    <i data-lucide="${col.icon}" class="w-4 h-4 text-${c}-500 dark:text-${c}-400"></i>
+                </div>
+                <span class="text-[11px] font-black text-${c}-600 dark:text-${c}-400 bg-${c}-100 dark:bg-${c}-900/40 w-6 h-6 rounded-full flex items-center justify-center">${cards.length}</span>
                 ${cards.length > 0 ? `
                 <button onclick="event.stopPropagation(); window.kanbanPinOpen('${col.key}')"
-                    class="kanban-pin-btn w-7 h-7 flex items-center justify-center rounded-lg bg-${c}-100 dark:bg-${c}-900/40 text-${c}-500 hover:bg-${c}-200 dark:hover:bg-${c}-800/60 transition-colors"
+                    class="kanban-pin-btn w-6 h-6 flex items-center justify-center rounded-lg bg-${c}-100 dark:bg-${c}-900/40 text-${c}-500 hover:bg-${c}-200 dark:hover:bg-${c}-800/60 transition-colors"
                     title="Pin column open">
-                    <i data-lucide="pin" class="w-4 h-4"></i>
+                    <i data-lucide="pin" class="w-3.5 h-3.5"></i>
                 </button>` : ''}
-                <i data-lucide="${col.icon}" class="w-4 h-4 text-${c}-500"></i>
-                <span class="text-[10px] font-black text-${c}-500 bg-${c}-100 dark:bg-${c}-900/40 px-2 py-0.5 rounded-full">${cards.length}</span>
-                <span class="kanban-col-collapsed-label text-${c}-600 dark:text-${c}-400">${col.label.length <= 6 ? col.label : col.label.slice(0, 4) + '..'}</span>
+                <span class="kanban-col-collapsed-label text-${c}-500 dark:text-${c}-400">${col.label.length <= 6 ? col.label : col.label.slice(0, 5) + '.'}</span>
             </div>
         </div>
 
         <!-- Expanded content -->
         <div class="kanban-col-expanded-view">
             <!-- Sticky Header -->
-            <div class="kanban-col-header bg-${c}-50 dark:bg-${c}-950/30 border-b-2 border-${c}-300 dark:border-${c}-700">
+            <div class="kanban-col-header bg-gradient-to-r from-${c}-50 via-${c}-50/60 to-transparent dark:from-${c}-950/30 dark:via-${c}-950/10 dark:to-transparent border-b border-${c}-200/70 dark:border-${c}-900/50">
                 <div class="flex items-center gap-2 min-w-0">
-                    <span class="w-2.5 h-2.5 rounded-full bg-${c}-500 flex-shrink-0"></span>
-                    <span class="text-sm font-extrabold text-${c}-700 dark:text-${c}-300 truncate">${col.label}</span>
-                    <span class="text-[10px] font-black text-${c}-500 bg-${c}-100 dark:bg-${c}-900/40 px-2 py-0.5 rounded-full flex-shrink-0">${cards.length}</span>
+                    <div class="w-7 h-7 rounded-lg bg-${c}-100 dark:bg-${c}-900/50 flex items-center justify-center flex-shrink-0">
+                        <i data-lucide="${col.icon}" class="w-3.5 h-3.5 text-${c}-600 dark:text-${c}-400"></i>
+                    </div>
+                    <span class="text-sm font-extrabold text-slate-800 dark:text-white truncate">${col.label}</span>
+                    ${cards.length > 0 ? `<span class="text-[10px] font-black text-${c}-600 dark:text-${c}-400 bg-${c}-100 dark:bg-${c}-900/50 px-2 py-0.5 rounded-full flex-shrink-0">${cards.length}</span>` : ''}
                 </div>
                 <div class="flex items-center gap-1">
                     <!-- Column info hover -->
@@ -380,9 +389,11 @@ function renderColumn(col, cards) {
                  ondrop="window.kanbanDrop(event, '${col.key}')">
                 ${cards.length > 0
                     ? cards.map(p => renderCard(p, col.key)).join('')
-                    : `<div class="kanban-empty-placeholder flex flex-col items-center justify-center py-10 opacity-40">
-                           <i data-lucide="${col.icon}" class="w-8 h-8 mb-2 text-${c}-300 dark:text-${c}-700"></i>
-                           <p class="text-xs text-slate-400">No proposals</p>
+                    : `<div class="kanban-empty-placeholder flex flex-col items-center justify-center py-12 opacity-40">
+                           <div class="w-12 h-12 rounded-2xl bg-${c}-100 dark:bg-${c}-900/30 flex items-center justify-center mb-3">
+                               <i data-lucide="${col.icon}" class="w-6 h-6 text-${c}-400 dark:text-${c}-600"></i>
+                           </div>
+                           <p class="text-xs font-bold text-slate-400 tracking-wide">Empty</p>
                        </div>`
                 }
             </div>

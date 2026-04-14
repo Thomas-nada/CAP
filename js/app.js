@@ -31,7 +31,7 @@ import { renderEdit } from './components/edit.js';
 import { renderConstitution } from './components/constitution.js';
 import { renderWizard } from './components/wizard.js';
 import { renderLearnHub } from './components/learn.js';
-import { initKanbanHandlers } from './components/kanban.js?v=3';
+import { initKanbanHandlers } from './components/kanban.js?v=6';
 
 
 // --- Toast Notification System ---

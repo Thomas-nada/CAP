@@ -3,7 +3,7 @@
  * GitHub API-based full-text search
  */
 
-import { renderKanban } from './kanban.js?v=5';
+import { renderKanban } from './kanban.js?v=6';
 
 export function renderRegistry(state) {
     if (state.registryView === 'kanban') {
