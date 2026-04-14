@@ -239,19 +239,35 @@ ${revisions.map((r, i) => `    ${i + 1}. ${r.section || 'General'}: ${r.original
                 
                 appliedCount++;
             } else if (originalTextNormalized && constitutionNormalized.includes(originalTextNormalized)) {
-                // Try normalized whitespace match against normalized constitution
-                const beforeLength = newConstitution.length;
-                // Replace in normalized version and reconstruct
-                const replacedNormalized = constitutionNormalized.replace(
-                    originalTextNormalized, 
-                    proposedTextTrimmed
-                );
-                // This is tricky - we need to apply this back to the original
-                // For now, just do a best-effort replacement
-                newConstitution = replacedNormalized;
-                const afterLength = newConstitution.length;
-                
-                appliedCount++;
+                // Build a whitespace-flexible regex and apply it to the ORIGINAL unflattened text.
+                // This preserves all paragraph breaks / document structure.
+                try {
+                    const flexRegex = new RegExp(
+                        originalTextNormalized
+                            .replace(/[.*+?^${}()|[\]\\]/g, '\\$&') // escape regex chars
+                            .replace(/\s+/g, '\\s+'),                // allow any whitespace
+                        'i'
+                    );
+                    if (flexRegex.test(newConstitution)) {
+                        newConstitution = newConstitution.replace(flexRegex, proposedTextTrimmed);
+                        appliedCount++;
+                    } else {
+                        failedRevisions.push({
+                            index: index + 1,
+                            section: revision.section,
+                            originalText: originalTextTrimmed.substring(0, 100) + '...',
+                            proposedText: proposedTextTrimmed.substring(0, 100) + '...'
+                        });
+                    }
+                } catch (regexErr) {
+                    // Regex too complex — fall through to failed
+                    failedRevisions.push({
+                        index: index + 1,
+                        section: revision.section,
+                        originalText: originalTextTrimmed.substring(0, 100) + '...',
+                        proposedText: proposedTextTrimmed.substring(0, 100) + '...'
+                    });
+                }
             } else {
                 // Try fuzzy matching - find text that contains most of the key words
                 // Exact match failed — attempt fuzzy match using key words

@@ -508,6 +508,61 @@ function renderDiffView(currentVersion, compareVersion) {
 
     const oldPs = normalizeParagraphs(currentVersion.content);
     const newPs = normalizeParagraphs(compareVersion.content);
+
+    // ── Flattened-file detection ─────────────────────────────────────────────
+    // When a CAP preview was generated with a whitespace-collapsing bug, the
+    // entire constitution ends up as 1–3 giant "paragraphs", while the official
+    // has 400–700 normal ones.  Comparing them paragraph-for-paragraph would
+    // produce hundreds of false "removed" entries.  Detect that case and show
+    // a friendly fallback instead.
+    const ratio = oldPs.length > 0 && newPs.length > 0
+        ? Math.max(oldPs.length, newPs.length) / Math.min(oldPs.length, newPs.length)
+        : 0;
+    const newAvgLen = newPs.length
+        ? newPs.reduce((s, p) => s + p.length, 0) / newPs.length
+        : 0;
+    const isFlattened = (newPs.length < 10 && oldPs.length > 50) ||
+                        newAvgLen > 4000 ||
+                        ratio > 15;
+
+    if (isFlattened) {
+        // Extract the Changes Summary section from the raw preview content so
+        // we can still show something useful.
+        const summaryMatch = compareVersion.content.match(
+            /##\s+CAP-\d+\s+Changes Summary([\s\S]*?)(?:<!--|$)/i
+        );
+        const summaryText = summaryMatch
+            ? summaryMatch[1].trim()
+            : 'No changes summary found in this preview file.';
+
+        return `
+            <div class="space-y-6">
+                <div class="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700/40 p-8 rounded-[2.5rem]">
+                    <div class="flex items-start gap-4">
+                        <i data-lucide="alert-triangle" class="w-6 h-6 text-amber-500 flex-shrink-0 mt-0.5"></i>
+                        <div>
+                            <p class="font-black text-amber-800 dark:text-amber-300 text-sm mb-2">Preview file needs to be regenerated</p>
+                            <p class="text-amber-700 dark:text-amber-400 text-xs leading-relaxed">
+                                This preview was generated with an older version of the tool that collapsed all
+                                paragraph formatting. A word-level diff cannot be shown accurately.
+                                An editor can open the CAP and click <strong>Regenerate Preview</strong> to fix this.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white dark:bg-slate-900 rounded-[2rem] border border-slate-100 dark:border-slate-800 shadow-sm overflow-hidden">
+                    <div class="px-6 py-4 border-b border-slate-100 dark:border-slate-800">
+                        <p class="text-[10px] font-black uppercase tracking-widest text-slate-400">Changes summary from preview file</p>
+                    </div>
+                    <div class="p-6 prose dark:prose-invert max-w-none text-sm">
+                        ${window.marked ? window.marked.parse(summaryText) : `<pre class="text-xs whitespace-pre-wrap">${escapeHtml(summaryText)}</pre>`}
+                    </div>
+                </div>
+            </div>`;
+    }
+    // ── End flattened-file detection ─────────────────────────────────────────
+
     const rawOps = diffParagraphs(oldPs, newPs);
 
     // Merge adjacent delete+insert pairs into a single 'modify' op so we can

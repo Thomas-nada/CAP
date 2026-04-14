@@ -19,7 +19,7 @@ import {
     addLabel,
     removeLabel,
     fetchEditors
-} from './api.js?v=4';
+} from './api.js?v=5';
 
 // Import UI Components
 import { renderNav } from './components/nav.js?v=3';
@@ -28,7 +28,7 @@ import { renderRegistry } from './components/registry.js?v=4';
 import { renderDetail } from './components/detail.js?v=3';
 import { renderCreate } from './components/create.js';
 import { renderEdit } from './components/edit.js';
-import { renderConstitution } from './components/constitution.js?v=2';
+import { renderConstitution } from './components/constitution.js?v=3';
 import { renderWizard } from './components/wizard.js';
 import { renderLearnHub } from './components/learn.js';
 import { initKanbanHandlers } from './components/kanban.js?v=6';
