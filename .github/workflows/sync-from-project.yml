@@ -1,19 +1,24 @@
-name: Kanban Board → Sync Label on Issue
+name: Kanban Board → Sync Labels on Issues
 
-# When a card is moved on the GitHub Projects Kanban board,
-# this workflow updates the corresponding issue's lifecycle label
-# so the CAP Portal Kanban stays in sync.
+# Runs every 5 minutes. Queries the GitHub Project for all items,
+# compares each item's Status field to the issue's current lifecycle label,
+# and updates the label if they differ.
+# This keeps the CAP Portal Kanban in sync when cards are moved directly
+# on the GitHub Projects board.
 
 on:
-  projects_v2_item:
-    types: [edited]
+  schedule:
+    - cron: '*/5 * * * *'
+  workflow_dispatch:  # Allow manual trigger
 
 jobs:
   sync:
     runs-on: ubuntu-latest
     steps:
-      - name: Sync project status back to issue label
+      - name: Sync project status → issue labels
         uses: actions/github-script@v7
+        env:
+          PROJECT_NUMBER: ${{ vars.KANBAN_PROJECT_NUMBER }}
         with:
           github-token: ${{ secrets.PROJECT_TOKEN }}
           script: |
@@ -31,87 +36,98 @@ jobs:
             };
 
             const LIFECYCLE_LABELS = Object.values(COLUMN_MAP);
+            const owner = context.repo.owner;
+            const repo  = context.repo.repo;
+            const projectNum = parseInt(process.env.PROJECT_NUMBER);
 
-            // Query the project item to get its linked issue and current Status value
-            const itemNodeId = context.payload.projects_v2_item.node_id;
+            if (!projectNum) {
+              core.setFailed('KANBAN_PROJECT_NUMBER variable is not set.');
+              return;
+            }
 
-            const data = await github.graphql(`
-              query($itemId: ID!) {
-                node(id: $itemId) {
-                  ... on ProjectV2Item {
-                    content {
-                      ... on Issue {
-                        number
-                        repository {
-                          name
-                          owner { login }
-                        }
-                      }
-                    }
-                    fieldValues(first: 20) {
-                      nodes {
-                        ... on ProjectV2ItemFieldSingleSelectValue {
-                          name
-                          field { ... on ProjectV2SingleSelectField { name } }
+            // Fetch all project items with their Status and linked issue
+            let project;
+            for (const ownerType of ['user', 'organization']) {
+              try {
+                const data = await github.graphql(`
+                  query($login: String!, $number: Int!) {
+                    ${ownerType}(login: $login) {
+                      projectV2(number: $number) {
+                        items(first: 100) {
+                          nodes {
+                            content {
+                              ... on Issue {
+                                number
+                                labels(first: 20) {
+                                  nodes { name }
+                                }
+                              }
+                            }
+                            fieldValues(first: 20) {
+                              nodes {
+                                ... on ProjectV2ItemFieldSingleSelectValue {
+                                  name
+                                  field { ... on ProjectV2SingleSelectField { name } }
+                                }
+                              }
+                            }
+                          }
                         }
                       }
                     }
                   }
+                `, { login: owner, number: projectNum });
+                project = data[ownerType].projectV2;
+                break;
+              } catch { /* try next */ }
+            }
+
+            if (!project) {
+              core.setFailed(`Project #${projectNum} not found for ${owner}.`);
+              return;
+            }
+
+            let synced = 0;
+
+            for (const item of project.items.nodes) {
+              if (!item.content?.number) continue;  // Skip non-issues
+
+              const issueNumber = item.content.number;
+              const currentLabels = item.content.labels.nodes.map(l => l.name);
+
+              // Find the project Status value
+              const statusField = item.fieldValues.nodes.find(
+                fv => fv.field?.name === 'Status'
+              );
+              if (!statusField?.name) continue;
+
+              const targetLabel = COLUMN_MAP[statusField.name];
+              if (!targetLabel) continue;
+
+              // Check if label already matches
+              const currentLifecycle = currentLabels.find(l => LIFECYCLE_LABELS.includes(l));
+              if (currentLifecycle === targetLabel) continue;
+
+              console.log(`Issue #${issueNumber}: board="${statusField.name}", label="${currentLifecycle || 'none'}" → syncing to "${targetLabel}"`);
+
+              // Remove old lifecycle labels
+              for (const label of currentLabels) {
+                if (LIFECYCLE_LABELS.includes(label)) {
+                  try {
+                    await github.rest.issues.removeLabel({
+                      owner, repo, issue_number: issueNumber, name: label
+                    });
+                  } catch {}
                 }
               }
-            `, { itemId: itemNodeId });
 
-            const item = data.node;
-            if (!item?.content?.number) {
-              console.log('Item is not linked to an issue, skipping.');
-              return;
+              // Add the correct label
+              await github.rest.issues.addLabels({
+                owner, repo, issue_number: issueNumber, labels: [targetLabel]
+              });
+
+              synced++;
+              console.log(`✅ Issue #${issueNumber} → "${targetLabel}"`);
             }
 
-            const issueNumber = item.content.number;
-            const owner       = item.content.repository.owner.login;
-            const repo        = item.content.repository.name;
-
-            // Find the Status field value
-            const statusValue = item.fieldValues.nodes.find(
-              fv => fv.field?.name === 'Status'
-            );
-
-            if (!statusValue?.name) {
-              console.log('No Status field value found, skipping.');
-              return;
-            }
-
-            const targetLabel = COLUMN_MAP[statusValue.name];
-            if (!targetLabel) {
-              console.log(`Unknown status "${statusValue.name}", skipping.`);
-              return;
-            }
-
-            // Get current labels on the issue
-            const { data: currentLabels } = await github.rest.issues.listLabelsOnIssue({
-              owner, repo, issue_number: issueNumber
-            });
-
-            const currentLifecycle = currentLabels.find(l => LIFECYCLE_LABELS.includes(l.name));
-
-            // Skip if the label is already correct (avoids infinite loop with sync-to-project)
-            if (currentLifecycle?.name === targetLabel) {
-              console.log(`Issue #${issueNumber} already has label "${targetLabel}", nothing to do.`);
-              return;
-            }
-
-            // Remove all existing lifecycle labels
-            for (const label of currentLabels) {
-              if (LIFECYCLE_LABELS.includes(label.name)) {
-                await github.rest.issues.removeLabel({
-                  owner, repo, issue_number: issueNumber, name: label.name
-                });
-              }
-            }
-
-            // Add the new lifecycle label
-            await github.rest.issues.addLabels({
-              owner, repo, issue_number: issueNumber, labels: [targetLabel]
-            });
-
-            console.log(`✅ Issue #${issueNumber} labelled "${targetLabel}" from board move to "${statusValue.name}"`);
+            console.log(`Sync complete. ${synced} issue(s) updated.`);
