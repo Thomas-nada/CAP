@@ -1,0 +1,117 @@
+name: Kanban Board → Sync Label on Issue
+
+# When a card is moved on the GitHub Projects Kanban board,
+# this workflow updates the corresponding issue's lifecycle label
+# so the CAP Portal Kanban stays in sync.
+
+on:
+  projects_v2_item:
+    types: [edited]
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Sync project status back to issue label
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.PROJECT_TOKEN }}
+          script: |
+            const COLUMN_MAP = {
+              'Draft':        'draft',
+              'Submitted':    'submitted',
+              'Review':       'review',
+              'Consultation': 'consultation',
+              'Revision':     'revision',
+              'Finalizing':   'finalizing',
+              'Ready':        'ready',
+              'On-Chain':     'onchain',
+              'Done':         'done',
+              'Withdrawn':    'withdrawn',
+            };
+
+            const LIFECYCLE_LABELS = Object.values(COLUMN_MAP);
+
+            // Query the project item to get its linked issue and current Status value
+            const itemNodeId = context.payload.projects_v2_item.node_id;
+
+            const data = await github.graphql(`
+              query($itemId: ID!) {
+                node(id: $itemId) {
+                  ... on ProjectV2Item {
+                    content {
+                      ... on Issue {
+                        number
+                        repository {
+                          name
+                          owner { login }
+                        }
+                      }
+                    }
+                    fieldValues(first: 20) {
+                      nodes {
+                        ... on ProjectV2ItemFieldSingleSelectValue {
+                          name
+                          field { ... on ProjectV2SingleSelectField { name } }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            `, { itemId: itemNodeId });
+
+            const item = data.node;
+            if (!item?.content?.number) {
+              console.log('Item is not linked to an issue, skipping.');
+              return;
+            }
+
+            const issueNumber = item.content.number;
+            const owner       = item.content.repository.owner.login;
+            const repo        = item.content.repository.name;
+
+            // Find the Status field value
+            const statusValue = item.fieldValues.nodes.find(
+              fv => fv.field?.name === 'Status'
+            );
+
+            if (!statusValue?.name) {
+              console.log('No Status field value found, skipping.');
+              return;
+            }
+
+            const targetLabel = COLUMN_MAP[statusValue.name];
+            if (!targetLabel) {
+              console.log(`Unknown status "${statusValue.name}", skipping.`);
+              return;
+            }
+
+            // Get current labels on the issue
+            const { data: currentLabels } = await github.rest.issues.listLabelsOnIssue({
+              owner, repo, issue_number: issueNumber
+            });
+
+            const currentLifecycle = currentLabels.find(l => LIFECYCLE_LABELS.includes(l.name));
+
+            // Skip if the label is already correct (avoids infinite loop with sync-to-project)
+            if (currentLifecycle?.name === targetLabel) {
+              console.log(`Issue #${issueNumber} already has label "${targetLabel}", nothing to do.`);
+              return;
+            }
+
+            // Remove all existing lifecycle labels
+            for (const label of currentLabels) {
+              if (LIFECYCLE_LABELS.includes(label.name)) {
+                await github.rest.issues.removeLabel({
+                  owner, repo, issue_number: issueNumber, name: label.name
+                });
+              }
+            }
+
+            // Add the new lifecycle label
+            await github.rest.issues.addLabels({
+              owner, repo, issue_number: issueNumber, labels: [targetLabel]
+            });
+
+            console.log(`✅ Issue #${issueNumber} labelled "${targetLabel}" from board move to "${statusValue.name}"`);
