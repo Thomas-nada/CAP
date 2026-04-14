@@ -1100,7 +1100,7 @@ const GATEKEEPER_URL    = 'https://cap-portal-auth.onrender.com';
 window.loginWithGitHub = () => {
     const redirect = window.location.origin + window.location.pathname;
     window.location.href =
-        `https://github.com/login/oauth/authorize?client_id=${GITHUB_CLIENT_ID}&scope=repo&redirect_uri=${encodeURIComponent(redirect)}`;
+        `https://github.com/login/oauth/authorize?client_id=${GITHUB_CLIENT_ID}&scope=public_repo&redirect_uri=${encodeURIComponent(redirect)}`;
 };
 
 window.submitToken = async () => {
