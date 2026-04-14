@@ -136,6 +136,15 @@ export function renderDetail(state) {
                             `).join('')}
 
                             <div class="pt-8 pl-0 sm:pl-20">
+                                ${!state.ghToken ? `
+                                <div class="bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[2rem] p-8 text-center">
+                                    <p class="text-slate-500 font-bold mb-4">Login to join the discussion</p>
+                                    <button onclick="window.loginWithGitHub()"
+                                        class="inline-flex items-center gap-2 px-6 py-3 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-xl text-xs font-black hover:scale-105 transition-all">
+                                        <i data-lucide="github" class="w-4 h-4"></i> Login with GitHub
+                                    </button>
+                                </div>
+                                ` : `
                                 <form onsubmit="event.preventDefault(); window.postComment(this)" class="space-y-6">
                                     <!-- Markdown Formatting Toolbar -->
                                     <div class="flex flex-wrap gap-2 p-4 bg-slate-50 dark:bg-slate-900/50 rounded-2xl border border-slate-100 dark:border-slate-800">
@@ -178,6 +187,7 @@ export function renderDetail(state) {
                                         </button>
                                     </div>
                                 </form>
+                                `}
                             </div>
                         </div>
                     </section>

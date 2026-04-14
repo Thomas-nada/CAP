@@ -1,23 +1,28 @@
 import { GITHUB_CONFIG } from './config.js';
 
 /**
- * Generic fetch wrapper for GitHub API
+ * Generic fetch wrapper for GitHub API.
+ * Token is optional — public repo read calls work without auth (60 req/hr limit).
+ * Write operations (POST/PUT/PATCH/DELETE) still require a token.
  */
 export async function ghFetch(endpoint, token, options = {}) {
     const activeToken = token || localStorage.getItem('gh_token');
-    if (!activeToken) throw new Error("AUTH_EXPIRED");
-    
+    const isWriteOp = options.method && ['POST','PUT','PATCH','DELETE'].includes(options.method.toUpperCase());
+    if (isWriteOp && !activeToken) throw new Error("AUTH_REQUIRED");
+
+    const headers = {
+        'Accept': 'application/vnd.github.v3+json',
+        'Content-Type': 'application/json',
+        ...options.headers
+    };
+    if (activeToken) headers['Authorization'] = `token ${activeToken}`;
+
     const res = await fetch(`${GITHUB_CONFIG.API_BASE}${endpoint}`, {
         ...options,
-        headers: {
-            'Authorization': `token ${activeToken}`,
-            'Accept': 'application/vnd.github.v3+json',
-            'Content-Type': 'application/json',
-            ...options.headers
-        }
+        headers
     });
 
-    if (res.status === 401) throw new Error("AUTH_EXPIRED");
+    if (res.status === 401) throw new Error(activeToken ? "AUTH_EXPIRED" : "AUTH_REQUIRED");
     if (!res.ok) {
         const data = await res.json().catch(() => ({}));
         throw new Error(data.message || `GitHub Error: ${res.status}`);

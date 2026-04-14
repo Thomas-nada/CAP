@@ -1,6 +1,6 @@
 import { APP_ID, EDITORS_FALLBACK } from './config.js?v=3';
 import { GITHUB_TOKEN } from './env.js';
-import { 
+import {
     ghFetch,
     fetchAllProposals,
     fetchProposalDetail,
@@ -19,14 +19,13 @@ import {
     addLabel,
     removeLabel,
     fetchEditors
-} from './api.js?v=3';
+} from './api.js?v=4';
 
 // Import UI Components
-import { renderNav } from './components/nav.js?v=2';
-import { renderLanding } from './components/landing.js';
+import { renderNav } from './components/nav.js?v=3';
 import { renderDashboard } from './components/dashboard.js';
 import { renderRegistry } from './components/registry.js?v=4';
-import { renderDetail } from './components/detail.js?v=2';
+import { renderDetail } from './components/detail.js?v=3';
 import { renderCreate } from './components/create.js';
 import { renderEdit } from './components/edit.js';
 import { renderConstitution } from './components/constitution.js';
@@ -342,21 +341,17 @@ window.updateUI = async function(force = false) {
     }
     document.documentElement.className = state.theme;
 
-    if (!state.ghToken) {
-        root.innerHTML = renderLanding();
-    } else {
-        const mainCls = isKanban
-            ? 'flex-grow overflow-hidden px-4 pt-4 pb-2'
-            : 'flex-grow container mx-auto px-6 py-12 max-w-7xl';
-        root.innerHTML = `
-            <div id="toast-container" class="fixed top-24 right-8 z-[300] space-y-3" style="max-width: 400px;"></div>
-            <div class="flex flex-col min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-white transition-colors duration-300 text-left">
-                ${renderNav(state)}
-                <main id="main-content" class="${mainCls}">
-                    ${renderActiveView()}
-                </main>
-            </div>`;
-    }
+    const mainCls = isKanban
+        ? 'flex-grow overflow-hidden px-4 pt-4 pb-2'
+        : 'flex-grow container mx-auto px-6 py-12 max-w-7xl';
+    root.innerHTML = `
+        <div id="toast-container" class="fixed top-24 right-8 z-[300] space-y-3" style="max-width: 400px;"></div>
+        <div class="flex flex-col min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-white transition-colors duration-300 text-left">
+            ${renderNav(state)}
+            <main id="main-content" class="${mainCls}">
+                ${renderActiveView()}
+            </main>
+        </div>`;
     if (window.lucide) window.lucide.createIcons();
     if (window.fixPreCode) window.fixPreCode();
     if (isKanban && window.kanbanInitScroll) window.kanbanInitScroll();
@@ -368,6 +363,11 @@ window.updateUI = async function(force = false) {
 };
 
 function renderActiveView() {
+    // Write-actions require login
+    const requiresAuth = ['create', 'wizard', 'edit'];
+    if (requiresAuth.includes(state.view) && !state.ghToken) {
+        return renderLoginPrompt();
+    }
     switch (state.view) {
         case 'dashboard': return renderDashboard(state);
         case 'list': return renderRegistry(state);
@@ -379,6 +379,28 @@ function renderActiveView() {
         case 'learn': return renderLearnHub(state);
         default: return '<p class="text-slate-400">Unknown view.</p>';
     }
+}
+
+function renderLoginPrompt() {
+    return `
+        <div class="flex items-center justify-center min-h-[60vh]">
+            <div class="text-center max-w-md">
+                <div class="w-20 h-20 bg-blue-50 dark:bg-blue-900/20 rounded-[2rem] flex items-center justify-center mx-auto mb-8">
+                    <i data-lucide="log-in" class="w-10 h-10 text-blue-600"></i>
+                </div>
+                <h2 class="text-4xl font-black italic tracking-tighter text-slate-900 dark:text-white mb-4">Login Required</h2>
+                <p class="text-slate-500 mb-8">You need to log in with GitHub to submit or edit proposals.</p>
+                <button onclick="window.loginWithGitHub()"
+                    class="inline-flex items-center gap-3 px-8 py-4 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-2xl font-black text-sm hover:scale-105 transition-all shadow-xl">
+                    <i data-lucide="github" class="w-5 h-5"></i>
+                    Login with GitHub
+                </button>
+                <button onclick="window.setView('dashboard')"
+                    class="block mx-auto mt-4 text-sm text-slate-400 hover:text-slate-600 font-bold">
+                    Back to Home
+                </button>
+            </div>
+        </div>`;
 }
 
 // --- Modal & Fragment Managers ---
@@ -946,7 +968,24 @@ async function loadProposals() {
             final: ps.filter(x => x.state === 'closed').length
         };
     } catch (e) {
-        if (e.message === "AUTH_EXPIRED") window.logout();
+        if (e.message === "AUTH_EXPIRED") {
+            // Token has expired — clear it and keep browsing as public
+            state.ghToken = null;
+            state.ghUser = null;
+            state.isEditor = false;
+            localStorage.removeItem('gh_token');
+            // Retry without auth
+            try {
+                const ps = await fetchAllProposals(null);
+                state.proposals = ps;
+                state.stats = {
+                    total: ps.length,
+                    draft: ps.filter(x => x.state === 'open').length,
+                    review: 0,
+                    final: ps.filter(x => x.state === 'closed').length
+                };
+            } catch {}
+        }
     }
     window.updateUI(true);
 }
@@ -990,6 +1029,8 @@ const SPECIAL_HANDLING_LABELS = ['bundle','minor','major','pause','fast-track'];
 
 window.editorSetLifecycle = async (stage) => {
     if (!state.isEditor || !state.currentProposal) return;
+    const current = state.currentProposal.labels.find(l => LIFECYCLE_LABELS.includes(l.name))?.name || 'none';
+    if (!confirm(`Move proposal from "${current}" → "${stage}"?`)) return;
     const number = state.currentProposal.number;
     const token = state.ghToken;
     try {
@@ -1408,6 +1449,20 @@ if (document.readyState === 'loading') {
     if (oauthCode) {
         // Remove code from URL immediately so it can't be replayed
         window.history.replaceState({}, document.title, window.location.pathname);
+
+        // Show a warm-up notice in case the gatekeeper is cold-starting
+        const warmupTimeout = setTimeout(() => {
+            const root = document.getElementById('app');
+            if (root && state.loading.init) {
+                root.innerHTML = `
+                    <div class="flex flex-col items-center justify-center min-h-screen bg-slate-50 dark:bg-slate-950 gap-6">
+                        <div class="w-16 h-16 border-4 border-blue-600/20 border-t-blue-600 rounded-full animate-spin"></div>
+                        <p class="text-slate-500 font-bold uppercase tracking-widest text-xs">Warming up auth server…</p>
+                        <p class="text-slate-400 text-xs">This can take up to 30 seconds on a cold start.</p>
+                    </div>`;
+            }
+        }, 2500);
+
         try {
             const res = await fetch(`${GATEKEEPER_URL}/authenticate/${oauthCode}`);
             const data = await res.json();
@@ -1417,6 +1472,8 @@ if (document.readyState === 'loading') {
             }
         } catch (e) {
             console.error('OAuth exchange failed:', e);
+        } finally {
+            clearTimeout(warmupTimeout);
         }
     }
 
@@ -1424,20 +1481,24 @@ if (document.readyState === 'loading') {
     if (!state.ghToken) {
         state.ghToken = localStorage.getItem('gh_token') || null;
     }
+
+    // Try to resolve user identity if we have a token
     if (state.ghToken) {
         try {
             state.ghUser = await ghFetch('/user', state.ghToken);
             const editorsList = await fetchEditors();
             const editors = editorsList.length > 0 ? editorsList : EDITORS_FALLBACK;
             state.isEditor = editors.includes(state.ghUser.login);
-            window.handleRouting();
         } catch (e) {
+            // Token is invalid — clear it, but still allow public browsing
             state.ghToken = null;
             localStorage.removeItem('gh_token');
         }
     }
+
+    // Always route and render — public browsing works without login
     state.loading.init = false;
-    window.updateUI(true);
+    window.handleRouting();
 })();
 
 window.onhashchange = window.handleRouting;

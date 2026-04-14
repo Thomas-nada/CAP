@@ -1,193 +1,145 @@
-# Cardano Governance Portal (CAP Portal)
+# CAP Portal — Cardano Constitutional Amendment Portal
 
-A modern, institutional-grade governance platform for managing Cardano Amendment Proposals (CAPs) and Constitutional Information Submissions (CIS).
+A governance platform for managing Cardano Amendment Proposals (CAPs) and Constitutional Information Submissions (CIS). Built with vanilla JavaScript, Tailwind CSS, and GitHub as the backend.
+
+**Live:** https://cap-portal.onrender.com
+
+---
 
 ## Features
 
-- **Amendment Wizard**: Step-by-step guided process for creating CAPs
-- **Constitution Viewer**: Browse and compare different versions of the constitution
-- **Proposal Registry**: Search and filter all governance proposals
-- **Learning Hub**: Educational resources for governance participation
-- **GitHub Integration**: Direct synchronization with GitHub Issues
-- **Dark Mode**: Full dark mode support
+- **Public read-only access** — anyone can browse proposals, view the constitution, and read guides without logging in
+- **GitHub OAuth login** — log in with your GitHub account to submit proposals and add comments
+- **Editor controls** — editors can manage lifecycle stages and signal labels (access managed via `editors.json`)
+- **Proposal Registry** — list and Kanban views with full-text search and filtering
+- **Constitution Viewer** — browse versions and compare diffs; select text to anchor CAP proposals
+- **Amendment Wizard** — step-by-step guided form for creating CAPs and CIS submissions
+- **Learning Hub** — guides and documentation for governance participants
+- **Dark mode** — full light/dark theme support
+
+---
+
+## Authentication
+
+The portal uses **GitHub OAuth** — no Personal Access Tokens required.
+
+- Public visitors can browse everything without logging in
+- Clicking "New CAP" or "Post Comment" prompts login
+- Login redirects through GitHub OAuth and back to the portal automatically
+
+The OAuth token exchange is handled by a small Flask gatekeeper service deployed at `https://cap-portal-auth.onrender.com`. This keeps the GitHub Client Secret server-side.
+
+---
+
+## Editors
+
+Editors have additional controls on proposal detail pages (lifecycle stage management, signal labels, special handling flags).
+
+The list of editors is maintained in **`editors.json`** in the root of the `Thomas-nada/cap` GitHub repo:
+
+```json
+["Thomas-nada", "another-editor"]
+```
+
+To add or remove editors, edit this file directly on GitHub. Changes take effect on the next login.
+
+---
 
 ## Project Structure
 
 ```
 cap-portal/
-├── index.html              # Main HTML entry point
-├── styles.css              # Global styles and custom CSS
-├── CAP.png                 # Logo file
+├── index.html                  # Single-page app entry point
+├── styles.css                  # Global styles
+├── CAP.png                     # Logo
+├── dev-server.py               # Local development server (port 8765)
+├── gatekeeper/
+│   ├── app.py                  # Flask OAuth gatekeeper (deployed to Render)
+│   └── requirements.txt
 ├── js/
-│   ├── app.js              # Main application logic and state management
-│   ├── api.js              # GitHub API integration functions
-│   ├── config.js           # Configuration (GitHub repo, Firebase)
+│   ├── app.js                  # App state, routing, all action handlers
+│   ├── api.js                  # GitHub API wrapper functions
+│   ├── config.js               # Repo owner/name, API base URL
+│   ├── env.js                  # GITHUB_TOKEN = null (OAuth used in production)
 │   └── components/
-│       ├── nav.js          # Navigation component
-│       ├── landing.js      # Landing/login page
-│       ├── dashboard.js    # Dashboard view
-│       ├── registry.js     # Proposal registry with search
-│       ├── wizard.js       # Amendment wizard
-│       ├── constitution.js # Constitution viewer
-│       ├── create.js       # Create proposal form
-│       ├── edit.js         # Edit proposal form
-│       ├── detail.js       # Proposal detail view
-│       └── learn.js        # Learning hub
+│       ├── nav.js              # Navigation bar
+│       ├── landing.js          # Login page (shown before OAuth completes)
+│       ├── dashboard.js        # Home view with stats and activity
+│       ├── registry.js         # Proposal list/kanban registry
+│       ├── kanban.js           # Kanban board view
+│       ├── detail.js           # Proposal detail, comments, editor controls
+│       ├── wizard.js           # Step-by-step proposal creation wizard
+│       ├── create.js           # Direct form-based proposal creation
+│       ├── edit.js             # Edit existing proposals
+│       ├── constitution.js     # Constitution viewer with diff and text selection
+│       └── learn.js            # Guides and learning hub
+├── docs/guides/                # Markdown guide files for the Learn hub
+└── CAPs/                       # CAP document files (CAP-0001/, etc.)
 ```
 
-## Setup Instructions
+---
 
-### 1. Configuration
+## Local Development
 
-Edit `js/config.js` to set your GitHub repository and Firebase credentials:
-
-```javascript
-export const GITHUB_CONFIG = {
-    REPO_OWNER: "your-github-username",
-    REPO_NAME: "your-repo-name",
-    API_BASE: "https://api.github.com"
-};
-
-export const FIREBASE_CONFIG = {
-    apiKey: "your-api-key",
-    authDomain: "your-project.firebaseapp.com",
-    projectId: "your-project-id",
-    // ... other Firebase config
-};
-```
-
-### 2. Local Development
-
-Since this app uses ES6 modules, you need to serve it through a web server (not just opening index.html in a browser).
-
-**Option 1: Python**
 ```bash
-# Python 3
-python -m http.server 8000
-
-# Then open: http://localhost:8000
+python dev-server.py
+# Open: http://localhost:8765
 ```
 
-**Option 2: Node.js (npx)**
-```bash
-npx http-server -p 8000
+The dev server serves the portal and handles ES6 module loading. OAuth login works on localhost because the GitHub OAuth app's callback URLs include `http://localhost:8765`.
 
-# Then open: http://localhost:8000
-```
+> **Note:** The Render free tier gatekeeper sleeps after inactivity. On first login after a period of inactivity, the auth exchange may take 20–30 seconds. The portal shows a "Warming up auth server…" message during this time.
 
-**Option 3: VS Code Live Server**
-- Install the "Live Server" extension
-- Right-click index.html and select "Open with Live Server"
+---
 
-### 3. GitHub Authentication
+## Deployment
 
-The app requires GitHub OAuth authentication. Users will need to:
-1. Click "Authorize via GitHub" on the landing page
-2. Grant the necessary repository permissions
-3. The app will store the access token locally
+The portal is deployed as two Render services:
 
-### 4. Repository Structure
+| Service | Type | URL |
+|---------|------|-----|
+| `cap-portal` | Static site | https://cap-portal.onrender.com |
+| `cap-portal-auth` | Flask web service | https://cap-portal-auth.onrender.com |
 
-Your GitHub repository should have:
-- `constitution/` folder with constitution markdown files
-- `constitution/CAP Constitutions/` folder for CAP preview versions (created automatically)
-- Issues enabled for CAP/CIS proposals
+The gatekeeper requires two environment variables set in Render:
+- `GITHUB_CLIENT_ID`
+- `GITHUB_CLIENT_SECRET`
 
-## Technologies Used
+These come from the GitHub OAuth App registered at https://github.com/settings/developers.
 
-- **Frontend**: Vanilla JavaScript (ES6 modules)
-- **Styling**: Tailwind CSS
-- **Markdown**: Marked.js
-- **Icons**: Lucide Icons
-- **Backend**: Firebase (authentication & logging)
-- **Version Control**: GitHub API & Issues
+---
 
-## Key Components
+## GitHub Repository Setup
 
-### Amendment Wizard (`wizard.js`)
-Guides users through creating a CAP with:
-- Step 1: Basic information (title, category)
-- Step 2: Text selection from constitution
-- Step 3: Proposed revisions
-- Step 4: Abstract and motivation
-- Step 5: Review and submit
+The portal reads from and writes to `Thomas-nada/cap` on GitHub.
 
-### Constitution Viewer (`constitution.js`)
-- View multiple constitution versions
-- Diff mode to compare versions
-- Text selection for creating CAPs
-- Support for CAP preview constitutions
+Required repo structure:
+- Issues enabled (proposals are stored as GitHub Issues)
+- Labels matching the lifecycle stages: `draft`, `submitted`, `review`, `consultation`, `revision`, `finalizing`, `ready`, `onchain`, `done`, `withdrawn`
+- `constitution/` folder with at least one `.md` constitution file
+- `editors.json` in the root listing GitHub usernames who have editor access
 
-### Registry (`registry.js`)
-- Full-text search across proposals
-- Filter by type (CAP/CIS) and status (open/closed)
-- Responsive card-based layout
+---
 
-### Learning Hub (`learn.js`)
-- Educational resources (framework ready)
-- Links to external documentation
-- FAQ section (to be filled)
+## Technologies
 
-## Browser Support
+- **Frontend:** Vanilla JavaScript (ES6 modules), Tailwind CSS, Marked.js, Lucide Icons
+- **Backend:** GitHub REST API + GraphQL, Flask gatekeeper for OAuth
+- **Auth:** GitHub OAuth 2.0 (web flow)
+- **Hosting:** Render (static site + web service)
 
-Modern browsers with ES6 module support:
-- Chrome 61+
-- Firefox 60+
-- Safari 11+
-- Edge 16+
+---
 
 ## Troubleshooting
 
-### White/Blank Page
+**Blank page / module errors:**
+- Must be served over HTTP (not `file://` protocol) — use `python dev-server.py`
+- Clear browser cache and hard-reload (Ctrl+Shift+R)
 
-If you see a white page or the app doesn't load:
+**Login doesn't work:**
+- The gatekeeper may be cold-starting — wait 30 seconds and try again
+- Check browser console for CORS errors; verify `GITHUB_CLIENT_ID` and `GITHUB_CLIENT_SECRET` are set in Render
 
-1. **Check the browser console** (F12) for errors
-2. **Verify you're using a web server** - ES6 modules don't work with `file://` protocol
-3. **Run the diagnostic test**: Open `test.html` in your browser to check all files
-4. **Clear browser cache** and reload
-5. **Disable browser extensions** temporarily (especially wallet extensions)
-
-### Common Issues
-
-**"Failed to load module" errors:**
-- Solution: Make sure you're running a web server, not opening index.html directly
-- Use: `python -m http.server 8000` or similar
-
-**404 errors for .js files:**
-- Check that all files extracted correctly from the zip
-- Verify the directory structure matches the Project Structure section above
-
-**Constitution not loading:**
-- The app will try to load from GitHub first
-- Falls back to local `cardano-constitution.md` file
-- Check `js/config.js` has correct GitHub repo settings
-
-**GitHub authentication fails:**
-- Verify your Firebase configuration in `js/config.js`
-- Check that your GitHub OAuth app is set up correctly
-- Make sure you're accessing via `http://` or `https://`, not `file://`
-
-### CSP (Content Security Policy) Warnings
-
-You may see CSP warnings in the console from browser extensions (Yoroi, Eternl, Nami, etc.). These are normal and don't affect the app's functionality. The warnings are from the extensions trying to inject scripts and can be safely ignored.
-
-### Diagnostic Test
-
-Open `test.html` in your browser to run automated diagnostics that will:
-- Check if all JavaScript files are accessible
-- Verify ES6 module support
-- Test image and CSS loading
-- Display server configuration info
-
-## License
-
-This project is licensed under CC-BY-4.0.
-
-## Contributing
-
-Contributions welcome! Please follow the existing code style and component structure.
-
-## Support
-
-For issues or questions, please open an issue on the GitHub repository.
+**Not showing as editor:**
+- Confirm your GitHub username is listed in `editors.json` in the `Thomas-nada/cap` repo
+- Log out and back in — editor status is resolved at login time

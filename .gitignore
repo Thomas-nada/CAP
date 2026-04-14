@@ -5,8 +5,9 @@ package-lock.json
 # Environment variables
 .env
 .env.local
-# js/env.js is committed with GITHUB_TOKEN = null for production.
-# For local dev, paste your PAT in js/env.js — do NOT commit a real token.
+# js/env.js is committed with GITHUB_TOKEN = null.
+# Production login uses GitHub OAuth (no PAT needed).
+# For local dev, the dev-server.py can inject a token via .env if needed.
 
 # IDE
 .vscode/
