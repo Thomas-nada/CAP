@@ -387,6 +387,33 @@ body {
     margin-right: 380px;
 }
 
+/* ─── Constitution Diff Viewer ─── */
+
+/* Word-level "deleted" highlight (red) */
+mark.diff-del {
+    background-color: #fee2e2;
+    color: #b91c1c;
+    text-decoration: line-through;
+    border-radius: 2px;
+    padding: 0 2px;
+}
+.dark mark.diff-del {
+    background-color: rgba(127, 29, 29, 0.4);
+    color: #fca5a5;
+}
+
+/* Word-level "inserted" highlight (green) */
+mark.diff-ins {
+    background-color: #dcfce7;
+    color: #15803d;
+    border-radius: 2px;
+    padding: 0 2px;
+}
+.dark mark.diff-ins {
+    background-color: rgba(20, 83, 45, 0.4);
+    color: #86efac;
+}
+
 /* line-clamp utility */
 .line-clamp-2 {
     display: -webkit-box;

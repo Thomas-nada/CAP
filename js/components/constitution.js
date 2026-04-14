@@ -401,357 +401,227 @@ function renderSingleView(version) {
         </article>`;
 }
 
+// ─── DIFF ENGINE (paragraph-aware) ─────────────────────────────────────────
+
 /**
- * Renders a side-by-side diff comparison.
- * Default: currentVersion = current constitution (left/baseline),
- *          compareVersion = proposed CAP changes (right/proposed).
- * Diff direction: old = currentVersion, new = compareVersion
- *   → Red  = removed from current constitution
- *   → Green = added by the proposal
+ * Strip metadata, normalize line endings, collapse single newlines within
+ * paragraphs, then return array of non-empty paragraph strings.
+ * This makes the diff immune to different word-wrap widths between files.
+ */
+function normalizeParagraphs(text) {
+    if (!text) return [];
+    // Strip all HTML comment blocks (CAP preview metadata)
+    text = text.replace(/<!--[\s\S]*?-->/g, '');
+    // Normalize line endings
+    text = text.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+    // Split on 2+ blank lines
+    return text.split(/\n{2,}/)
+        .map(p => p.trim()
+            // Filter out pure-separator lines within a paragraph block
+            .replace(/^[=\-*]{3,}$/gm, '')
+            .trim()
+            // Collapse single newlines (word-wrap artifacts) to spaces
+            .replace(/\n/g, ' ')
+            // Collapse runs of whitespace
+            .replace(/\s+/g, ' ')
+        )
+        .filter(p => p.length > 3); // skip trivially short chunks
+}
+
+/**
+ * LCS-based paragraph diff.
+ * Returns array of {type:'equal'|'delete'|'insert', value:string}
+ */
+function diffParagraphs(oldPs, newPs) {
+    const m = oldPs.length, n = newPs.length;
+    // Build LCS table
+    const dp = Array.from({length: m + 1}, () => new Int32Array(n + 1));
+    for (let i = 1; i <= m; i++)
+        for (let j = 1; j <= n; j++)
+            dp[i][j] = oldPs[i-1] === newPs[j-1]
+                ? dp[i-1][j-1] + 1
+                : Math.max(dp[i-1][j], dp[i][j-1]);
+
+    // Backtrack
+    const ops = [];
+    let i = m, j = n;
+    while (i > 0 || j > 0) {
+        if (i > 0 && j > 0 && oldPs[i-1] === newPs[j-1]) {
+            ops.push({type:'equal', value: oldPs[i-1]}); i--; j--;
+        } else if (j > 0 && (i === 0 || dp[i][j-1] >= dp[i-1][j])) {
+            ops.push({type:'insert', value: newPs[j-1]}); j--;
+        } else {
+            ops.push({type:'delete', value: oldPs[i-1]}); i--;
+        }
+    }
+    return ops.reverse();
+}
+
+/**
+ * Word-level diff between two paragraph strings.
+ * Returns {oldHtml, newHtml} with <mark> highlights.
+ */
+function wordLevelDiff(oldText, newText) {
+    // Tokenize preserving spaces so rendered output stays readable
+    const tok = t => t.match(/\S+|\s+/g) || [];
+    const ow = tok(oldText), nw = tok(newText);
+    const m = ow.length, n = nw.length;
+
+    const dp = Array.from({length: m + 1}, () => new Int32Array(n + 1));
+    for (let i = 1; i <= m; i++)
+        for (let j = 1; j <= n; j++)
+            dp[i][j] = ow[i-1] === nw[j-1]
+                ? dp[i-1][j-1] + 1
+                : Math.max(dp[i-1][j], dp[i][j-1]);
+
+    const ops = [];
+    let i = m, j = n;
+    while (i > 0 || j > 0) {
+        if (i > 0 && j > 0 && ow[i-1] === nw[j-1]) {
+            ops.push({t:'eq', v: ow[i-1]}); i--; j--;
+        } else if (j > 0 && (i === 0 || dp[i][j-1] >= dp[i-1][j])) {
+            ops.push({t:'ins', v: nw[j-1]}); j--;
+        } else {
+            ops.push({t:'del', v: ow[i-1]}); i--;
+        }
+    }
+    ops.reverse();
+
+    let oldHtml = '', newHtml = '';
+    for (const op of ops) {
+        const v = escapeHtml(op.v);
+        if (op.t === 'eq')  { oldHtml += v; newHtml += v; }
+        else if (op.t === 'del') oldHtml += `<mark class="diff-del">${v}</mark>`;
+        else                     newHtml += `<mark class="diff-ins">${v}</mark>`;
+    }
+    return {oldHtml, newHtml};
+}
+
+/**
+ * Renders a focused diff — shows only changed paragraphs, not the whole document.
+ * Uses the paragraph-aware engine above so line-wrap differences are invisible.
  */
 function renderDiffView(currentVersion, compareVersion) {
     if (!currentVersion || !compareVersion) {
-        return '<p class="text-slate-400">Please select both versions to compare.</p>';
+        return '<p class="text-slate-400 p-10">Cannot render diff: missing version data.</p>';
     }
 
-    // Diff: old = current constitution (baseline), new = proposed changes
-    const diff = generateDiff(currentVersion.content, compareVersion.content);
+    const oldPs = normalizeParagraphs(currentVersion.content);
+    const newPs = normalizeParagraphs(compareVersion.content);
+    const rawOps = diffParagraphs(oldPs, newPs);
 
-    // Dynamic labels: detect if the compare version is a CAP preview
-    const isCapComparison = compareVersion.isOfficial === false;
-    const leftLabel = currentVersion.isCurrent ? 'Current Constitution' : currentVersion.name;
-    const rightLabel = isCapComparison ? `Proposed — ${compareVersion.name}` : compareVersion.name;
+    // Merge adjacent delete+insert pairs into a single 'modify' op so we can
+    // show a side-by-side word-level diff instead of two separate blocks.
+    const ops = [];
+    for (let k = 0; k < rawOps.length; k++) {
+        if (
+            rawOps[k].type === 'delete' &&
+            k + 1 < rawOps.length &&
+            rawOps[k + 1].type === 'insert'
+        ) {
+            ops.push({ type: 'modify', oldValue: rawOps[k].value, newValue: rawOps[k + 1].value });
+            k++;
+        } else {
+            ops.push(rawOps[k]);
+        }
+    }
+
+    const changes = ops.filter(op => op.type !== 'equal');
+
+    if (changes.length === 0) {
+        return `
+            <div class="bg-white dark:bg-slate-900 p-20 rounded-[4rem] border border-slate-100 dark:border-slate-800 shadow-sm text-center">
+                <div class="w-16 h-16 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <i data-lucide="check-circle" class="w-8 h-8 text-green-500"></i>
+                </div>
+                <p class="text-slate-400 font-bold uppercase tracking-widest text-xs mb-2">No Differences Found</p>
+                <p class="text-slate-500 text-sm">These two versions appear to be identical.</p>
+            </div>`;
+    }
+
+    const nRemoved  = changes.filter(c => c.type === 'delete').length;
+    const nAdded    = changes.filter(c => c.type === 'insert').length;
+    const nModified = changes.filter(c => c.type === 'modify').length;
+
+    const changeBlocks = changes.map((op, idx) => {
+        const label = `Change ${idx + 1} of ${changes.length}`;
+
+        if (op.type === 'modify') {
+            const { oldHtml, newHtml } = wordLevelDiff(op.oldValue, op.newValue);
+            return `
+                <div class="bg-white dark:bg-slate-900 rounded-[2rem] border border-blue-200 dark:border-blue-900/40 shadow-sm overflow-hidden">
+                    <div class="px-6 py-3 bg-blue-50 dark:bg-blue-900/20 border-b border-blue-100 dark:border-blue-900/30 flex items-center gap-2">
+                        <div class="w-2 h-2 bg-blue-500 rounded-full"></div>
+                        <span class="text-[10px] font-black uppercase tracking-widest text-blue-600 dark:text-blue-400">Modified</span>
+                        <span class="text-[10px] text-blue-400 dark:text-blue-500 ml-auto">${label}</span>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-slate-100 dark:divide-slate-800">
+                        <div class="p-6">
+                            <p class="text-[9px] font-black uppercase tracking-widest text-red-400 mb-3">Before (current)</p>
+                            <p class="text-sm leading-relaxed text-slate-700 dark:text-slate-300">${oldHtml}</p>
+                        </div>
+                        <div class="p-6">
+                            <p class="text-[9px] font-black uppercase tracking-widest text-green-500 mb-3">After (proposed)</p>
+                            <p class="text-sm leading-relaxed text-slate-700 dark:text-slate-300">${newHtml}</p>
+                        </div>
+                    </div>
+                </div>`;
+        }
+
+        if (op.type === 'delete') {
+            return `
+                <div class="bg-white dark:bg-slate-900 rounded-[2rem] border border-red-200 dark:border-red-900/40 shadow-sm overflow-hidden">
+                    <div class="px-6 py-3 bg-red-50 dark:bg-red-900/20 border-b border-red-100 dark:border-red-900/30 flex items-center gap-2">
+                        <div class="w-2 h-2 bg-red-500 rounded-full"></div>
+                        <span class="text-[10px] font-black uppercase tracking-widest text-red-600 dark:text-red-400">Removed</span>
+                        <span class="text-[10px] text-red-400 dark:text-red-500 ml-auto">${label}</span>
+                    </div>
+                    <div class="p-6">
+                        <p class="text-[9px] font-black uppercase tracking-widest text-red-400 mb-3">Paragraph removed from current</p>
+                        <p class="text-sm leading-relaxed text-slate-500 dark:text-slate-400 line-through">${escapeHtml(op.value)}</p>
+                    </div>
+                </div>`;
+        }
+
+        // insert
+        return `
+            <div class="bg-white dark:bg-slate-900 rounded-[2rem] border border-green-200 dark:border-green-900/40 shadow-sm overflow-hidden">
+                <div class="px-6 py-3 bg-green-50 dark:bg-green-900/20 border-b border-green-100 dark:border-green-900/30 flex items-center gap-2">
+                    <div class="w-2 h-2 bg-green-500 rounded-full"></div>
+                    <span class="text-[10px] font-black uppercase tracking-widest text-green-600 dark:text-green-400">Added</span>
+                    <span class="text-[10px] text-green-400 dark:text-green-500 ml-auto">${label}</span>
+                </div>
+                <div class="p-6">
+                    <p class="text-[9px] font-black uppercase tracking-widest text-green-500 mb-3">New paragraph in proposed</p>
+                    <p class="text-sm leading-relaxed text-slate-700 dark:text-slate-300">${escapeHtml(op.value)}</p>
+                </div>
+            </div>`;
+    }).join('');
 
     return `
-        <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
-            <!-- Baseline (Current Constitution) -->
-            <div class="bg-white dark:bg-slate-900 rounded-[3rem] border border-slate-100 dark:border-slate-800 shadow-sm overflow-hidden">
-                <div class="p-6 bg-slate-50 dark:bg-slate-800/50 border-b border-slate-100 dark:border-slate-800">
-                    <p class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-1">${currentVersion.isCurrent ? 'Current Constitution' : 'Base Version'}</p>
-                    <p class="text-xl font-black tracking-tight text-slate-900 dark:text-white">${leftLabel}</p>
-                </div>
-                <div class="p-10 prose dark:prose-invert max-w-none text-left leading-relaxed overflow-auto max-h-[800px] no-scrollbar">
-                    ${window.marked.parse(diff.oldContent)}
+        <div class="space-y-6">
+            <!-- Summary bar -->
+            <div class="bg-white dark:bg-slate-900 p-8 rounded-[2.5rem] border border-slate-100 dark:border-slate-800 shadow-sm">
+                <div class="flex flex-wrap items-center gap-4">
+                    <div>
+                        <p class="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">Comparing versions</p>
+                        <p class="text-lg font-black text-slate-900 dark:text-white">
+                            ${escapeHtml(currentVersion.name)}
+                            <span class="text-slate-400 font-normal mx-2">→</span>
+                            ${escapeHtml(compareVersion.name)}
+                        </p>
+                    </div>
+                    <div class="ml-auto flex items-center gap-2 flex-wrap">
+                        ${nRemoved  ? `<span class="px-3 py-1 bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 rounded-full text-xs font-bold">${nRemoved} removed</span>` : ''}
+                        ${nAdded    ? `<span class="px-3 py-1 bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 rounded-full text-xs font-bold">${nAdded} added</span>` : ''}
+                        ${nModified ? `<span class="px-3 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-full text-xs font-bold">${nModified} modified</span>` : ''}
+                    </div>
                 </div>
             </div>
 
-            <!-- Proposed Changes -->
-            <div class="bg-white dark:bg-slate-900 rounded-[3rem] border border-slate-100 dark:border-slate-800 shadow-sm overflow-hidden">
-                <div class="p-6 bg-blue-50 dark:bg-blue-900/20 border-b border-blue-100 dark:border-blue-900/30">
-                    <p class="text-[10px] font-black uppercase tracking-[0.2em] text-blue-600 mb-1">${isCapComparison ? 'Proposed Changes' : 'Compare Version'}</p>
-                    <p class="text-xl font-black tracking-tight text-slate-900 dark:text-white">${rightLabel}</p>
-                </div>
-                <div class="p-10 prose dark:prose-invert max-w-none text-left leading-relaxed overflow-auto max-h-[800px] no-scrollbar">
-                    ${window.marked.parse(diff.newContent)}
-                </div>
-            </div>
-        </div>
-
-        <!-- Unified Diff View -->
-        <div class="mt-6 bg-white dark:bg-slate-900 p-10 rounded-[3rem] border border-slate-100 dark:border-slate-800 shadow-sm">
-            <div class="flex items-center gap-4 mb-8">
-                <div class="w-10 h-10 bg-amber-500 rounded-xl flex items-center justify-center text-white">
-                    <i data-lucide="list" class="w-5 h-5"></i>
-                </div>
-                <h3 class="text-2xl font-black italic tracking-tighter text-slate-900 dark:text-white uppercase">Unified Changes</h3>
-            </div>
-            <div class="prose dark:prose-invert max-w-none text-left leading-relaxed">
-                ${diff.unified}
-            </div>
+            <!-- Individual change blocks -->
+            ${changeBlocks}
         </div>`;
-}
-
-/**
- * Generates a smart diff between two texts using a sequence matching algorithm
- */
-function generateDiff(oldText, newText) {
-    // Remove CAP preview headers and footers before diffing
-    const cleanText = (text) => {
-        // Remove the CAP preview header comment
-        text = text.replace(/<!--\s*CAP-\d+\s+PREVIEW.*?-->/is, '');
-        
-        // Remove the Changes Summary section and footer comment
-        text = text.replace(/##\s+CAP-\d+\s+Changes Summary[\s\S]*?<!--\s*GENERATION SUMMARY[\s\S]*?-->/i, '');
-        
-        // Clean up any extra whitespace at start/end
-        return text.trim();
-    };
-    
-    const cleanOldText = cleanText(oldText);
-    const cleanNewText = cleanText(newText);
-    
-    const oldLines = cleanOldText.split('\n');
-    const newLines = cleanNewText.split('\n');
-    
-    // Use a simple longest common subsequence approach to find matching lines
-    const diff = computeLineDiff(oldLines, newLines);
-    
-    let oldContent = '';
-    let newContent = '';
-    let unified = '';
-    
-    for (const change of diff) {
-        if (change.type === 'equal') {
-            // Unchanged line - show in both
-            const line = change.value;
-            oldContent += line + '\n';
-            newContent += line + '\n';
-            unified += `<div class="p-2 my-1 rounded">${escapeHtml(line || ' ')}</div>`;
-        } else if (change.type === 'delete') {
-            // Removed line
-            const line = change.value;
-            if (change.isPartial) {
-                // Character-level diff - line contains HTML markup
-                oldContent += `<span style="background-color: rgba(239, 68, 68, 0.2); padding: 2px 4px; border-radius: 4px; text-decoration: line-through;">${line}</span>\n`;
-            } else {
-                oldContent += `<span style="background-color: rgba(239, 68, 68, 0.2); padding: 2px 4px; border-radius: 4px; text-decoration: line-through;">${escapeHtml(line)}</span>\n`;
-            }
-            if (!change.isPartial) {
-                unified += `<div class="p-2 my-1 rounded bg-red-50 dark:bg-red-900/20 border-l-4 border-red-500"><span class="text-red-600 dark:text-red-400 line-through">− ${escapeHtml(line)}</span></div>`;
-            }
-        } else if (change.type === 'insert') {
-            // Added line
-            const line = change.value;
-            if (change.isPartial) {
-                // Character-level diff - line contains HTML markup
-                newContent += `<span style="background-color: rgba(34, 197, 94, 0.2); padding: 2px 4px; border-radius: 4px;">${line}</span>\n`;
-            } else {
-                newContent += `<span style="background-color: rgba(34, 197, 94, 0.2); padding: 2px 4px; border-radius: 4px;">${escapeHtml(line)}</span>\n`;
-            }
-            if (!change.isPartial) {
-                unified += `<div class="p-2 my-1 rounded bg-green-50 dark:bg-green-900/20 border-l-4 border-green-500"><span class="text-green-600 dark:text-green-400">+ ${escapeHtml(line)}</span></div>`;
-            }
-        }
-    }
-    
-    return { oldContent, newContent, unified };
-}
-
-/**
- * Computes line-by-line diff using a smarter matching algorithm
- * Matches lines that appear in both documents to handle additions/deletions better
- */
-function computeLineDiff(oldLines, newLines) {
-    // Create maps of line content to indices for faster matching
-    const oldLineMap = {};
-    const newLineMap = {};
-    
-    oldLines.forEach((line, idx) => {
-        if (!oldLineMap[line]) oldLineMap[line] = [];
-        oldLineMap[line].push(idx);
-    });
-    
-    newLines.forEach((line, idx) => {
-        if (!newLineMap[line]) newLineMap[line] = [];
-        newLineMap[line].push(idx);
-    });
-    
-    const result = [];
-    const matchedOldIndices = new Set();
-    const matchedNewIndices = new Set();
-    
-    // First pass: mark all exact matches
-    for (let i = 0; i < oldLines.length; i++) {
-        const line = oldLines[i];
-        if (newLineMap[line] && newLineMap[line].length > 0) {
-            // Find an unmatched occurrence in newLines
-            const newIdx = newLineMap[line].find(idx => !matchedNewIndices.has(idx));
-            if (newIdx !== undefined) {
-                matchedOldIndices.add(i);
-                matchedNewIndices.add(newIdx);
-            }
-        }
-    }
-    
-    // Second pass: build the diff result
-    let oldIdx = 0;
-    let newIdx = 0;
-    
-    while (oldIdx < oldLines.length || newIdx < newLines.length) {
-        if (oldIdx < oldLines.length && newIdx < newLines.length && 
-            oldLines[oldIdx] === newLines[newIdx]) {
-            // Exact match - no highlighting needed
-            result.push({ type: 'equal', value: oldLines[oldIdx] });
-            oldIdx++;
-            newIdx++;
-        } else if (oldIdx < oldLines.length && newIdx < newLines.length && 
-                   matchedOldIndices.has(oldIdx) && matchedNewIndices.has(newIdx) &&
-                   oldLines[oldIdx] !== newLines[newIdx]) {
-            // Both are marked as having matches elsewhere, but different here
-            // This is a modified line - do character-level diff
-            const delLine = oldLines[oldIdx];
-            const insLine = newLines[newIdx];
-            const charDiff = getCharacterDiff(delLine, insLine);
-            result.push({ type: 'delete', value: charDiff.old, isPartial: true });
-            result.push({ type: 'insert', value: charDiff.new, isPartial: true });
-            oldIdx++;
-            newIdx++;
-        } else if (oldIdx < oldLines.length && newIdx < newLines.length &&
-                   !matchedOldIndices.has(oldIdx) && !matchedNewIndices.has(newIdx)) {
-            // Both have unmatched lines at same position - might be a modification
-            const delLine = oldLines[oldIdx];
-            const insLine = newLines[newIdx];
-            const similarity = getLineSimilarity(delLine, insLine);
-            
-            if (similarity > 0.6) {
-                // Similar enough to show character-level diff
-                const charDiff = getCharacterDiff(delLine, insLine);
-                result.push({ type: 'delete', value: charDiff.old, isPartial: true });
-                result.push({ type: 'insert', value: charDiff.new, isPartial: true });
-            } else {
-                result.push({ type: 'delete', value: delLine });
-                result.push({ type: 'insert', value: insLine });
-            }
-            oldIdx++;
-            newIdx++;
-        } else if (oldIdx < oldLines.length && 
-                   (!matchedOldIndices.has(oldIdx) || newIdx >= newLines.length)) {
-            // Unmatched old line (deletion)
-            result.push({ type: 'delete', value: oldLines[oldIdx] });
-            oldIdx++;
-        } else if (newIdx < newLines.length &&
-                   (!matchedNewIndices.has(newIdx) || oldIdx >= oldLines.length)) {
-            // Unmatched new line (insertion)
-            result.push({ type: 'insert', value: newLines[newIdx] });
-            newIdx++;
-        } else {
-            // Shouldn't reach here, but safety check
-            oldIdx++;
-            newIdx++;
-        }
-    }
-    
-    return result;
-}
-
-/**
- * Calculates similarity between two lines (0-1)
- */
-function getLineSimilarity(str1, str2) {
-    const longer = str1.length > str2.length ? str1 : str2;
-    const shorter = str1.length > str2.length ? str2 : str1;
-    
-    if (longer.length === 0) return 1.0;
-    
-    const editDistance = getEditDistance(longer, shorter);
-    return (longer.length - editDistance) / longer.length;
-}
-
-/**
- * Calculates Levenshtein distance between two strings
- */
-function getEditDistance(s1, s2) {
-    const costs = [];
-    for (let i = 0; i <= s1.length; i++) {
-        let lastValue = i;
-        for (let j = 0; j <= s2.length; j++) {
-            if (i === 0) {
-                costs[j] = j;
-            } else if (j > 0) {
-                let newValue = costs[j - 1];
-                if (s1.charAt(i - 1) !== s2.charAt(j - 1)) {
-                    newValue = Math.min(Math.min(newValue, lastValue), costs[j]) + 1;
-                }
-                costs[j - 1] = lastValue;
-                lastValue = newValue;
-            }
-        }
-        if (i > 0) costs[s2.length] = lastValue;
-    }
-    return costs[s2.length];
-}
-
-/**
- * Performs character-level diff between two similar lines
- */
-function getCharacterDiff(oldLine, newLine) {
-    const oldChars = oldLine.split('');
-    const newChars = newLine.split('');
-    
-    // Simple character-level diff using LCS
-    let oldDiffStr = '';
-    let newDiffStr = '';
-    
-    let i = 0, j = 0;
-    while (i < oldChars.length || j < newChars.length) {
-        if (i < oldChars.length && j < newChars.length && oldChars[i] === newChars[j]) {
-            oldDiffStr += oldChars[i];
-            newDiffStr += newChars[j];
-            i++;
-            j++;
-        } else if (i < oldChars.length && j < newChars.length) {
-            // Look ahead to find better matches
-            let foundMatch = false;
-            for (let ii = i + 1; ii < Math.min(i + 20, oldChars.length); ii++) {
-                for (let jj = j + 1; jj < Math.min(j + 20, newChars.length); jj++) {
-                    if (oldChars[ii] === newChars[jj]) {
-                        // Found a match ahead
-                        while (i < ii) {
-                            oldDiffStr += `<span style="background-color: rgba(239, 68, 68, 0.3);">${escapeHtml(oldChars[i])}</span>`;
-                            i++;
-                        }
-                        while (j < jj) {
-                            newDiffStr += `<span style="background-color: rgba(34, 197, 94, 0.3);">${escapeHtml(newChars[j])}</span>`;
-                            j++;
-                        }
-                        foundMatch = true;
-                        break;
-                    }
-                }
-                if (foundMatch) break;
-            }
-            if (!foundMatch) {
-                if (i < oldChars.length) {
-                    oldDiffStr += `<span style="background-color: rgba(239, 68, 68, 0.5);">${escapeHtml(oldChars[i])}</span>`;
-                    i++;
-                }
-                if (j < newChars.length) {
-                    newDiffStr += `<span style="background-color: rgba(34, 197, 94, 0.5);">${escapeHtml(newChars[j])}</span>`;
-                    j++;
-                }
-            }
-        } else if (i < oldChars.length) {
-            oldDiffStr += `<span style="background-color: rgba(239, 68, 68, 0.5);">${escapeHtml(oldChars[i])}</span>`;
-            i++;
-        } else {
-            newDiffStr += `<span style="background-color: rgba(34, 197, 94, 0.5);">${escapeHtml(newChars[j])}</span>`;
-            j++;
-        }
-    }
-    
-    return { old: oldDiffStr, new: newDiffStr };
-}
-
-/**
- * Simple longest common subsequence algorithm
- */
-function getLCS(oldLines, newLines) {
-    // Create a map of line values to indices in newLines
-    const newLineMap = {};
-    newLines.forEach((line, idx) => {
-        if (!newLineMap[line]) newLineMap[line] = [];
-        newLineMap[line].push(idx);
-    });
-    
-    // Find longest subsequence
-    const lcs = [];
-    let lastNewIdx = -1;
-    
-    for (let oldIdx = 0; oldIdx < oldLines.length; oldIdx++) {
-        const oldLine = oldLines[oldIdx];
-        const newIndices = newLineMap[oldLine] || [];
-        
-        // Find the closest matching line in newLines after the last match
-        for (const newIdx of newIndices) {
-            if (newIdx > lastNewIdx) {
-                lcs.push(oldLine);
-                lastNewIdx = newIdx;
-                break;
-            }
-        }
-    }
-    
-    return lcs;
 }
 
 function escapeHtml(text) {
