@@ -279,10 +279,56 @@ export function renderDetail(state) {
                     </div>
 
                     <!-- Author Administration Card -->
-                    ${isAuthor ? `
+                    ${isAuthor ? (() => {
+                        const lifecycleLabels = ['draft','submitted','review','consultation','revision','finalizing','ready','onchain','done','withdrawn'];
+                        const currentStage = p.labels.map(l => l.name).find(n => lifecycleLabels.includes(n)) || null;
+                        const editorOkNow = p.labels.some(l => l.name === 'editor-ok');
+                        const editorOkEver = state.proposalEvents?.some(e => e.event === 'labeled' && e.label?.name === 'editor-ok') || false;
+                        const editorConcernNow = p.labels.some(l => l.name === 'editor-concern');
+
+                        // Author-permitted forward transitions
+                        const authorTransitions = {
+                            'draft':    { to: 'submitted',    label: 'Submit for Editor Review', icon: 'send',        color: 'blue' },
+                            'revision': { to: 'consultation', label: 'Resubmit after Revisions', icon: 'rotate-ccw',  color: 'orange' },
+                            'ready':    { to: 'onchain',      label: 'Submit On-Chain',          icon: 'link',        color: 'indigo' },
+                        };
+                        const nextTransition = currentStage ? authorTransitions[currentStage] : null;
+
+                        // Editor review status badge
+                        const reviewStatus = editorOkNow
+                            ? { icon: 'check-circle', text: 'Editor approved',       cls: 'bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400 border-green-200 dark:border-green-800/40' }
+                            : editorConcernNow
+                            ? { icon: 'alert-circle', text: 'Editor has concerns',   cls: 'bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400 border-red-200 dark:border-red-800/40' }
+                            : editorOkEver
+                            ? { icon: 'check-circle', text: 'Editor approved (previously)', cls: 'bg-slate-50 dark:bg-slate-800 text-slate-500 dark:text-slate-400 border-slate-200 dark:border-slate-700' }
+                            : { icon: 'clock',        text: 'No editor review yet',  cls: 'bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-400 border-amber-200 dark:border-amber-800/40' };
+
+                        return `
                         <div class="bg-white dark:bg-slate-900 p-8 rounded-[2.5rem] border-2 border-blue-100 dark:border-blue-900/20 shadow-xl space-y-6">
                             <h3 class="text-[10px] font-black uppercase tracking-[0.2em] text-blue-600">Author Controls</h3>
+
+                            <!-- Editor Review Status -->
+                            <div class="flex items-center gap-2.5 px-4 py-3 rounded-2xl border text-[10px] font-bold ${reviewStatus.cls}">
+                                <i data-lucide="${reviewStatus.icon}" class="w-3.5 h-3.5 flex-shrink-0"></i>
+                                <span>${reviewStatus.text}</span>
+                            </div>
+
                             <div class="space-y-3">
+                                <!-- Stage advance button (context-aware) -->
+                                ${nextTransition ? `
+                                <button onclick="window.authorAdvanceStage('${nextTransition.to}')"
+                                    class="w-full flex items-center justify-between p-5 rounded-2xl bg-${nextTransition.color}-50 dark:bg-${nextTransition.color}-900/10 hover:bg-${nextTransition.color}-100 dark:hover:bg-${nextTransition.color}-900/20 transition-all group border border-${nextTransition.color}-100 dark:border-${nextTransition.color}-900/20">
+                                    <div class="flex items-center gap-3">
+                                        <i data-lucide="${nextTransition.icon}" class="w-4 h-4 text-${nextTransition.color}-600"></i>
+                                        <div>
+                                            <span class="text-xs font-bold text-${nextTransition.color}-600 block">${nextTransition.label}</span>
+                                            <span class="text-[9px] text-${nextTransition.color}-400">Recorded in proposal history</span>
+                                        </div>
+                                    </div>
+                                    <i data-lucide="chevron-right" class="w-4 h-4 text-${nextTransition.color}-300 group-hover:translate-x-1 transition-transform"></i>
+                                </button>
+                                ` : ''}
+
                                 <button onclick="window.startEdit()" class="w-full flex items-center justify-between p-5 rounded-2xl bg-blue-50 dark:bg-blue-900/10 hover:bg-blue-100 dark:hover:bg-blue-900/20 transition-all group">
                                     <div class="flex items-center gap-3">
                                         <i data-lucide="edit-3" class="w-4 h-4 text-blue-600"></i>
@@ -291,10 +337,13 @@ export function renderDetail(state) {
                                     <i data-lucide="chevron-right" class="w-4 h-4 text-blue-300 group-hover:translate-x-1 transition-transform"></i>
                                 </button>
 
-                                <button onclick="window.closeProposal(${p.number})" class="w-full flex items-center justify-between p-5 rounded-2xl bg-slate-50 dark:bg-slate-950 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all group border border-slate-100 dark:border-slate-800">
+                                <button onclick="window.authorWithdraw()" class="w-full flex items-center justify-between p-5 rounded-2xl bg-slate-50 dark:bg-slate-950 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all group border border-slate-100 dark:border-slate-800">
                                     <div class="flex items-center gap-3">
-                                        <i data-lucide="archive" class="w-4 h-4 text-slate-400 group-hover:text-slate-900 transition-colors"></i>
-                                        <span class="text-xs font-bold text-slate-600 dark:text-slate-400">Close Proposal</span>
+                                        <i data-lucide="x-circle" class="w-4 h-4 text-slate-400 group-hover:text-slate-900 transition-colors"></i>
+                                        <div>
+                                            <span class="text-xs font-bold text-slate-600 dark:text-slate-400 block">Withdraw Proposal</span>
+                                            <span class="text-[9px] text-slate-400">Closes and marks as withdrawn</span>
+                                        </div>
                                     </div>
                                     <i data-lucide="chevron-right" class="w-4 h-4 text-slate-300"></i>
                                 </button>
@@ -307,8 +356,12 @@ export function renderDetail(state) {
                                     <i data-lucide="alert-triangle" class="w-4 h-4 text-red-300"></i>
                                 </button>
                             </div>
-                        </div>
-                    ` : ''}
+
+                            <p class="text-[9px] text-slate-400 leading-relaxed">
+                                As author you may advance your proposal at any time, regardless of editor review status. All stage changes are permanently recorded in the audit trail above.
+                            </p>
+                        </div>`;
+                    })() : ''}
 
                     ${isEditor ? (() => {
                         const labels = p.labels.map(l => l.name);
@@ -421,18 +474,57 @@ function getEventDetails(event) {
         extUrl: ''
     };
 
-    const phaseLabels = ['Review', 'Proposed', 'Final', 'Draft', 'Deliberation-Period'];
+    const lifecycleLabels = ['draft','submitted','review','consultation','revision','finalizing','ready','onchain','done','withdrawn'];
+    const editorSignalLabels = ['editor-ok','editor-concern','editor-suggested'];
 
     switch (type) {
-        case 'labeled':
+        case 'labeled': {
             const label = event.label?.name;
-            details.icon = phaseLabels.includes(label) ? 'award' : 'tag';
-            details.color = phaseLabels.includes(label) ? 'text-blue-600' : 'text-blue-500';
-            details.message = phaseLabels.includes(label) 
-                ? `Proposal Advanced: <span class="font-black text-blue-600 underline">${label}</span>`
-                : `Metadata Assigned: <span class="font-bold">${label}</span>`;
-            details.fullDescription = `This proposal has been labeled as **"${label}"**. Labels help organize and track different stages of proposals.`;
+            if (lifecycleLabels.includes(label)) {
+                details.icon = 'arrow-right-circle';
+                details.color = 'text-blue-600';
+                details.message = `Stage → <span class="font-black text-blue-600 uppercase">${label}</span>`;
+                details.fullDescription = `This proposal was moved to the **"${label}"** stage by **${event.actor?.login || 'unknown'}**.`;
+            } else if (editorSignalLabels.includes(label)) {
+                const sigConf = {
+                    'editor-ok':        { icon: 'check-circle', color: 'text-green-600', msg: 'Editor Review: ✅ Approved' },
+                    'editor-concern':   { icon: 'alert-circle',  color: 'text-red-500',   msg: 'Editor Review: ⚠️ Concern Raised' },
+                    'editor-suggested': { icon: 'lightbulb',     color: 'text-amber-500', msg: 'Editor Review: 💡 Revision Suggested' },
+                };
+                const sc = sigConf[label];
+                details.icon = sc.icon;
+                details.color = sc.color;
+                details.message = sc.msg;
+                details.fullDescription = `**${event.actor?.login || 'An editor'}** applied the **"${label}"** signal to this proposal.`;
+            } else {
+                details.icon = 'tag';
+                details.color = 'text-slate-500';
+                details.message = `Label Added: <span class="font-bold">${label}</span>`;
+                details.fullDescription = `The label **"${label}"** was applied by **${event.actor?.login || 'unknown'}**.`;
+            }
             break;
+        }
+
+        case 'unlabeled': {
+            const label = event.label?.name;
+            if (lifecycleLabels.includes(label)) {
+                details.icon = 'minus-circle';
+                details.color = 'text-slate-400';
+                details.message = `Stage Label Removed: <span class="font-bold text-slate-500">${label}</span>`;
+                details.fullDescription = `The **"${label}"** stage label was removed by **${event.actor?.login || 'unknown'}**. This typically happens when the proposal is moved to a different stage.`;
+            } else if (editorSignalLabels.includes(label)) {
+                details.icon = 'x-circle';
+                details.color = 'text-orange-400';
+                details.message = `Editor Signal Cleared: <span class="font-bold">${label}</span>`;
+                details.fullDescription = `The editor signal **"${label}"** was removed by **${event.actor?.login || 'unknown'}**.`;
+            } else {
+                details.icon = 'x';
+                details.color = 'text-slate-400';
+                details.message = `Label Removed: <span class="font-bold">${label}</span>`;
+                details.fullDescription = `The label **"${label}"** was removed by **${event.actor?.login || 'unknown'}**.`;
+            }
+            break;
+        }
 
         case 'commented':
             const body = event.comment?.body || '';

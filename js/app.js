@@ -25,7 +25,7 @@ import {
 import { renderNav } from './components/nav.js?v=3';
 import { renderDashboard } from './components/dashboard.js';
 import { renderRegistry } from './components/registry.js?v=4';
-import { renderDetail } from './components/detail.js?v=3';
+import { renderDetail } from './components/detail.js?v=4';
 import { renderCreate } from './components/create.js';
 import { renderEdit } from './components/edit.js';
 import { renderConstitution } from './components/constitution.js?v=3';
@@ -1019,6 +1019,76 @@ window.deleteProposal = async (n) => {
         await deleteIssue(n, state.ghToken);
         window.location.hash = '#/registry';
     } catch (e) { state.error = e.message; }
+};
+
+// --- Author Stage Advance ---
+
+// Stages an author is permitted to advance to on their own proposal.
+const AUTHOR_PERMITTED_TRANSITIONS = {
+    'draft':    'submitted',
+    'revision': 'consultation',
+    'ready':    'onchain',
+};
+
+window.authorAdvanceStage = async (targetStage) => {
+    if (!state.ghToken || !state.currentProposal) return;
+    const isAuthor = state.ghUser?.login === state.currentProposal.user.login;
+    if (!isAuthor) return;
+
+    const current = state.currentProposal.labels.find(l => LIFECYCLE_LABELS.includes(l.name))?.name || 'none';
+    const permitted = AUTHOR_PERMITTED_TRANSITIONS[current];
+    if (permitted !== targetStage) {
+        window.showToast('Not Permitted', `Authors cannot move from "${current}" to "${targetStage}".`, 'error');
+        return;
+    }
+
+    const confirmMsg = targetStage === 'submitted'
+        ? `Submit this proposal for editorial review?\n\nNote: Editors have not yet reviewed this proposal. You can submit at any time — this will be recorded in the proposal history.`
+        : targetStage === 'consultation'
+        ? `Resubmit this proposal for consultation after revisions?`
+        : `Mark this proposal as submitted on-chain?`;
+
+    if (!confirm(confirmMsg)) return;
+
+    const number = state.currentProposal.number;
+    const token = state.ghToken;
+    try {
+        const existing = state.currentProposal.labels.map(l => l.name);
+        for (const lbl of LIFECYCLE_LABELS) {
+            if (existing.includes(lbl)) await removeLabel(number, lbl, token);
+        }
+        await addLabel(number, targetStage, token);
+        state.currentProposal = await fetchProposalDetail(number, token);
+        state.proposalEvents = await fetchProposalEvents(number, token);
+        updateUI(true);
+        window.showToast('Stage Updated', `Your proposal is now: ${targetStage}`, 'success');
+    } catch (e) {
+        window.showToast('Error', e.message, 'error');
+    }
+};
+
+window.authorWithdraw = async () => {
+    if (!state.ghToken || !state.currentProposal) return;
+    const isAuthor = state.ghUser?.login === state.currentProposal.user.login;
+    if (!isAuthor) return;
+    if (!confirm('Withdraw this proposal? This marks it as withdrawn and closes the issue. This is recorded in the proposal history.')) return;
+
+    const number = state.currentProposal.number;
+    const token = state.ghToken;
+    try {
+        const existing = state.currentProposal.labels.map(l => l.name);
+        for (const lbl of LIFECYCLE_LABELS) {
+            if (existing.includes(lbl)) await removeLabel(number, lbl, token);
+        }
+        await addLabel(number, 'withdrawn', token);
+        await updateIssueState(number, 'closed', token);
+        state.currentProposal = await fetchProposalDetail(number, token);
+        state.proposalEvents = await fetchProposalEvents(number, token);
+        updateUI(true);
+        window.showToast('Proposal Withdrawn', 'Marked as withdrawn and closed.', 'info');
+    } catch (e) {
+        window.showToast('Error', e.message, 'error');
+    }
 };
 
 // --- Editor Actions ---
