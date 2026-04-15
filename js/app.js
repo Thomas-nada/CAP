@@ -22,16 +22,16 @@ import {
 } from './api.js?v=5';
 
 // Import UI Components
-import { renderNav } from './components/nav.js?v=3';
-import { renderDashboard } from './components/dashboard.js';
-import { renderRegistry } from './components/registry.js?v=4';
-import { renderDetail } from './components/detail.js?v=4';
-import { renderCreate } from './components/create.js';
-import { renderEdit } from './components/edit.js';
-import { renderConstitution } from './components/constitution.js?v=3';
-import { renderWizard } from './components/wizard.js';
-import { renderLearnHub } from './components/learn.js';
-import { initKanbanHandlers } from './components/kanban.js?v=6';
+import { renderNav } from './components/nav.js?v=4';
+import { renderDashboard } from './components/dashboard.js?v=2';
+import { renderRegistry } from './components/registry.js?v=5';
+import { renderDetail } from './components/detail.js?v=5';
+import { renderCreate } from './components/create.js?v=2';
+import { renderEdit } from './components/edit.js?v=2';
+import { renderConstitution } from './components/constitution.js?v=4';
+import { renderWizard } from './components/wizard.js?v=2';
+import { renderLearnHub } from './components/learn.js?v=2';
+import { initKanbanHandlers } from './components/kanban.js?v=7';
 
 
 // --- Toast Notification System ---
