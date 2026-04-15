@@ -48,7 +48,7 @@ See the [Creating a CAP or CIS via GitHub](creating-a-cap) guide or use the [CAP
 
 ### Submit a CAP
 
-If you have a specific proposal to change or clarify the Constitution, submit a Cardano Amendment Proposal (CAP). The portal's Amendment Wizard guides you through the process step by step, including selecting the exact constitutional text you want to change.
+If you have a specific proposal to change or clarify the Constitution, submit a Constitutional Amendment Proposal (CAP). The portal's Amendment Wizard guides you through the process step by step, including selecting the exact constitutional text you want to change.
 
 ---
 

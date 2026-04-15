@@ -1,6 +1,6 @@
 # What is a CAP?
 
-A **Cardano Amendment Proposal (CAP)** is a formal governance document that proposes a specific change, clarification, or addition to the Cardano Constitution or its governance processes.
+A **Constitutional Amendment Proposal (CAP)** is a formal governance document that proposes a specific change, clarification, or addition to the Cardano Constitution or its governance processes.
 
 ---
 

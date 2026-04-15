@@ -1,6 +1,6 @@
 # CAP Portal — Cardano Constitutional Amendment Portal
 
-A governance platform for managing Cardano Amendment Proposals (CAPs) and Constitutional Information Submissions (CIS). Built with vanilla JavaScript, Tailwind CSS, and GitHub as the backend.
+A governance platform for managing Constitutional Amendment Proposals (CAPs) and Constitutional Information Submissions (CIS). Built with vanilla JavaScript, Tailwind CSS, and GitHub as the backend.
 
 **Live:** https://cap-portal.onrender.com
 

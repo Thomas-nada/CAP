@@ -1,6 +1,6 @@
 # Creating a CAP or CIS via GitHub
 
-You can submit a Cardano Amendment Proposal (CAP) or Constitution Issue Statement (CIS) directly through GitHub Issues — no portal required. This guide walks you through the process step by step.
+You can submit a Constitutional Amendment Proposal (CAP) or Constitution Issue Statement (CIS) directly through GitHub Issues — no portal required. This guide walks you through the process step by step.
 
 ---
 

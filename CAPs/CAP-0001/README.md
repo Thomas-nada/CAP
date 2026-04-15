@@ -18,7 +18,7 @@ License: "CC-BY-4.0"
 
 ## Abstract
 
-A Cardano Amendment Proposal (CAP) is the standard document and workflow for proposing amendments to Cardano governance artifacts, especially constitutional text and related governance rules. This CAP defines the current submission and review process as implemented today: CAPs are opened as GitHub Issues, labeled and discussed in public, and optionally prepared through a dedicated submission tool that publishes the same issue format. The process is designed to maximize transparency, traceability, and broad review before any ratification step.
+A Constitutional Amendment Proposal (CAP) is the standard document and workflow for proposing amendments to Cardano governance artifacts, especially constitutional text and related governance rules. This CAP defines the current submission and review process as implemented today: CAPs are opened as GitHub Issues, labeled and discussed in public, and optionally prepared through a dedicated submission tool that publishes the same issue format. The process is designed to maximize transparency, traceability, and broad review before any ratification step.
 
 ---
 

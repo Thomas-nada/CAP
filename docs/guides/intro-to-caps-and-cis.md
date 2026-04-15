@@ -1,12 +1,12 @@
 # Introduction to CAPs and CISs
 
-Cardano's Constitution can evolve. Two document types exist to support that evolution in a structured, transparent, and community-driven way: **Cardano Amendment Proposals (CAPs)** and **Constitution Issue Statements (CISs)**.
+Cardano's Constitution can evolve. Two document types exist to support that evolution in a structured, transparent, and community-driven way: **Constitutional Amendment Proposals (CAPs)** and **Constitution Issue Statements (CISs)**.
 
 ---
 
 ## What is a CAP?
 
-A **Cardano Amendment Proposal (CAP)** is a formal governance document that proposes a specific change, clarification, or addition to the Cardano Constitution or its governance processes.
+A **Constitutional Amendment Proposal (CAP)** is a formal governance document that proposes a specific change, clarification, or addition to the Cardano Constitution or its governance processes.
 
 A CAP is:
 - **Specific** — it proposes exact changes to exact constitutional text

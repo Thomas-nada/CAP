@@ -185,7 +185,7 @@ function renderStep1Type(wizard) {
                 </div>
                 <p class="text-sm text-slate-500 mt-3">
                     ${wizard.type === 'CAP' ? 
-                        '<strong>CAP (Constitution Amendment Proposal):</strong> Proposes specific changes to the constitution text.' : 
+                        '<strong>CAP (Constitutional Amendment Proposal):</strong> Proposes specific changes to the constitution text.' : 
                         '<strong>CIS (Constitutional Issue Statement):</strong> Identifies a problem without proposing specific changes.'}
                 </p>
             </div>
