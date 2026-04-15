@@ -35,6 +35,6 @@ This structure ensures proposals are precise, justifiable, and actionable.
 
 ## How it relates to a CIS
 
-A **Constitution Issue Statement (CIS)** defines a constitutional problem. A CAP proposes the fix. If you have spotted an ambiguity or governance gap but are unsure how to address it, a CIS is the right starting point.
+A **Constitutional Issue Statement (CIS)** defines a constitutional problem. A CAP proposes the fix. If you have spotted an ambiguity or governance gap but are unsure how to address it, a CIS is the right starting point.
 
 See [Introduction to CAPs and CISs](intro-to-caps-and-cis) for the full picture.

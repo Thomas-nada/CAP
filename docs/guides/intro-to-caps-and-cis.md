@@ -1,6 +1,6 @@
 # Introduction to CAPs and CISs
 
-Cardano's Constitution can evolve. Two document types exist to support that evolution in a structured, transparent, and community-driven way: **Constitutional Amendment Proposals (CAPs)** and **Constitution Issue Statements (CISs)**.
+Cardano's Constitution can evolve. Two document types exist to support that evolution in a structured, transparent, and community-driven way: **Constitutional Amendment Proposals (CAPs)** and **Constitutional Issue Statements (CISs)**.
 
 ---
 
@@ -20,7 +20,7 @@ A CAP does **not** itself enact a constitutional change. It is the formal commun
 
 ## What is a CIS?
 
-A **Constitution Issue Statement (CIS)** is a formal document that defines a constitutional problem — an ambiguity, procedural gap, or governance risk — without proposing a specific solution.
+A **Constitutional Issue Statement (CIS)** is a formal document that defines a constitutional problem — an ambiguity, procedural gap, or governance risk — without proposing a specific solution.
 
 A CIS is:
 - **Problem-focused** — it articulates what is wrong or unclear, not how to fix it

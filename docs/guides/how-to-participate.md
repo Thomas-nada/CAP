@@ -40,7 +40,7 @@ If you want to signal support or concern without writing a full comment, use Git
 
 ### Submit a CIS
 
-If you have identified a constitutional problem, ambiguity, or governance gap but aren't ready to propose a specific fix, submit a Constitution Issue Statement (CIS). This formally documents the problem and opens it for community discussion.
+If you have identified a constitutional problem, ambiguity, or governance gap but aren't ready to propose a specific fix, submit a Constitutional Issue Statement (CIS). This formally documents the problem and opens it for community discussion.
 
 See the [Creating a CAP or CIS via GitHub](creating-a-cap) guide or use the [CAP Portal](https://thomas-nada.github.io/CAP) to get started.
 

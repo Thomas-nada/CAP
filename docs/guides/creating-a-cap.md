@@ -1,6 +1,6 @@
 # Creating a CAP or CIS via GitHub
 
-You can submit a Constitutional Amendment Proposal (CAP) or Constitution Issue Statement (CIS) directly through GitHub Issues — no portal required. This guide walks you through the process step by step.
+You can submit a Constitutional Amendment Proposal (CAP) or Constitutional Issue Statement (CIS) directly through GitHub Issues — no portal required. This guide walks you through the process step by step.
 
 ---
 
@@ -21,7 +21,7 @@ Navigate to the [CAP repository](https://github.com/Thomas-nada/CAP) and click t
 You will see two templates available:
 
 - **Amendment Proposal (CAP)** — use this to propose a change, clarification, or addition to the Constitution
-- **Constitution Issue Statement (CIS)** — use this to formally describe a constitutional problem without proposing a specific fix
+- **Constitutional Issue Statement (CIS)** — use this to formally describe a constitutional problem without proposing a specific fix
 
 Click **Get started** next to the appropriate template.
 

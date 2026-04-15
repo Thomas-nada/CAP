@@ -11,7 +11,7 @@ These labels identify what kind of proposal an issue is.
 | Label | Meaning |
 | :--- | :--- |
 | **CAP** | Constitutional Amendment Proposal — proposes a change to the Constitution |
-| **CIS** | Constitution Issue Statement — formally defines a constitutional problem |
+| **CIS** | Constitutional Issue Statement — formally defines a constitutional problem |
 
 ---
 

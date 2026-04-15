@@ -1,6 +1,6 @@
 # What is a CIS?
 
-A **Constitution Issue Statement (CIS)** is a formal document that defines a constitutional problem — an ambiguity, procedural gap, or governance risk — without proposing a specific solution.
+A **Constitutional Issue Statement (CIS)** is a formal document that defines a constitutional problem — an ambiguity, procedural gap, or governance risk — without proposing a specific solution.
 
 ---
 
