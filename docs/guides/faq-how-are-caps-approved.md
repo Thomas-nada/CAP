@@ -24,7 +24,7 @@ Acceptance alone does not change the Constitution. To make the amendment officia
 
 The on-chain vote requires support from at least **65% of the active voting stake** (or a different threshold if the Guardrails Appendix specifies one for a particular provision).
 
-The three governance bodies — **DReps, SPOs, and the Constitutional Committee (CC)** — each play a role depending on the action type. For a Constitution amendment action:
+The three governance bodies — **DReps, SPOs, and the Constitutional Committee (CC)** — each play a role depending on the action type. For a constitutional amendment action:
 
 - **DReps** vote with weight proportional to delegated stake
 - **SPOs** vote on certain action types (Hard Fork, No Confidence, etc.)
