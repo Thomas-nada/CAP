@@ -17,7 +17,7 @@ export function renderLanding() {
                 </h1>
 
                 <p class="text-slate-400 font-black text-xs uppercase tracking-[0.3em] mb-12">
-                    Cardano Amendment Process
+                    Constitutional Amendment Process
                 </p>
 
                 <button
