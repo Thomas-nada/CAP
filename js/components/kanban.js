@@ -35,7 +35,8 @@ function getColumnOrder(columnKey) {
 // DATA: Lifecycle columns & transition graph
 // ──────────────────────────────────────────────
 
-const LIFECYCLE_COLUMNS = [
+// All lifecycle stages (for label detection and card rendering)
+const ALL_LIFECYCLE_STAGES = [
     { key: 'draft',         label: 'Draft',         color: 'slate',   icon: 'file-edit',       responsible: 'Author' },
     { key: 'submitted',     label: 'Submitted',     color: 'blue',    icon: 'send',            responsible: 'Author -> Editor' },
     { key: 'review',        label: 'Review',         color: 'amber',   icon: 'search',          responsible: 'Editor' },
@@ -48,20 +49,24 @@ const LIFECYCLE_COLUMNS = [
     { key: 'withdrawn',     label: 'Withdrawn',      color: 'red',     icon: 'x-circle',        responsible: 'Author' },
 ];
 
+// Columns visible on the Kanban board (subset)
+const LIFECYCLE_COLUMNS = [
+    { key: 'consultation',  label: 'Consultation',   color: 'purple',  icon: 'messages-square', responsible: 'Editor' },
+    { key: 'ready',         label: 'Ready',           color: 'green',   icon: 'check-circle',    responsible: 'Editor' },
+    { key: 'done',          label: 'Done',            color: 'emerald', icon: 'archive',         responsible: 'Editor' },
+    { key: 'withdrawn',     label: 'Withdrawn',      color: 'red',     icon: 'x-circle',        responsible: 'Author' },
+];
+
 /** Forward transitions: from -> { to, who, hint } */
 const NEXT_TRANSITIONS = {
-    'draft':        { to: 'submitted',    who: 'Author',              hint: 'Submit for review' },
-    'submitted':    { to: 'review',       who: 'Editor',              hint: 'Begin editorial review' },
-    'review':       { to: 'consultation', who: 'Editor',              hint: 'Open for consultation' },
-    'consultation': { to: 'finalizing',   who: 'Editor',              hint: 'Move to finalizing (or revision)' },
-    'revision':     { to: 'consultation', who: 'Author',              hint: 'Resubmit after revisions' },
-    'finalizing':   { to: 'ready',        who: 'Editor',              hint: 'Mark as ready' },
-    'ready':        { to: 'onchain',      who: 'Author',              hint: 'Submit on-chain' },
-    'onchain':      { to: 'done',         who: 'Editor',              hint: 'Confirm completion' },
+    'consultation': { to: 'ready',        who: 'Editor',              hint: 'Mark as ready for on-chain' },
+    'ready':        { to: 'done',         who: 'Editor',              hint: 'Confirm completion' },
 };
 
 /** Tag-aware action suggestions based on status labels */
 const STATUS_ACTIONS = {
+    'revision':        { icon: 'pencil',         text: 'Under revision',      cls: 'bg-orange-50 text-orange-700 border-orange-200 dark:bg-orange-950/40 dark:text-orange-300 dark:border-orange-800' },
+    'on-chain':        { icon: 'link',            text: 'Submitted on-chain',  cls: 'bg-indigo-50 text-indigo-700 border-indigo-200 dark:bg-indigo-950/40 dark:text-indigo-300 dark:border-indigo-800' },
     'needs-feedback':  { icon: 'message-circle', text: 'Awaiting feedback',   cls: 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/40 dark:text-amber-300 dark:border-amber-800' },
     'needs-update':    { icon: 'edit-3',         text: 'Author update needed', cls: 'bg-orange-50 text-orange-700 border-orange-200 dark:bg-orange-950/40 dark:text-orange-300 dark:border-orange-800' },
     'blocked':         { icon: 'alert-triangle', text: 'Blocked',             cls: 'bg-red-50 text-red-700 border-red-200 dark:bg-red-950/40 dark:text-red-300 dark:border-red-800' },
@@ -86,10 +91,8 @@ const TAG_TAXONOMY = [
             { name: 'submitted', color: 'blue', desc: 'Author has submitted for review' },
             { name: 'review', color: 'amber', desc: 'Under editorial review' },
             { name: 'consultation', color: 'purple', desc: 'Open for community deliberation' },
-            { name: 'revision', color: 'orange', desc: 'Author is revising based on feedback' },
             { name: 'finalizing', color: 'cyan', desc: 'Editor is preparing final version' },
             { name: 'ready', color: 'green', desc: 'Ready for on-chain submission' },
-            { name: 'onchain', color: 'indigo', desc: 'Submitted to the blockchain' },
             { name: 'done', color: 'emerald', desc: 'Process complete' },
             { name: 'withdrawn', color: 'red', desc: 'Author has withdrawn the proposal' },
         ]
@@ -99,6 +102,8 @@ const TAG_TAXONOMY = [
         icon: 'activity',
         desc: 'Action required. Max 1-2 per proposal.',
         tags: [
+            { name: 'revision', color: 'orange', desc: 'Author is revising based on feedback' },
+            { name: 'on-chain', color: 'indigo', desc: 'Submitted to the blockchain' },
             { name: 'needs-feedback', color: 'amber', desc: 'Community feedback requested' },
             { name: 'needs-update', color: 'orange', desc: 'Author needs to update' },
             { name: 'ready', color: 'green', desc: 'Ready for next stage' },
@@ -194,8 +199,8 @@ function isUserCollapsed(key) {
 
 function getLifecycleStage(proposal) {
     const labelNames = (proposal.labels || []).map(l => l.name.toLowerCase());
-    for (const col of LIFECYCLE_COLUMNS) {
-        if (labelNames.includes(col.key)) return col.key;
+    for (const s of ALL_LIFECYCLE_STAGES) {
+        if (labelNames.includes(s.key)) return s.key;
     }
     if (proposal.state === 'closed') return 'done';
     return 'draft';
@@ -253,11 +258,14 @@ function renderTagWithTooltip(label) {
 // ──────────────────────────────────────────────
 
 function renderCard(proposal, stage) {
-    const col = LIFECYCLE_COLUMNS.find(c => c.key === stage);
+    const col = ALL_LIFECYCLE_STAGES.find(c => c.key === stage);
     const c = col?.color || 'slate';
+    // Filter out lifecycle labels but show revision/onchain as tags since they aren't columns
+    const NON_COLUMN_STAGES = ['revision', 'onchain'];
     const labels = (proposal.labels || []).filter(l => {
         const lc = l.name.toLowerCase();
-        return !LIFECYCLE_COLUMNS.some(col => col.key === lc);
+        if (NON_COLUMN_STAGES.includes(lc)) return true; // show as tag
+        return !ALL_LIFECYCLE_STAGES.some(s => s.key === lc);
     });
     const isCIS = proposal.labels.some(l => l.name === 'CIS');
     const type = isCIS ? 'CIS' : 'CAP';
@@ -478,14 +486,14 @@ function buildTagPanelHTML() {
 
 function buildDetailPanelHTML(proposal) {
     const stage = getLifecycleStage(proposal);
-    const stageCol = LIFECYCLE_COLUMNS.find(c => c.key === stage);
+    const stageCol = ALL_LIFECYCLE_STAGES.find(c => c.key === stage);
     const action = getCardAction(proposal, stage);
     const isCIS = proposal.labels.some(l => l.name === 'CIS');
     const type = isCIS ? 'CIS' : 'CAP';
     const typeColor = isCIS ? 'bg-teal-500' : 'bg-blue-600';
     const labels = (proposal.labels || []).filter(l => {
         const lc = l.name.toLowerCase();
-        return !LIFECYCLE_COLUMNS.some(c => c.key === lc);
+        return !ALL_LIFECYCLE_STAGES.some(s => s.key === lc);
     });
 
     // Truncate body to ~20 lines
@@ -644,12 +652,16 @@ export function renderKanban(state) {
         );
     }
 
-    // Bucket
+    // Bucket — only proposals in board-visible stages appear
     const buckets = {};
     LIFECYCLE_COLUMNS.forEach(c => { buckets[c.key] = []; });
     filtered.forEach(p => {
         const stage = getLifecycleStage(p);
-        (buckets[stage] || buckets['draft']).push(p);
+        if (buckets[stage]) {
+            buckets[stage].push(p);
+        }
+        // Proposals in non-column stages (draft, submitted, review, revision,
+        // finalizing, onchain) are intentionally excluded from the board
     });
 
     // Apply custom position ordering from cache
@@ -1061,7 +1073,7 @@ export function initKanbanHandlers(state) {
         // Optimistic: swap the lifecycle label locally
         if (isStageChange) {
             proposal.labels = proposal.labels.filter(l => {
-                return !LIFECYCLE_COLUMNS.some(c => c.key === l.name.toLowerCase());
+                return !ALL_LIFECYCLE_STAGES.some(s => s.key === l.name.toLowerCase());
             });
             proposal.labels.push({ name: targetStage });
         }
@@ -1304,7 +1316,7 @@ export function initKanbanHandlers(state) {
         const isStageChange = currentStage !== targetStage;
 
         if (isStageChange) {
-            proposal.labels = proposal.labels.filter(l => !LIFECYCLE_COLUMNS.some(c => c.key === l.name.toLowerCase()));
+            proposal.labels = proposal.labels.filter(l => !ALL_LIFECYCLE_STAGES.some(s => s.key === l.name.toLowerCase()));
             proposal.labels.push({ name: targetStage });
         }
 
