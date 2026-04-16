@@ -100,18 +100,19 @@ window.showToast = (title, message, type = 'info') => {
 
 // --- Bug Report System ---
 const BUG_REPORT_REPO = 'Thomas-nada/cap-tool';
+let _bugScreenshots = []; // array of { file: File, dataUrl: string }
 
 window.openBugReport = () => {
-    // Remove existing modal if any
     const existing = document.getElementById('bug-report-modal');
     if (existing) { existing.remove(); return; }
+    _bugScreenshots = [];
 
     const modal = document.createElement('div');
     modal.id = 'bug-report-modal';
     modal.className = 'fixed inset-0 z-[400] flex items-center justify-center p-4';
     modal.innerHTML = `
         <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" onclick="window.closeBugReport()"></div>
-        <div class="relative bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-800 w-full max-w-lg p-8 fade-in">
+        <div class="relative bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-800 w-full max-w-lg p-8 fade-in max-h-[90vh] overflow-y-auto no-scrollbar">
             <button onclick="window.closeBugReport()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 dark:hover:text-white">
                 <i data-lucide="x" class="w-5 h-5"></i>
             </button>
@@ -130,8 +131,18 @@ window.openBugReport = () => {
                     class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white text-sm font-medium mb-4 focus:ring-2 focus:ring-red-500 focus:border-transparent outline-none" />
 
                 <label class="block mb-1 text-xs font-black text-slate-500 uppercase tracking-widest">Description</label>
-                <textarea id="bug-description" required rows="5" placeholder="What happened? What did you expect? Steps to reproduce…"
+                <textarea id="bug-description" required rows="4" placeholder="What happened? What did you expect? Steps to reproduce…"
                     class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white text-sm font-medium mb-4 focus:ring-2 focus:ring-red-500 focus:border-transparent outline-none resize-none"></textarea>
+
+                <label class="block mb-1 text-xs font-black text-slate-500 uppercase tracking-widest">Screenshots</label>
+                <div id="bug-drop-zone"
+                    class="w-full border-2 border-dashed border-slate-300 dark:border-slate-700 rounded-xl p-4 mb-2 text-center cursor-pointer hover:border-red-400 dark:hover:border-red-500 transition-colors"
+                    onclick="document.getElementById('bug-file-input').click()">
+                    <i data-lucide="image-plus" class="w-6 h-6 mx-auto text-slate-400 mb-1"></i>
+                    <p class="text-xs text-slate-400 font-bold">Click, drag & drop, or paste (Ctrl+V)</p>
+                </div>
+                <input id="bug-file-input" type="file" accept="image/*" multiple class="hidden" onchange="window.bugHandleFiles(this.files)" />
+                <div id="bug-preview-strip" class="flex gap-2 flex-wrap mb-4"></div>
 
                 <p class="text-[10px] text-slate-400 mb-4">Page, browser, and viewport info will be included automatically.</p>
 
@@ -147,14 +158,68 @@ window.openBugReport = () => {
                 </div>
             </form>
         </div>`;
+
     document.body.appendChild(modal);
     if (window.lucide) window.lucide.createIcons();
     document.getElementById('bug-title').focus();
+
+    // Drag & drop
+    const dropZone = document.getElementById('bug-drop-zone');
+    dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('border-red-400', 'dark:border-red-500', 'bg-red-50/50', 'dark:bg-red-900/10'); });
+    dropZone.addEventListener('dragleave', () => { dropZone.classList.remove('border-red-400', 'dark:border-red-500', 'bg-red-50/50', 'dark:bg-red-900/10'); });
+    dropZone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        dropZone.classList.remove('border-red-400', 'dark:border-red-500', 'bg-red-50/50', 'dark:bg-red-900/10');
+        const files = [...e.dataTransfer.files].filter(f => f.type.startsWith('image/'));
+        if (files.length) window.bugHandleFiles(files);
+    });
+
+    // Paste anywhere in the modal
+    modal.addEventListener('paste', (e) => {
+        const items = [...(e.clipboardData?.items || [])];
+        const imageItems = items.filter(i => i.type.startsWith('image/'));
+        if (imageItems.length) {
+            e.preventDefault();
+            const files = imageItems.map(i => i.getAsFile()).filter(Boolean);
+            window.bugHandleFiles(files);
+        }
+    });
+};
+
+window.bugHandleFiles = (files) => {
+    const fileArr = files instanceof FileList ? [...files] : files;
+    fileArr.forEach(file => {
+        if (!file.type.startsWith('image/') || _bugScreenshots.length >= 5) return;
+        const reader = new FileReader();
+        reader.onload = () => {
+            _bugScreenshots.push({ file, dataUrl: reader.result });
+            window._bugRenderPreviews();
+        };
+        reader.readAsDataURL(file);
+    });
+};
+
+window.bugRemoveScreenshot = (index) => {
+    _bugScreenshots.splice(index, 1);
+    window._bugRenderPreviews();
+};
+
+window._bugRenderPreviews = () => {
+    const strip = document.getElementById('bug-preview-strip');
+    if (!strip) return;
+    strip.innerHTML = _bugScreenshots.map((s, i) => `
+        <div class="relative group">
+            <img src="${s.dataUrl}" class="w-20 h-20 object-cover rounded-lg border border-slate-200 dark:border-slate-700" />
+            <button type="button" onclick="window.bugRemoveScreenshot(${i})"
+                class="absolute -top-2 -right-2 w-5 h-5 bg-red-500 text-white rounded-full text-xs font-bold flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow">×</button>
+        </div>
+    `).join('');
 };
 
 window.closeBugReport = () => {
     const modal = document.getElementById('bug-report-modal');
     if (modal) modal.remove();
+    _bugScreenshots = [];
 };
 
 window.submitBugReport = async (e) => {
@@ -165,7 +230,7 @@ window.submitBugReport = async (e) => {
 
     const btn = document.getElementById('bug-submit-btn');
     btn.disabled = true;
-    btn.textContent = 'Submitting…';
+    btn.textContent = _bugScreenshots.length ? 'Uploading screenshots…' : 'Submitting…';
 
     // Collect environment metadata
     const meta = [
@@ -177,10 +242,40 @@ window.submitBugReport = async (e) => {
         `**Timestamp:** ${new Date().toISOString()}`
     ].filter(Boolean).join('\n');
 
-    const body = `## Bug Report\n\n${description}\n\n---\n\n### Environment\n${meta}`;
+    // Upload screenshots to repo (logged-in only)
+    let screenshotMarkdown = '';
+    if (_bugScreenshots.length && state.ghToken) {
+        const ts = Date.now();
+        const uploaded = [];
+        for (let i = 0; i < _bugScreenshots.length; i++) {
+            try {
+                btn.textContent = `Uploading screenshot ${i + 1}/${_bugScreenshots.length}…`;
+                const s = _bugScreenshots[i];
+                const ext = s.file.name?.split('.').pop() || 'png';
+                const path = `bug-screenshots/${ts}-${i}.${ext}`;
+                const base64 = s.dataUrl.split(',')[1];
+                await ghFetch(`/repos/${BUG_REPORT_REPO}/contents/${path}`, state.ghToken, {
+                    method: 'PUT',
+                    body: JSON.stringify({
+                        message: `Bug screenshot ${ts}-${i}`,
+                        content: base64
+                    })
+                });
+                const rawUrl = `https://raw.githubusercontent.com/${BUG_REPORT_REPO}/main/${path}`;
+                uploaded.push(`![Screenshot ${i + 1}](${rawUrl})`);
+            } catch (err) {
+                console.warn('Screenshot upload failed:', err);
+            }
+        }
+        if (uploaded.length) {
+            screenshotMarkdown = `\n\n### Screenshots\n${uploaded.join('\n\n')}`;
+        }
+    }
+
+    btn.textContent = 'Submitting…';
+    const body = `## Bug Report\n\n${description}${screenshotMarkdown}\n\n---\n\n### Environment\n${meta}`;
 
     if (state.ghToken) {
-        // Logged-in: submit directly via API
         try {
             await ghFetch(`/repos/${BUG_REPORT_REPO}/issues`, state.ghToken, {
                 method: 'POST',
@@ -194,7 +289,6 @@ window.submitBugReport = async (e) => {
             window.showToast('Bug Reported', 'Thank you! Your report has been submitted.', 'success');
         } catch (err) {
             console.error('Bug report failed:', err);
-            // Fallback to GitHub link
             window.closeBugReport();
             const url = `https://github.com/${BUG_REPORT_REPO}/issues/new?` + new URLSearchParams({
                 title: `[Bug] ${title}`, body, labels: 'bug'
@@ -203,13 +297,13 @@ window.submitBugReport = async (e) => {
             window.showToast('Redirected', 'Opening GitHub to complete your report.', 'info');
         }
     } else {
-        // Anonymous: open pre-filled GitHub issue
+        // Anonymous: open pre-filled GitHub issue (screenshots can't be uploaded without auth)
         window.closeBugReport();
         const url = `https://github.com/${BUG_REPORT_REPO}/issues/new?` + new URLSearchParams({
-            title: `[Bug] ${title}`, body, labels: 'bug'
+            title: `[Bug] ${title}`, body: `## Bug Report\n\n${description}\n\n---\n\n### Environment\n${meta}`, labels: 'bug'
         }).toString();
         window.open(url, '_blank');
-        window.showToast('Redirected', 'Opening GitHub — log in there to submit.', 'info');
+        window.showToast('Redirected', 'Opening GitHub — log in there to submit. Screenshots must be added manually.', 'info');
     }
 };
 
