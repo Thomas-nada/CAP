@@ -11,7 +11,7 @@ The preamble is a structured metadata block at the top of the issue. It is gener
 It records:
 - **CAP number** — assigned when the proposal is accepted and published
 - **Title** — a short, clear description of the proposed change
-- **Category** — determines the minimum deliberation period
+- **Category** — determines the recommended minimum deliberation period
 - **Status** — tracks the proposal's lifecycle (Draft → Proposed → Active)
 - **Authors** — who submitted the proposal
 - **Discussions** — link to the GitHub issue

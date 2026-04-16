@@ -56,7 +56,7 @@ Editors apply one of these labels to communicate their assessment of a proposal.
 
 ## Category Labels
 
-The category label determines the mandatory minimum deliberation period. It is applied when an issue is opened, based on the category selected in the submission form.
+The category label determines the recommended minimum deliberation period. It is applied when an issue is opened, based on the category selected in the submission form.
 
 | Label | Deliberation Period | Typical Use |
 | :--- | :---: | :--- |

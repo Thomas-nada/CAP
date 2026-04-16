@@ -1,12 +1,12 @@
 # How long is deliberation?
 
-The minimum deliberation period depends on the **category** of the proposal.
+The recommended minimum deliberation period depends on the **category** of the proposal.
 
 ---
 
-## Minimum periods by category
+## Recommended minimum periods by category
 
-| Category | Minimum Period |
+| Category | Recommended Minimum |
 | :--- | :---: |
 | Procedural | 60 days |
 | Substantive | 60 days |

@@ -6,7 +6,7 @@ Nothing happens automatically. The deliberation period expiring is not a trigger
 
 ## The steps after deliberation
 
-Once the minimum deliberation period has elapsed:
+Once the recommended minimum deliberation period has elapsed:
 
 1. **The author signals readiness** by clicking "Signal Ready for Review Board" in their Author Controls panel on the CAP Portal. This applies the `author-ready` label and notifies editors that the author considers the proposal ready to advance.
 

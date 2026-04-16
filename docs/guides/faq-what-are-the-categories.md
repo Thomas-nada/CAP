@@ -1,6 +1,6 @@
 # What CAP categories exist?
 
-Every CAP and CIS must be assigned a category when submitted. The category determines the minimum deliberation period and signals the nature of the change being proposed.
+Every CAP and CIS must be assigned a category when submitted. The category determines the recommended minimum deliberation period and signals the nature of the change being proposed.
 
 ---
 

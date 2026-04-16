@@ -240,7 +240,7 @@ The [Constitution viewer](/#/constitution) allows you to select and read any ver
 Any future amendment to the Constitution must be:
 
 1. Proposed via the CAP process (or submitted directly as a governance action)
-2. Deliberated during the appropriate minimum period
+2. Deliberated during the appropriate recommended minimum period
 3. Ratified via an on-chain governance action supported by at least 65% of the active voting stake (unless a different threshold applies under the Guardrails)
 
 When ratified, the new version will be added to the `constitution/` folder in this repository and this history updated accordingly.

@@ -9,7 +9,7 @@ There are two distinct stages: advancement through the CAP process (off-chain), 
 A CAP advances through the following steps:
 
 1. The proposal enters **Consultation** — open for community deliberation
-2. The community discusses, critiques, and refines the proposal during the minimum deliberation period
+2. The community discusses, critiques, and refines the proposal during the recommended minimum deliberation period
 3. A CAP Editor conducts a review — checking completeness, constitutionality, and quality
 4. When both the **author signals readiness** (via the `author-ready` label) and the **editor is satisfied**, the editor moves the proposal to **Ready**
 5. This two-step confirmation — author signal + editor confirmation — is required at every stage advance

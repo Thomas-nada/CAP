@@ -14,9 +14,9 @@ There is no separate step to "open" a proposal for discussion. Submission and th
 
 ## How Long Does It Last?
 
-The minimum deliberation period depends on the proposal's category:
+The recommended minimum deliberation period depends on the proposal's category:
 
-| Category | Minimum Period |
+| Category | Recommended Minimum |
 | :--- | :---: |
 | Procedural | 60 days |
 | Substantive | 60 days |
@@ -59,7 +59,7 @@ Editors do not approve or reject proposals during the initial review. They facil
 
 ## What Happens When Deliberation Ends?
 
-Once the minimum deliberation period has elapsed, the proposal does not advance automatically. The following steps apply:
+Once the recommended minimum deliberation period has elapsed, the proposal does not advance automatically. The following steps apply:
 
 1. **The author signals readiness** by clicking "Signal Ready for Review Board" in their Author Controls panel on the CAP Portal. This applies the `author-ready` label to the proposal.
 

@@ -23,7 +23,7 @@ No hard limits exist, but there are practical considerations:
 
 - **Minor corrections** (typos, formatting, clarifying a sentence) can be made silently or with a brief note
 - **Substantive changes** — changes to the specification, motivation, or rationale — should be clearly flagged in a comment. If a change significantly alters what the proposal is doing, the community deserves to know
-- **Changing the scope or category** of a proposal mid-deliberation should be noted, as it may affect the minimum deliberation period
+- **Changing the scope or category** of a proposal mid-deliberation should be noted, as it may affect the recommended minimum deliberation period
 
 ---
 

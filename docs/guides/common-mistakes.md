@@ -38,7 +38,7 @@ The Motivation section should describe the **problem**, not the fix. A common mi
 
 ## 5. Setting the wrong category
 
-The category you select determines your minimum deliberation period. Selecting a lighter category (e.g., Editorial) for a change that is actually Substantive shortens the deliberation window inappropriately and will be corrected by an editor.
+The category you select determines your recommended minimum deliberation period. Selecting a lighter category (e.g., Editorial) for a change that is actually Substantive shortens the deliberation window inappropriately and will be corrected by an editor.
 
 **Fix:** When in doubt, choose the more conservative category. See the [Labels and Workflow](labels-and-workflow) guide for definitions.
 

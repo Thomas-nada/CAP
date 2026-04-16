@@ -15,7 +15,7 @@ This guide will be updated as proposals move through the process and are ratifie
 CAP-0001 is a **Procedural** proposal. Rather than amending constitutional text, it establishes the process by which all constitutional amendments are made. It defines:
 
 - The two submission paths (CAP Portal wizard and direct GitHub issue)
-- The six categories and their minimum deliberation periods (14 days for Editorial up to 60 days for Procedural and Substantive)
+- The six categories and their recommended minimum deliberation periods (14 days for Editorial up to 60 days for Procedural and Substantive)
 - The four lifecycle stages: Consultation → Ready → Done, with Withdrawn available at any point
 - The two-step confirmation pattern: the author must signal readiness before an editor can advance a stage
 - Status tags, editor signals, and special handling labels — and who applies each
