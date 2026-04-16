@@ -22,16 +22,16 @@ import {
 } from './api.js?v=6';
 
 // Import UI Components
-import { renderNav } from './components/nav.js?v=4';
+import { renderNav } from './components/nav.js?v=5';
 import { renderDashboard } from './components/dashboard.js?v=2';
-import { renderRegistry } from './components/registry.js?v=5';
-import { renderDetail } from './components/detail.js?v=7';
+import { renderRegistry } from './components/registry.js?v=6';
+import { renderDetail } from './components/detail.js?v=8';
 import { renderCreate } from './components/create.js?v=2';
 import { renderEdit } from './components/edit.js?v=2';
 import { renderConstitution } from './components/constitution.js?v=7';
 import { renderWizard } from './components/wizard.js?v=2';
-import { renderLearnHub } from './components/learn.js?v=3';
-import { initKanbanHandlers } from './components/kanban.js?v=12';
+import { renderLearnHub } from './components/learn.js?v=4';
+import { initKanbanHandlers } from './components/kanban.js?v=13';
 
 
 // --- Toast Notification System ---
@@ -652,6 +652,13 @@ window.openGuide = async (slug) => {
         state.loading.guide = false;
         window.updateUI(true);
     }
+};
+
+window.closeGuide = () => {
+    state.activeGuide = null;
+    state.guideHtml = '';
+    window.location.hash = '#/learn';
+    window.updateUI(true);
 };
 
 // Insert markdown formatting around selected text or at cursor
@@ -1326,7 +1333,12 @@ window.authorWithdraw = async () => {
     const token = state.ghToken;
     try {
         const existing = state.currentProposal.labels.map(l => l.name);
+        // Clear lifecycle labels
         for (const lbl of LIFECYCLE_LABELS) {
+            if (existing.includes(lbl)) await removeLabel(number, lbl, token);
+        }
+        // Clear all status tags and author signal — they're meaningless on a withdrawn proposal
+        for (const lbl of [...STATUS_TAG_LABELS, 'author-ready']) {
             if (existing.includes(lbl)) await removeLabel(number, lbl, token);
         }
         await addLabel(number, 'withdrawn', token);
@@ -1368,14 +1380,23 @@ window.editorSetLifecycle = async (stage) => {
     if (!confirm(`Move proposal from "${current}" → "${stage}"?`)) return;
     const number = state.currentProposal.number;
     const token = state.ghToken;
+    // Tags that are only meaningful in a specific stage — auto-clear when leaving that stage
+    const STAGE_CLEANUP_TAGS = {
+        'consultation': ['revision', 'finalizing'],
+        'ready': ['onchain'],
+    };
     try {
         // Remove all existing lifecycle labels, then add new one
         const existing = state.currentProposal.labels.map(l => l.name);
         for (const lbl of LIFECYCLE_LABELS) {
             if (existing.includes(lbl)) await removeLabel(number, lbl, token);
         }
-        // Also clear the author-ready signal on stage advance — it was for this step only
+        // Clear author-ready signal — it was for this step only
         if (existing.includes('author-ready')) await removeLabel(number, 'author-ready', token);
+        // Clear stage-specific status tags that no longer apply
+        for (const lbl of (STAGE_CLEANUP_TAGS[current] || [])) {
+            if (existing.includes(lbl)) await removeLabel(number, lbl, token);
+        }
         await addLabel(number, stage, token);
         // Refresh
         state.currentProposal = await fetchProposalDetail(number, token);

@@ -71,11 +71,17 @@ export function renderDetail(state) {
                 <div class="lg:col-span-2 space-y-16">
                     <header class="space-y-8">
                         <div class="flex flex-wrap gap-3">
-                            ${p.labels.map(l => `
+                            ${p.labels.filter(l => l.name !== 'author-ready').map(l => `
                                 <span class="px-5 py-2 rounded-full text-[10px] font-black uppercase tracking-widest border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm">
                                     ${l.name}
                                 </span>
                             `).join('')}
+                            ${p.labels.some(l => l.name === 'author-ready') ? `
+                                <span class="flex items-center gap-1.5 px-5 py-2 rounded-full text-[10px] font-black uppercase tracking-widest bg-green-100 dark:bg-green-900/30 border border-green-300 dark:border-green-800/50 text-green-700 dark:text-green-400">
+                                    <i data-lucide="thumbs-up" class="w-3 h-3"></i>
+                                    Author Ready
+                                </span>
+                            ` : ''}
                             ${p.state === 'closed' ? `
                                 <span class="px-5 py-2 rounded-full text-[10px] font-black uppercase tracking-widest bg-slate-950 text-white dark:bg-white dark:text-slate-950">
                                     Archived

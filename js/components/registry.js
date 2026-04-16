@@ -134,9 +134,17 @@ export function renderRegistry(state) {
                                 <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
                                     ${new Date(p.created_at).toLocaleDateString()}
                                 </span>
-                                <span class="text-[8px] font-black px-2 py-1 ${p.state === 'open' ? 'bg-green-100 dark:bg-green-900/30 text-green-600' : 'bg-slate-100 dark:bg-slate-800 text-slate-500'} rounded-full uppercase tracking-wider">
-                                    ${p.state}
-                                </span>
+                                ${(() => {
+                                    const LIFECYCLE = ['consultation','ready','done','withdrawn'];
+                                    const LIFECYCLE_COLORS = { consultation: 'purple', ready: 'green', done: 'emerald', withdrawn: 'red' };
+                                    const stage = p.labels?.map(l => l.name).find(n => LIFECYCLE.includes(n));
+                                    const color = stage ? LIFECYCLE_COLORS[stage] : null;
+                                    return stage ? `<span class="text-[9px] font-black px-2.5 py-1 rounded-full bg-${color}-100 dark:bg-${color}-900/30 text-${color}-700 dark:text-${color}-300 uppercase tracking-wider">${stage}</span>` : '';
+                                })()}
+                                ${p.labels?.some(l => l.name === 'author-ready') ? `
+                                <span class="flex items-center gap-1 text-[9px] font-black px-2.5 py-1 rounded-full bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 uppercase tracking-wider">
+                                    <i data-lucide="thumbs-up" class="w-2.5 h-2.5"></i> Author Ready
+                                </span>` : ''}
                             </div>
                             <h3 class="text-2xl font-black tracking-tight text-slate-900 dark:text-white group-hover:text-blue-600 transition-colors">
                                 ${highlightText(p.title, searchQuery)}

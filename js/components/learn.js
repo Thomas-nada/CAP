@@ -10,7 +10,10 @@ export function renderLearnHub(state) {
         return `
         <div class="max-w-6xl mx-auto pb-20 fade-in text-left">
             <div class="mb-8">
-                <button onclick="window.location.hash='#/learn'" class="px-4 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-sm font-bold">← Back to Learn Hub</button>
+                <button onclick="window.closeGuide()" class="group flex items-center gap-2 text-slate-400 hover:text-blue-600 transition-colors font-bold uppercase text-xs tracking-widest">
+                    <i data-lucide="arrow-left" class="w-4 h-4 group-hover:-translate-x-1 transition-transform"></i>
+                    Back to Guides
+                </button>
             </div>
             <article id="guide-content" class="bg-white dark:bg-slate-900 p-10 rounded-[2rem] border border-slate-100 dark:border-slate-800 shadow-sm prose dark:prose-invert max-w-none">
                 ${state.loading && state.loading.guide ? '<p class="text-slate-400">Loading…</p>' : (state.guideHtml || '<p class="text-slate-400">No content available.</p>')}

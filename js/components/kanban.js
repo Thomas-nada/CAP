@@ -478,9 +478,10 @@ function buildDetailPanelHTML(proposal) {
     const isCIS = proposal.labels.some(l => l.name === 'CIS');
     const type = isCIS ? 'CIS' : 'CAP';
     const typeColor = isCIS ? 'bg-teal-500' : 'bg-blue-600';
+    const authorReady = (proposal.labels || []).some(l => l.name === 'author-ready');
     const labels = (proposal.labels || []).filter(l => {
         const lc = l.name.toLowerCase();
-        return !ALL_LIFECYCLE_STAGES.some(s => s.key === lc);
+        return !ALL_LIFECYCLE_STAGES.some(s => s.key === lc) && lc !== 'author-ready';
     });
 
     // Truncate body to ~20 lines
@@ -514,12 +515,19 @@ function buildDetailPanelHTML(proposal) {
             <h3 class="text-base font-extrabold text-slate-900 dark:text-white leading-snug">${escapeHtml(proposal.title)}</h3>
 
             <!-- Lifecycle stage badge -->
-            ${stageCol ? `
-            <div class="flex items-center gap-2">
-                <span class="w-2.5 h-2.5 rounded-full bg-${stageCol.color}-500 flex-shrink-0"></span>
-                <span class="text-xs font-bold text-${stageCol.color}-700 dark:text-${stageCol.color}-300">${stageCol.label}</span>
-                <span class="text-[10px] text-slate-400">-- ${stageCol.responsible}</span>
-            </div>` : ''}
+            <div class="flex items-center gap-2 flex-wrap">
+                ${stageCol ? `
+                <div class="flex items-center gap-2">
+                    <span class="w-2.5 h-2.5 rounded-full bg-${stageCol.color}-500 flex-shrink-0"></span>
+                    <span class="text-xs font-bold text-${stageCol.color}-700 dark:text-${stageCol.color}-300">${stageCol.label}</span>
+                    <span class="text-[10px] text-slate-400">— ${stageCol.responsible}</span>
+                </div>` : ''}
+                ${authorReady ? `
+                <div class="flex items-center gap-1 px-2 py-0.5 rounded-full bg-green-100 dark:bg-green-900/30 border border-green-200 dark:border-green-800/40 text-[10px] font-bold text-green-700 dark:text-green-400">
+                    <i data-lucide="thumbs-up" class="w-2.5 h-2.5"></i>
+                    Author ready
+                </div>` : ''}
+            </div>
 
             <!-- Next-action callout -->
             ${action ? `
