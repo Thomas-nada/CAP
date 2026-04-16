@@ -21,7 +21,7 @@ It does not mean the proposal is invalid or will be blocked.
 
 When a CAP Editor reviews a proposal at the end of the deliberation period, they look at the quality and completeness of the proposal itself — not a comment count. A well-written, complete proposal with zero comments is still eligible to advance.
 
-That said, if the proposal touches on something significant and community sentiment is unclear, an Editor may note this and encourage more outreach before applying the Accepted label.
+That said, if the proposal touches on something significant and community sentiment is unclear, an Editor may note this and encourage more outreach before moving the proposal to the Ready stage.
 
 ---
 
@@ -36,4 +36,4 @@ That said, if the proposal touches on something significant and community sentim
 
 ## If your proposal remains inactive
 
-If you decide the proposal is no longer relevant or you want to revise and resubmit, you can close the issue at any time. It will be labelled **Inactive** and remain as a historical record. You can open a new issue with a revised version whenever you are ready.
+If you decide the proposal is no longer relevant or you want to revise and resubmit, you can withdraw it at any time using the Withdraw button in your Author Controls panel on the CAP Portal. This applies the `withdrawn` label and closes the issue — the closed issue remains as a permanent historical record. You can open a new issue with a revised version whenever you are ready.

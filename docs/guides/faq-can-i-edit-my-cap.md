@@ -37,4 +37,4 @@ However, if a substantive revision is made late in the deliberation period, a CA
 
 ## Can I withdraw and resubmit instead of editing?
 
-Yes. If your changes are significant enough that the original issue no longer reflects the proposal, you may close the existing issue (it will be labelled **Inactive** and remain as a historical record) and open a new one with the revised proposal. The new issue will start a fresh deliberation period.
+Yes. If your changes are significant enough that the original issue no longer reflects the proposal, you may withdraw the existing issue using the Withdraw button in your Author Controls panel on the CAP Portal. This applies the `withdrawn` label and closes the issue — it remains as a permanent historical record. You can then open a new issue with the revised proposal, which will start a fresh deliberation period.

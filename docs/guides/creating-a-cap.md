@@ -85,4 +85,4 @@ During this period the community discusses your proposal in the issue comments. 
 - Share the issue link with stakeholders to invite discussion
 - Monitor the comments and respond to questions
 - If you need to make substantive edits, you can edit the issue body directly
-- Once the deliberation period ends, a CAP Editor will review your proposal and may apply the **Proposed** label to indicate it is ready for formal review
+- Once the deliberation period ends, signal that you are ready to advance using the "Signal Ready for Review Board" button in your Author Controls panel on the CAP Portal. A CAP Editor will then review and, if satisfied, move the proposal to the **Ready** stage

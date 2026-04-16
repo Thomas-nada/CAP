@@ -9,7 +9,7 @@ Editors do not have veto power over proposals based on policy disagreement. Thei
 **An Editor can:**
 - Ask clarifying questions about your intent or reasoning
 - Flag a constitutional problem — for example, if the proposal appears to conflict with an existing Article or Guardrail
-- Note that the proposal is incomplete and decline to apply the Accepted label until it is ready
+- Note that the proposal is incomplete and decline to move it to the Ready stage until it is ready
 - Suggest edits to improve clarity or structure
 
 **An Editor cannot:**
