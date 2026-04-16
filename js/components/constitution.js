@@ -408,24 +408,52 @@ function renderSingleView(version) {
  * paragraphs, then return array of non-empty paragraph strings.
  * This makes the diff immune to different word-wrap widths between files.
  */
-function normalizeParagraphs(text) {
-    if (!text) return [];
-    // Strip all HTML comment blocks (CAP preview metadata)
+/**
+ * Split text into paragraphs and build a heading map.
+ * Returns { paragraphs: string[], headingMap: string[] }
+ * headingMap[i] = the nearest heading context for paragraph i
+ */
+function normalizeParagraphsWithHeadings(text) {
+    if (!text) return { paragraphs: [], headingMap: [] };
     text = text.replace(/<!--[\s\S]*?-->/g, '');
-    // Normalize line endings
     text = text.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
-    // Split on 2+ blank lines
-    return text.split(/\n{2,}/)
-        .map(p => p.trim()
-            // Filter out pure-separator lines within a paragraph block
+
+    const rawBlocks = text.split(/\n{2,}/);
+    const paragraphs = [];
+    const headingMap = [];
+    let currentHeading = '';
+
+    for (const block of rawBlocks) {
+        let p = block.trim()
             .replace(/^[=\-*]{3,}$/gm, '')
-            .trim()
-            // Collapse single newlines (word-wrap artifacts) to spaces
-            .replace(/\n/g, ' ')
-            // Collapse runs of whitespace
-            .replace(/\s+/g, ' ')
-        )
-        .filter(p => p.length > 3); // skip trivially short chunks
+            .trim();
+
+        // Detect heading lines before collapsing
+        const headingMatch = p.match(/^(#{1,6})\s+(.+)/);
+        if (headingMatch) {
+            const level = headingMatch[1].length;
+            const title = headingMatch[2].replace(/\*\*/g, '').trim();
+            if (level <= 2) {
+                currentHeading = title;
+            } else {
+                // Sub-heading: show as "Parent > Sub"
+                const parent = currentHeading.split(' > ')[0];
+                currentHeading = parent ? `${parent} > ${title}` : title;
+            }
+        }
+
+        p = p.replace(/\n/g, ' ').replace(/\s+/g, ' ');
+        if (p.length > 3) {
+            paragraphs.push(p);
+            headingMap.push(currentHeading);
+        }
+    }
+
+    return { paragraphs, headingMap };
+}
+
+function normalizeParagraphs(text) {
+    return normalizeParagraphsWithHeadings(text).paragraphs;
 }
 
 /**
@@ -434,7 +462,6 @@ function normalizeParagraphs(text) {
  */
 function diffParagraphs(oldPs, newPs) {
     const m = oldPs.length, n = newPs.length;
-    // Build LCS table
     const dp = Array.from({length: m + 1}, () => new Int32Array(n + 1));
     for (let i = 1; i <= m; i++)
         for (let j = 1; j <= n; j++)
@@ -442,16 +469,15 @@ function diffParagraphs(oldPs, newPs) {
                 ? dp[i-1][j-1] + 1
                 : Math.max(dp[i-1][j], dp[i][j-1]);
 
-    // Backtrack
     const ops = [];
     let i = m, j = n;
     while (i > 0 || j > 0) {
         if (i > 0 && j > 0 && oldPs[i-1] === newPs[j-1]) {
-            ops.push({type:'equal', value: oldPs[i-1]}); i--; j--;
+            ops.push({type:'equal', value: oldPs[i-1], oldIdx: i-1, newIdx: j-1}); i--; j--;
         } else if (j > 0 && (i === 0 || dp[i][j-1] >= dp[i-1][j])) {
-            ops.push({type:'insert', value: newPs[j-1]}); j--;
+            ops.push({type:'insert', value: newPs[j-1], newIdx: j-1}); j--;
         } else {
-            ops.push({type:'delete', value: oldPs[i-1]}); i--;
+            ops.push({type:'delete', value: oldPs[i-1], oldIdx: i-1}); i--;
         }
     }
     return ops.reverse();
@@ -506,8 +532,12 @@ function renderDiffView(currentVersion, compareVersion) {
         return '<p class="text-slate-400 p-10">Cannot render diff: missing version data.</p>';
     }
 
-    const oldPs = normalizeParagraphs(currentVersion.content);
-    const newPs = normalizeParagraphs(compareVersion.content);
+    const oldData = normalizeParagraphsWithHeadings(currentVersion.content);
+    const newData = normalizeParagraphsWithHeadings(compareVersion.content);
+    const oldPs = oldData.paragraphs;
+    const newPs = newData.paragraphs;
+    const oldHeadings = oldData.headingMap;
+    const newHeadings = newData.headingMap;
 
     // ── Flattened-file detection ─────────────────────────────────────────────
     // When a CAP preview was generated with a whitespace-collapsing bug, the
@@ -574,7 +604,13 @@ function renderDiffView(currentVersion, compareVersion) {
             k + 1 < rawOps.length &&
             rawOps[k + 1].type === 'insert'
         ) {
-            ops.push({ type: 'modify', oldValue: rawOps[k].value, newValue: rawOps[k + 1].value });
+            ops.push({
+                type: 'modify',
+                oldValue: rawOps[k].value,
+                newValue: rawOps[k + 1].value,
+                oldIdx: rawOps[k].oldIdx,
+                newIdx: rawOps[k + 1].newIdx
+            });
             k++;
         } else {
             ops.push(rawOps[k]);
@@ -582,6 +618,13 @@ function renderDiffView(currentVersion, compareVersion) {
     }
 
     const changes = ops.filter(op => op.type !== 'equal');
+
+    // Resolve heading context for each change
+    const getHeading = (op) => {
+        if (op.oldIdx != null && oldHeadings[op.oldIdx]) return oldHeadings[op.oldIdx];
+        if (op.newIdx != null && newHeadings[op.newIdx]) return newHeadings[op.newIdx];
+        return '';
+    };
 
     if (changes.length === 0) {
         return `
@@ -600,14 +643,19 @@ function renderDiffView(currentVersion, compareVersion) {
 
     const changeBlocks = changes.map((op, idx) => {
         const label = `Change ${idx + 1} of ${changes.length}`;
+        const heading = getHeading(op);
+        const headingBadge = heading
+            ? `<span class="text-[10px] font-bold text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-2.5 py-0.5 rounded-full truncate max-w-[300px]" title="${escapeHtml(heading)}"><i data-lucide="bookmark" class="w-3 h-3 inline -mt-0.5 mr-1"></i>${escapeHtml(heading)}</span>`
+            : '';
 
         if (op.type === 'modify') {
             const { oldHtml, newHtml } = wordLevelDiff(op.oldValue, op.newValue);
             return `
                 <div class="bg-white dark:bg-slate-900 rounded-[2rem] border border-blue-200 dark:border-blue-900/40 shadow-sm overflow-hidden">
-                    <div class="px-6 py-3 bg-blue-50 dark:bg-blue-900/20 border-b border-blue-100 dark:border-blue-900/30 flex items-center gap-2">
+                    <div class="px-6 py-3 bg-blue-50 dark:bg-blue-900/20 border-b border-blue-100 dark:border-blue-900/30 flex items-center gap-2 flex-wrap">
                         <div class="w-2 h-2 bg-blue-500 rounded-full"></div>
                         <span class="text-[10px] font-black uppercase tracking-widest text-blue-600 dark:text-blue-400">Modified</span>
+                        ${headingBadge}
                         <span class="text-[10px] text-blue-400 dark:text-blue-500 ml-auto">${label}</span>
                     </div>
                     <div class="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-slate-100 dark:divide-slate-800">
@@ -626,9 +674,10 @@ function renderDiffView(currentVersion, compareVersion) {
         if (op.type === 'delete') {
             return `
                 <div class="bg-white dark:bg-slate-900 rounded-[2rem] border border-red-200 dark:border-red-900/40 shadow-sm overflow-hidden">
-                    <div class="px-6 py-3 bg-red-50 dark:bg-red-900/20 border-b border-red-100 dark:border-red-900/30 flex items-center gap-2">
+                    <div class="px-6 py-3 bg-red-50 dark:bg-red-900/20 border-b border-red-100 dark:border-red-900/30 flex items-center gap-2 flex-wrap">
                         <div class="w-2 h-2 bg-red-500 rounded-full"></div>
                         <span class="text-[10px] font-black uppercase tracking-widest text-red-600 dark:text-red-400">Removed</span>
+                        ${headingBadge}
                         <span class="text-[10px] text-red-400 dark:text-red-500 ml-auto">${label}</span>
                     </div>
                     <div class="p-6">
@@ -641,9 +690,10 @@ function renderDiffView(currentVersion, compareVersion) {
         // insert
         return `
             <div class="bg-white dark:bg-slate-900 rounded-[2rem] border border-green-200 dark:border-green-900/40 shadow-sm overflow-hidden">
-                <div class="px-6 py-3 bg-green-50 dark:bg-green-900/20 border-b border-green-100 dark:border-green-900/30 flex items-center gap-2">
+                <div class="px-6 py-3 bg-green-50 dark:bg-green-900/20 border-b border-green-100 dark:border-green-900/30 flex items-center gap-2 flex-wrap">
                     <div class="w-2 h-2 bg-green-500 rounded-full"></div>
                     <span class="text-[10px] font-black uppercase tracking-widest text-green-600 dark:text-green-400">Added</span>
+                    ${headingBadge}
                     <span class="text-[10px] text-green-400 dark:text-green-500 ml-auto">${label}</span>
                 </div>
                 <div class="p-6">
