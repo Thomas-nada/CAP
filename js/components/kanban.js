@@ -60,6 +60,7 @@ const NEXT_TRANSITIONS = {
 
 /** Tag-aware action suggestions based on status labels */
 const STATUS_ACTIONS = {
+    'author-ready':    { icon: 'thumbs-up',      text: 'Author ready to advance', cls: 'bg-green-50 text-green-700 border-green-200 dark:bg-green-950/40 dark:text-green-300 dark:border-green-800' },
     'review':          { icon: 'search',         text: 'Under review',        cls: 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/40 dark:text-amber-300 dark:border-amber-800' },
     'revision':        { icon: 'pencil',         text: 'Under revision',      cls: 'bg-orange-50 text-orange-700 border-orange-200 dark:bg-orange-950/40 dark:text-orange-300 dark:border-orange-800' },
     'finalizing':      { icon: 'check-square',   text: 'Finalizing',          cls: 'bg-cyan-50 text-cyan-700 border-cyan-200 dark:bg-cyan-950/40 dark:text-cyan-300 dark:border-cyan-800' },
@@ -92,10 +93,11 @@ const TAG_TAXONOMY = [
         icon: 'activity',
         desc: 'Editor-assigned status. Context-sensitive — some tags are only available in certain stages.',
         tags: [
-            { name: 'review',     color: 'amber',  desc: 'Under editorial review (any stage)' },
-            { name: 'revision',   color: 'orange', desc: 'Author is revising — only during Consultation' },
-            { name: 'finalizing', color: 'cyan',   desc: 'Editor finalizing — only during Consultation' },
-            { name: 'onchain',    color: 'indigo', desc: 'Submitted on-chain — only during Ready' },
+            { name: 'author-ready', color: 'green',  desc: 'Author has signalled readiness to advance' },
+            { name: 'review',       color: 'amber',  desc: 'Under editorial review (any stage)' },
+            { name: 'revision',     color: 'orange', desc: 'Author is revising — only during Consultation' },
+            { name: 'finalizing',   color: 'cyan',   desc: 'Editor finalizing — only during Consultation' },
+            { name: 'onchain',      color: 'indigo', desc: 'Submitted on-chain — only during Ready' },
         ]
     },
     {

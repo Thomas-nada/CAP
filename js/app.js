@@ -25,13 +25,13 @@ import {
 import { renderNav } from './components/nav.js?v=4';
 import { renderDashboard } from './components/dashboard.js?v=2';
 import { renderRegistry } from './components/registry.js?v=5';
-import { renderDetail } from './components/detail.js?v=6';
+import { renderDetail } from './components/detail.js?v=7';
 import { renderCreate } from './components/create.js?v=2';
 import { renderEdit } from './components/edit.js?v=2';
 import { renderConstitution } from './components/constitution.js?v=7';
 import { renderWizard } from './components/wizard.js?v=2';
 import { renderLearnHub } from './components/learn.js?v=2';
-import { initKanbanHandlers } from './components/kanban.js?v=11';
+import { initKanbanHandlers } from './components/kanban.js?v=12';
 
 
 // --- Toast Notification System ---
@@ -1286,6 +1286,31 @@ window.authorAdvanceStage = async (targetStage) => {
         state.proposalEvents = await fetchProposalEvents(number, token);
         updateUI(true);
         window.showToast('Stage Updated', `Your proposal is now: ${targetStage}`, 'success');
+    } catch (e) {
+        window.showToast('Error', e.message, 'error');
+    }
+};
+
+window.authorSignalReady = async () => {
+    if (!state.ghToken || !state.currentProposal) return;
+    const isAuthor = state.ghUser?.login === state.currentProposal.user.login;
+    if (!isAuthor) return;
+    const number = state.currentProposal.number;
+    const token = state.ghToken;
+    try {
+        const isOn = state.currentProposal.labels.some(l => l.name === 'author-ready');
+        if (isOn) {
+            await removeLabel(number, 'author-ready', token);
+        } else {
+            await addLabel(number, 'author-ready', token);
+        }
+        state.currentProposal = await fetchProposalDetail(number, token);
+        updateUI(true);
+        window.showToast(
+            isOn ? 'Signal Withdrawn' : 'Ready Signal Sent',
+            isOn ? 'Your ready signal has been removed.' : 'Editors can now see you are ready to advance.',
+            isOn ? 'info' : 'success'
+        );
     } catch (e) {
         window.showToast('Error', e.message, 'error');
     }

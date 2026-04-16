@@ -285,7 +285,13 @@ export function renderDetail(state) {
                         const editorOkNow = p.labels.some(l => l.name === 'editor-ok');
                         const editorOkEver = state.proposalEvents?.some(e => e.event === 'labeled' && e.label?.name === 'editor-ok') || false;
                         const editorConcernNow = p.labels.some(l => l.name === 'editor-concern');
-                        const nextTransition = null; // lifecycle stage transitions are editor-controlled
+                        const authorReadyNow = p.labels.some(l => l.name === 'author-ready');
+                        const isActive = currentStage === 'consultation' || currentStage === 'ready';
+
+                        // Context-sensitive signal text
+                        const signalText = currentStage === 'consultation' ? 'Signal Ready for Review Board'
+                                         : currentStage === 'ready'        ? 'Signal Ready for Completion'
+                                         : null;
 
                         // Editor review status badge
                         const reviewStatus = editorOkNow
@@ -307,21 +313,28 @@ export function renderDetail(state) {
                             </div>
 
                             <div class="space-y-3">
-                                <!-- Stage advance button (context-aware) -->
-                                ${nextTransition ? `
-                                <button onclick="window.authorAdvanceStage('${nextTransition.to}')"
-                                    class="w-full flex items-center justify-between p-5 rounded-2xl bg-${nextTransition.color}-50 dark:bg-${nextTransition.color}-900/10 hover:bg-${nextTransition.color}-100 dark:hover:bg-${nextTransition.color}-900/20 transition-all group border border-${nextTransition.color}-100 dark:border-${nextTransition.color}-900/20">
+                                <!-- Author Ready Signal — only when in an actionable stage -->
+                                ${signalText ? `
+                                <button onclick="window.authorSignalReady()"
+                                    class="w-full flex items-center justify-between p-5 rounded-2xl transition-all group border ${
+                                        authorReadyNow
+                                        ? 'bg-green-600 border-green-600'
+                                        : 'bg-green-50 dark:bg-green-900/10 border-green-100 dark:border-green-900/20 hover:bg-green-100 dark:hover:bg-green-900/20'
+                                    }">
                                     <div class="flex items-center gap-3">
-                                        <i data-lucide="${nextTransition.icon}" class="w-4 h-4 text-${nextTransition.color}-600"></i>
+                                        <i data-lucide="${authorReadyNow ? 'check-circle' : 'thumbs-up'}" class="w-4 h-4 ${authorReadyNow ? 'text-white' : 'text-green-600'}"></i>
                                         <div>
-                                            <span class="text-xs font-bold text-${nextTransition.color}-600 block">${nextTransition.label}</span>
-                                            <span class="text-[9px] text-${nextTransition.color}-400">Recorded in proposal history</span>
+                                            <span class="text-xs font-bold ${authorReadyNow ? 'text-white' : 'text-green-700 dark:text-green-300'} block">${authorReadyNow ? '✓ Ready Signal Active' : signalText}</span>
+                                            <span class="text-[9px] ${authorReadyNow ? 'text-green-100' : 'text-green-500'}">
+                                                ${authorReadyNow ? 'Click to withdraw your signal' : 'Advisory — editor still confirms the move'}
+                                            </span>
                                         </div>
                                     </div>
-                                    <i data-lucide="chevron-right" class="w-4 h-4 text-${nextTransition.color}-300 group-hover:translate-x-1 transition-transform"></i>
+                                    <i data-lucide="chevron-right" class="w-4 h-4 ${authorReadyNow ? 'text-green-200' : 'text-green-300'} group-hover:translate-x-1 transition-transform"></i>
                                 </button>
                                 ` : ''}
 
+                                ${isActive ? `
                                 <button onclick="window.startEdit()" class="w-full flex items-center justify-between p-5 rounded-2xl bg-blue-50 dark:bg-blue-900/10 hover:bg-blue-100 dark:hover:bg-blue-900/20 transition-all group">
                                     <div class="flex items-center gap-3">
                                         <i data-lucide="edit-3" class="w-4 h-4 text-blue-600"></i>
@@ -329,6 +342,7 @@ export function renderDetail(state) {
                                     </div>
                                     <i data-lucide="chevron-right" class="w-4 h-4 text-blue-300 group-hover:translate-x-1 transition-transform"></i>
                                 </button>
+                                ` : ''}
 
                                 <button onclick="window.authorWithdraw()" class="w-full flex items-center justify-between p-5 rounded-2xl bg-slate-50 dark:bg-slate-950 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all group border border-slate-100 dark:border-slate-800">
                                     <div class="flex items-center gap-3">
@@ -351,7 +365,7 @@ export function renderDetail(state) {
                             </div>
 
                             <p class="text-[9px] text-slate-400 leading-relaxed">
-                                Editors control lifecycle stage progression. Authors may edit content or withdraw at any time. All actions are permanently recorded in the audit trail above.
+                                Editors control lifecycle stage progression. Your ready signal is advisory — the editor still confirms the move. All actions are permanently recorded in the audit trail.
                             </p>
                         </div>`;
                     })() : ''}
@@ -394,6 +408,14 @@ export function renderDetail(state) {
                             cfg.stages === null || (currentLifecycle && cfg.stages.includes(currentLifecycle))
                         );
 
+                        // Forward-only single step: consultation→ready, ready→done
+                        const editorNextStage = currentLifecycle === 'consultation' ? 'ready'
+                                              : currentLifecycle === 'ready'        ? 'done'
+                                              : null;
+                        const nextCfg = editorNextStage ? lifecycleConfig[editorNextStage] : null;
+                        const curCfg  = currentLifecycle ? lifecycleConfig[currentLifecycle] : null;
+                        const authorReadyNow = labels.includes('author-ready');
+
                         return `
                         <div class="bg-white dark:bg-slate-900 p-8 rounded-[2.5rem] border-2 border-amber-100 dark:border-amber-900/20 shadow-xl space-y-8">
                             <h3 class="text-[10px] font-black uppercase tracking-[0.2em] text-amber-600 flex items-center gap-2">
@@ -403,19 +425,39 @@ export function renderDetail(state) {
                             <!-- Lifecycle Stage -->
                             <div class="space-y-3">
                                 <p class="text-[9px] font-black uppercase tracking-[0.18em] text-slate-400">Lifecycle Stage</p>
-                                <div class="grid grid-cols-2 gap-2">
-                                    ${Object.entries(lifecycleConfig).map(([stage, cfg]) => {
-                                        const isActive = currentLifecycle === stage;
-                                        const activeCls = isActive
-                                            ? `bg-${cfg.color}-600 text-white border-${cfg.color}-600`
-                                            : `bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:border-${cfg.color}-400 hover:text-${cfg.color}-600`;
-                                        return `<button onclick="window.editorSetLifecycle('${stage}')"
-                                            class="flex items-center gap-2 px-3 py-2.5 rounded-xl border text-[10px] font-bold uppercase tracking-wider transition-all ${activeCls}">
-                                            <i data-lucide="${cfg.icon}" class="w-3 h-3 flex-shrink-0"></i>
-                                            ${cfg.label}
-                                        </button>`;
-                                    }).join('')}
+
+                                <!-- Current stage badge -->
+                                ${curCfg ? `
+                                <div class="flex items-center gap-2.5 px-4 py-3 rounded-2xl bg-${curCfg.color}-50 dark:bg-${curCfg.color}-900/10 border border-${curCfg.color}-200 dark:border-${curCfg.color}-900/30 text-[10px] font-bold text-${curCfg.color}-700 dark:text-${curCfg.color}-300 uppercase tracking-wider">
+                                    <i data-lucide="${curCfg.icon}" class="w-3.5 h-3.5 flex-shrink-0"></i>
+                                    ${curCfg.label}
                                 </div>
+                                ` : ''}
+
+                                ${nextCfg ? `
+                                <!-- Author ready signal indicator -->
+                                ${authorReadyNow ? `
+                                <div class="flex items-center gap-2.5 px-4 py-2.5 rounded-xl bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800/40 text-[10px] font-bold text-green-700 dark:text-green-400">
+                                    <i data-lucide="thumbs-up" class="w-3.5 h-3.5 flex-shrink-0"></i>
+                                    Author has signalled ready to advance
+                                </div>
+                                ` : ''}
+
+                                <!-- Single forward transition button -->
+                                <button onclick="window.editorSetLifecycle('${editorNextStage}')"
+                                    class="w-full flex items-center justify-between px-4 py-3.5 rounded-xl border bg-${nextCfg.color}-50 dark:bg-${nextCfg.color}-900/10 border-${nextCfg.color}-200 dark:border-${nextCfg.color}-900/30 hover:bg-${nextCfg.color}-100 dark:hover:bg-${nextCfg.color}-900/20 transition-all group">
+                                    <div class="flex items-center gap-3">
+                                        <i data-lucide="arrow-right-circle" class="w-4 h-4 text-${nextCfg.color}-600 flex-shrink-0"></i>
+                                        <div>
+                                            <span class="text-[10px] font-bold text-${nextCfg.color}-700 dark:text-${nextCfg.color}-300 uppercase tracking-wider block">Move to ${nextCfg.label}</span>
+                                            <span class="text-[9px] text-${nextCfg.color}-500 dark:text-${nextCfg.color}-400">Permanently recorded in audit trail</span>
+                                        </div>
+                                    </div>
+                                    <i data-lucide="chevron-right" class="w-4 h-4 text-${nextCfg.color}-300 group-hover:translate-x-1 transition-transform"></i>
+                                </button>
+                                ` : `
+                                <p class="text-[10px] text-slate-400 italic">No further lifecycle transitions from this stage.</p>
+                                `}
                             </div>
 
                             <!-- Status Tags (context-sensitive) -->
@@ -498,6 +540,7 @@ function getEventDetails(event) {
 
     const lifecycleLabels = ['consultation','ready','done','withdrawn'];
     const statusTagLabels = ['review','revision','finalizing','onchain'];
+    const authorSignalLabels = ['author-ready'];
     const editorSignalLabels = ['editor-ok','editor-concern','editor-suggested'];
 
     switch (type) {
@@ -513,6 +556,11 @@ function getEventDetails(event) {
                 details.color = 'text-purple-500';
                 details.message = `Status Tag Added: <span class="font-bold text-purple-600 uppercase">${label}</span>`;
                 details.fullDescription = `The status tag **"${label}"** was added by **${event.actor?.login || 'unknown'}**.`;
+            } else if (authorSignalLabels.includes(label)) {
+                details.icon = 'thumbs-up';
+                details.color = 'text-green-600';
+                details.message = `Author Signalled: <span class="font-bold text-green-600">Ready to Advance</span>`;
+                details.fullDescription = `**${event.actor?.login || 'The author'}** signalled that they are ready for the proposal to advance to the next stage.`;
             } else if (editorSignalLabels.includes(label)) {
                 const sigConf = {
                     'editor-ok':        { icon: 'check-circle', color: 'text-green-600', msg: 'Editor Review: ✅ Approved' },
@@ -545,6 +593,11 @@ function getEventDetails(event) {
                 details.color = 'text-purple-400';
                 details.message = `Status Tag Removed: <span class="font-bold">${label}</span>`;
                 details.fullDescription = `The status tag **"${label}"** was removed by **${event.actor?.login || 'unknown'}**.`;
+            } else if (authorSignalLabels.includes(label)) {
+                details.icon = 'thumbs-down';
+                details.color = 'text-slate-400';
+                details.message = `Author Withdrew Ready Signal`;
+                details.fullDescription = `**${event.actor?.login || 'The author'}** withdrew their ready-to-advance signal.`;
             } else if (editorSignalLabels.includes(label)) {
                 details.icon = 'x-circle';
                 details.color = 'text-orange-400';
