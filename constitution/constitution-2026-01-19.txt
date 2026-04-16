@@ -1,8 +1,6 @@
-<!-- 
-    This is a CIP-120 compliant copy of the Cardano Constitution.
-    The raw, authoritative version can be found at:
-    https://ipfs.io/ipfs/bafkreieyuknozbtewyurfqoagvplvykadn6a4u6wglupavdz46bbsnnl6e
--->
+*This is a CIP-120 compliant copy of the Cardano Constitution.
+The raw, authoritative version can be found at:
+https://ipfs.io/ipfs/bafkreieyuknozbtewyurfqoagvplvykadn6a4u6wglupavdz46bbsnnl6e*
 
 # CARDANO BLOCKCHAIN ECOSYSTEM CONSTITUTION
 
