@@ -36,7 +36,7 @@ export function renderNav(state) {
             <div class="flex items-center gap-4 px-4 cursor-pointer group" onclick="window.setView('dashboard')">
                 <div class="w-10 h-10 flex items-center justify-center flex-shrink-0">
                     <img src="CAP.png" alt="CAP Logo"
-                        class="w-10 h-10 object-contain dark:brightness-0 dark:invert transition-all duration-300">
+                        class="w-10 h-10 object-contain cap-logo">
                 </div>
                 <div class="hidden sm:block text-left">
                     <h1 class="font-extrabold text-lg leading-none tracking-tighter text-slate-900 dark:text-white">CAP Portal</h1>

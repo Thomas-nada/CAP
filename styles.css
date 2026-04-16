@@ -22,9 +22,18 @@ body {
 }
 
 /* Glassmorphism Effect */
-.glass { 
-    backdrop-filter: blur(12px); 
-    -webkit-backdrop-filter: blur(12px); 
+.glass {
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+}
+
+/* CAP Logo — recolored to match blue-600 (#2563EB) in light mode, white in dark */
+.cap-logo {
+    filter: brightness(0) saturate(100%) invert(27%) sepia(85%) saturate(1600%) hue-rotate(212deg) brightness(101%) contrast(97%);
+    transition: filter 0.3s;
+}
+.dark .cap-logo {
+    filter: brightness(0) invert(1);
 }
 
 /* Prose & Markdown Rendering System */
