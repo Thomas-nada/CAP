@@ -1350,6 +1350,21 @@ const SPECIAL_HANDLING_LABELS = ['bundle','minor','major','pause','fast-track'];
 window.editorSetLifecycle = async (stage) => {
     if (!state.isEditor || !state.currentProposal) return;
     const current = state.currentProposal.labels.find(l => LIFECYCLE_LABELS.includes(l.name))?.name || 'none';
+
+    // Forward transitions require the author to have signalled readiness first
+    const FORWARD = { 'consultation': 'ready', 'ready': 'done' };
+    if (FORWARD[current] === stage) {
+        const authorReady = state.currentProposal.labels.some(l => l.name === 'author-ready');
+        if (!authorReady) {
+            window.showToast(
+                'Author Signal Required',
+                'The author must signal readiness before this proposal can advance.',
+                'warning'
+            );
+            return;
+        }
+    }
+
     if (!confirm(`Move proposal from "${current}" → "${stage}"?`)) return;
     const number = state.currentProposal.number;
     const token = state.ghToken;
@@ -1359,6 +1374,8 @@ window.editorSetLifecycle = async (stage) => {
         for (const lbl of LIFECYCLE_LABELS) {
             if (existing.includes(lbl)) await removeLabel(number, lbl, token);
         }
+        // Also clear the author-ready signal on stage advance — it was for this step only
+        if (existing.includes('author-ready')) await removeLabel(number, 'author-ready', token);
         await addLabel(number, stage, token);
         // Refresh
         state.currentProposal = await fetchProposalDetail(number, token);
