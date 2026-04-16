@@ -25,13 +25,13 @@ import {
 import { renderNav } from './components/nav.js?v=4';
 import { renderDashboard } from './components/dashboard.js?v=2';
 import { renderRegistry } from './components/registry.js?v=5';
-import { renderDetail } from './components/detail.js?v=5';
+import { renderDetail } from './components/detail.js?v=6';
 import { renderCreate } from './components/create.js?v=2';
 import { renderEdit } from './components/edit.js?v=2';
 import { renderConstitution } from './components/constitution.js?v=7';
 import { renderWizard } from './components/wizard.js?v=2';
 import { renderLearnHub } from './components/learn.js?v=2';
-import { initKanbanHandlers } from './components/kanban.js?v=10';
+import { initKanbanHandlers } from './components/kanban.js?v=11';
 
 
 // --- Toast Notification System ---
@@ -1255,12 +1255,8 @@ window.deleteProposal = async (n) => {
 
 // --- Author Stage Advance ---
 
-// Stages an author is permitted to advance to on their own proposal.
-const AUTHOR_PERMITTED_TRANSITIONS = {
-    'draft':    'submitted',
-    'revision': 'consultation',
-    'ready':    'onchain',
-};
+// Authors no longer advance lifecycle stages — editors control all stage transitions.
+const AUTHOR_PERMITTED_TRANSITIONS = {};
 
 window.authorAdvanceStage = async (targetStage) => {
     if (!state.ghToken || !state.currentProposal) return;
@@ -1274,11 +1270,7 @@ window.authorAdvanceStage = async (targetStage) => {
         return;
     }
 
-    const confirmMsg = targetStage === 'submitted'
-        ? `Submit this proposal for editorial review?\n\nNote: Editors have not yet reviewed this proposal. You can submit at any time — this will be recorded in the proposal history.`
-        : targetStage === 'consultation'
-        ? `Resubmit this proposal for consultation after revisions?`
-        : `Mark this proposal as submitted on-chain?`;
+    const confirmMsg = `Move proposal to "${targetStage}"?`;
 
     if (!confirm(confirmMsg)) return;
 
@@ -1325,7 +1317,8 @@ window.authorWithdraw = async () => {
 
 // --- Editor Actions ---
 
-const LIFECYCLE_LABELS = ['draft','submitted','review','consultation','revision','finalizing','ready','onchain','done','withdrawn'];
+const LIFECYCLE_LABELS = ['consultation','ready','done','withdrawn'];
+const STATUS_TAG_LABELS = ['review','revision','finalizing','onchain'];
 const EDITOR_SIGNAL_LABELS = ['editor-ok','editor-concern','editor-suggested'];
 const SPECIAL_HANDLING_LABELS = ['bundle','minor','major','pause','fast-track'];
 
@@ -1346,6 +1339,26 @@ window.editorSetLifecycle = async (stage) => {
         state.currentProposal = await fetchProposalDetail(number, token);
         updateUI(true);
         window.showToast('Stage Updated', `Moved to: ${stage}`, 'success');
+    } catch (e) {
+        window.showToast('Error', e.message, 'error');
+    }
+};
+
+window.editorToggleStatusTag = async (label) => {
+    if (!state.isEditor || !state.currentProposal) return;
+    const number = state.currentProposal.number;
+    const token = state.ghToken;
+    try {
+        const existing = state.currentProposal.labels.map(l => l.name);
+        const isOn = existing.includes(label);
+        if (isOn) {
+            await removeLabel(number, label, token);
+        } else {
+            await addLabel(number, label, token);
+        }
+        state.currentProposal = await fetchProposalDetail(number, token);
+        updateUI(true);
+        window.showToast('Tag Updated', isOn ? `Removed: ${label}` : `Added: ${label}`, 'success');
     } catch (e) {
         window.showToast('Error', e.message, 'error');
     }

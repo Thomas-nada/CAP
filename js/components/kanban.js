@@ -36,15 +36,10 @@ function getColumnOrder(columnKey) {
 // ──────────────────────────────────────────────
 
 // All lifecycle stages (for label detection and card rendering)
+// Matches the 4 visible Kanban columns — status tags (review/revision/finalizing/onchain) are separate.
 const ALL_LIFECYCLE_STAGES = [
-    { key: 'draft',         label: 'Draft',         color: 'slate',   icon: 'file-edit',       responsible: 'Author' },
-    { key: 'submitted',     label: 'Submitted',     color: 'blue',    icon: 'send',            responsible: 'Author -> Editor' },
-    { key: 'review',        label: 'Review',         color: 'amber',   icon: 'search',          responsible: 'Editor' },
     { key: 'consultation',  label: 'Consultation',   color: 'purple',  icon: 'messages-square', responsible: 'Editor' },
-    { key: 'revision',      label: 'Revision',       color: 'orange',  icon: 'pencil',          responsible: 'Author / Editor' },
-    { key: 'finalizing',    label: 'Finalizing',     color: 'cyan',    icon: 'check-square',    responsible: 'Editor' },
     { key: 'ready',         label: 'Ready',           color: 'green',   icon: 'check-circle',    responsible: 'Editor' },
-    { key: 'onchain',       label: 'On-Chain',       color: 'indigo',  icon: 'link',            responsible: 'Author' },
     { key: 'done',          label: 'Done',            color: 'emerald', icon: 'archive',         responsible: 'Editor' },
     { key: 'withdrawn',     label: 'Withdrawn',      color: 'red',     icon: 'x-circle',        responsible: 'Author' },
 ];
@@ -65,12 +60,10 @@ const NEXT_TRANSITIONS = {
 
 /** Tag-aware action suggestions based on status labels */
 const STATUS_ACTIONS = {
+    'review':          { icon: 'search',         text: 'Under review',        cls: 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/40 dark:text-amber-300 dark:border-amber-800' },
     'revision':        { icon: 'pencil',         text: 'Under revision',      cls: 'bg-orange-50 text-orange-700 border-orange-200 dark:bg-orange-950/40 dark:text-orange-300 dark:border-orange-800' },
-    'on-chain':        { icon: 'link',            text: 'Submitted on-chain',  cls: 'bg-indigo-50 text-indigo-700 border-indigo-200 dark:bg-indigo-950/40 dark:text-indigo-300 dark:border-indigo-800' },
+    'finalizing':      { icon: 'check-square',   text: 'Finalizing',          cls: 'bg-cyan-50 text-cyan-700 border-cyan-200 dark:bg-cyan-950/40 dark:text-cyan-300 dark:border-cyan-800' },
     'onchain':         { icon: 'link',            text: 'Submitted on-chain',  cls: 'bg-indigo-50 text-indigo-700 border-indigo-200 dark:bg-indigo-950/40 dark:text-indigo-300 dark:border-indigo-800' },
-    'needs-feedback':  { icon: 'message-circle', text: 'Awaiting feedback',   cls: 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/40 dark:text-amber-300 dark:border-amber-800' },
-    'needs-update':    { icon: 'edit-3',         text: 'Author update needed', cls: 'bg-orange-50 text-orange-700 border-orange-200 dark:bg-orange-950/40 dark:text-orange-300 dark:border-orange-800' },
-    'blocked':         { icon: 'alert-triangle', text: 'Blocked',             cls: 'bg-red-50 text-red-700 border-red-200 dark:bg-red-950/40 dark:text-red-300 dark:border-red-800' },
     'editor-concern':  { icon: 'alert-circle',   text: 'Editor concern',      cls: 'bg-red-50 text-red-700 border-red-200 dark:bg-red-950/40 dark:text-red-300 dark:border-red-800' },
     'editor-ok':       { icon: 'check-circle',   text: 'Editor approved',     cls: 'bg-green-50 text-green-700 border-green-200 dark:bg-green-950/40 dark:text-green-300 dark:border-green-800' },
     'editor-suggested':{ icon: 'lightbulb',      text: 'Editor suggestion',   cls: 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/40 dark:text-amber-300 dark:border-amber-800' },
@@ -86,29 +79,23 @@ const TAG_TAXONOMY = [
     {
         title: 'Lifecycle (Required)',
         icon: 'git-branch',
-        desc: 'Exactly one per proposal. Defines process stage.',
+        desc: 'Exactly one per proposal. Defines the process stage.',
         tags: [
-            { name: 'draft', color: 'slate', desc: 'Initial authoring stage' },
-            { name: 'submitted', color: 'blue', desc: 'Author has submitted for review' },
-            { name: 'review', color: 'amber', desc: 'Under editorial review' },
-            { name: 'consultation', color: 'purple', desc: 'Open for community deliberation' },
-            { name: 'finalizing', color: 'cyan', desc: 'Editor is preparing final version' },
-            { name: 'ready', color: 'green', desc: 'Ready for on-chain submission' },
-            { name: 'done', color: 'emerald', desc: 'Process complete' },
-            { name: 'withdrawn', color: 'red', desc: 'Author has withdrawn the proposal' },
+            { name: 'consultation', color: 'purple',  desc: 'Open for community deliberation' },
+            { name: 'ready',        color: 'green',   desc: 'Ready for on-chain submission' },
+            { name: 'done',         color: 'emerald', desc: 'Process complete' },
+            { name: 'withdrawn',    color: 'red',     desc: 'Author has withdrawn the proposal' },
         ]
     },
     {
-        title: 'Status (Optional)',
+        title: 'Status Tags (Optional)',
         icon: 'activity',
-        desc: 'Action required. Max 1-2 per proposal.',
+        desc: 'Editor-assigned status. Context-sensitive — some tags are only available in certain stages.',
         tags: [
-            { name: 'revision', color: 'orange', desc: 'Author is revising based on feedback' },
-            { name: 'on-chain', color: 'indigo', desc: 'Submitted to the blockchain' },
-            { name: 'needs-feedback', color: 'amber', desc: 'Community feedback requested' },
-            { name: 'needs-update', color: 'orange', desc: 'Author needs to update' },
-            { name: 'ready', color: 'green', desc: 'Ready for next stage' },
-            { name: 'blocked', color: 'red', desc: 'Blocked by external dependency' },
+            { name: 'review',     color: 'amber',  desc: 'Under editorial review (any stage)' },
+            { name: 'revision',   color: 'orange', desc: 'Author is revising — only during Consultation' },
+            { name: 'finalizing', color: 'cyan',   desc: 'Editor finalizing — only during Consultation' },
+            { name: 'onchain',    color: 'indigo', desc: 'Submitted on-chain — only during Ready' },
         ]
     },
     {
@@ -261,13 +248,10 @@ function renderTagWithTooltip(label) {
 function renderCard(proposal, stage) {
     const col = ALL_LIFECYCLE_STAGES.find(c => c.key === stage);
     const c = col?.color || 'slate';
-    // Filter out lifecycle labels but show revision/onchain as tags since they aren't columns
-    const NON_COLUMN_STAGES = ['revision', 'onchain'];
-    const labels = (proposal.labels || []).filter(l => {
-        const lc = l.name.toLowerCase();
-        if (NON_COLUMN_STAGES.includes(lc)) return true; // show as tag
-        return !ALL_LIFECYCLE_STAGES.some(s => s.key === lc);
-    });
+    // Filter out lifecycle stage labels; all other labels (including status tags) show as chips
+    const labels = (proposal.labels || []).filter(l =>
+        !ALL_LIFECYCLE_STAGES.some(s => s.key === l.name.toLowerCase())
+    );
     const isCIS = proposal.labels.some(l => l.name === 'CIS');
     const type = isCIS ? 'CIS' : 'CAP';
     const typeCls = isCIS
@@ -653,15 +637,8 @@ export function renderKanban(state) {
         );
     }
 
-    // Bucket — map non-column stages to their nearest visible column
-    const STAGE_FALLBACK = {
-        'draft':       null,          // not shown
-        'submitted':   null,          // not shown
-        'review':      null,          // not shown
-        'finalizing':  null,          // not shown
-        'revision':    'consultation',// tag shown on card
-        'onchain':     'ready',       // tag shown on card
-    };
+    // Bucket — lifecycle labels map 1:1 to columns, no fallback needed
+    const STAGE_FALLBACK = {};
     const buckets = {};
     LIFECYCLE_COLUMNS.forEach(c => { buckets[c.key] = []; });
     filtered.forEach(p => {

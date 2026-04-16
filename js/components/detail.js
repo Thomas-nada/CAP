@@ -280,19 +280,12 @@ export function renderDetail(state) {
 
                     <!-- Author Administration Card -->
                     ${isAuthor ? (() => {
-                        const lifecycleLabels = ['draft','submitted','review','consultation','revision','finalizing','ready','onchain','done','withdrawn'];
+                        const lifecycleLabels = ['consultation','ready','done','withdrawn'];
                         const currentStage = p.labels.map(l => l.name).find(n => lifecycleLabels.includes(n)) || null;
                         const editorOkNow = p.labels.some(l => l.name === 'editor-ok');
                         const editorOkEver = state.proposalEvents?.some(e => e.event === 'labeled' && e.label?.name === 'editor-ok') || false;
                         const editorConcernNow = p.labels.some(l => l.name === 'editor-concern');
-
-                        // Author-permitted forward transitions
-                        const authorTransitions = {
-                            'draft':    { to: 'submitted',    label: 'Submit for Editor Review', icon: 'send',        color: 'blue' },
-                            'revision': { to: 'consultation', label: 'Resubmit after Revisions', icon: 'rotate-ccw',  color: 'orange' },
-                            'ready':    { to: 'onchain',      label: 'Submit On-Chain',          icon: 'link',        color: 'indigo' },
-                        };
-                        const nextTransition = currentStage ? authorTransitions[currentStage] : null;
+                        const nextTransition = null; // lifecycle stage transitions are editor-controlled
 
                         // Editor review status badge
                         const reviewStatus = editorOkNow
@@ -358,38 +351,48 @@ export function renderDetail(state) {
                             </div>
 
                             <p class="text-[9px] text-slate-400 leading-relaxed">
-                                As author you may advance your proposal at any time, regardless of editor review status. All stage changes are permanently recorded in the audit trail above.
+                                Editors control lifecycle stage progression. Authors may edit content or withdraw at any time. All actions are permanently recorded in the audit trail above.
                             </p>
                         </div>`;
                     })() : ''}
 
                     ${isEditor ? (() => {
                         const labels = p.labels.map(l => l.name);
-                        const currentLifecycle = ['draft','submitted','review','consultation','revision','finalizing','ready','onchain','done','withdrawn'].find(s => labels.includes(s)) || null;
+                        const currentLifecycle = ['consultation','ready','done','withdrawn'].find(s => labels.includes(s)) || null;
                         const currentSignal = ['editor-ok','editor-concern','editor-suggested'].find(s => labels.includes(s)) || null;
 
-                        const lifecycleColors = {
-                            draft: 'slate', submitted: 'blue', review: 'amber', consultation: 'purple',
-                            revision: 'orange', finalizing: 'cyan', ready: 'green', onchain: 'indigo',
-                            done: 'emerald', withdrawn: 'red'
+                        const lifecycleConfig = {
+                            'consultation': { color: 'purple',  icon: 'messages-square', label: 'Consultation' },
+                            'ready':        { color: 'green',   icon: 'check-circle',    label: 'Ready' },
+                            'done':         { color: 'emerald', icon: 'archive',          label: 'Done' },
+                            'withdrawn':    { color: 'red',     icon: 'x-circle',         label: 'Withdrawn' },
                         };
-                        const lifecycleIcons = {
-                            draft: 'file-edit', submitted: 'send', review: 'search', consultation: 'messages-square',
-                            revision: 'pencil', finalizing: 'check-square', ready: 'check-circle', onchain: 'link',
-                            done: 'archive', withdrawn: 'x-circle'
+
+                        // Context-sensitive status tags
+                        const statusTagConfig = {
+                            'review':     { color: 'amber',  icon: 'search',       label: 'Review',     stages: null },            // always
+                            'revision':   { color: 'orange', icon: 'pencil',       label: 'Revision',   stages: ['consultation'] },
+                            'finalizing': { color: 'cyan',   icon: 'check-square', label: 'Finalizing', stages: ['consultation'] },
+                            'onchain':    { color: 'indigo', icon: 'link',         label: 'On-Chain',   stages: ['ready'] },
                         };
+
                         const signalConfig = {
-                            'editor-ok':       { color: 'green',  icon: 'check-circle',  label: 'OK' },
-                            'editor-concern':   { color: 'red',    icon: 'alert-circle',   label: 'Concern' },
-                            'editor-suggested': { color: 'amber',  icon: 'lightbulb',      label: 'Suggested' },
+                            'editor-ok':       { color: 'green',  icon: 'check-circle', label: 'OK' },
+                            'editor-concern':   { color: 'red',    icon: 'alert-circle',  label: 'Concern' },
+                            'editor-suggested': { color: 'amber',  icon: 'lightbulb',     label: 'Suggested' },
                         };
                         const specialConfig = {
-                            'pause':      { color: 'slate', icon: 'pause-circle', label: 'Pause' },
-                            'fast-track': { color: 'green', icon: 'zap',          label: 'Fast-Track' },
-                            'bundle':     { color: 'blue',  icon: 'layers',       label: 'Bundle' },
-                            'minor':      { color: 'slate', icon: 'minus-circle', label: 'Minor' },
+                            'pause':      { color: 'slate', icon: 'pause-circle',  label: 'Pause' },
+                            'fast-track': { color: 'green', icon: 'zap',           label: 'Fast-Track' },
+                            'bundle':     { color: 'blue',  icon: 'layers',        label: 'Bundle' },
+                            'minor':      { color: 'slate', icon: 'minus-circle',  label: 'Minor' },
                             'major':      { color: 'red',   icon: 'alert-triangle',label: 'Major' },
                         };
+
+                        // Which status tags are available given the current stage
+                        const availableStatusTags = Object.entries(statusTagConfig).filter(([, cfg]) =>
+                            cfg.stages === null || (currentLifecycle && cfg.stages.includes(currentLifecycle))
+                        );
 
                         return `
                         <div class="bg-white dark:bg-slate-900 p-8 rounded-[2.5rem] border-2 border-amber-100 dark:border-amber-900/20 shadow-xl space-y-8">
@@ -401,20 +404,39 @@ export function renderDetail(state) {
                             <div class="space-y-3">
                                 <p class="text-[9px] font-black uppercase tracking-[0.18em] text-slate-400">Lifecycle Stage</p>
                                 <div class="grid grid-cols-2 gap-2">
-                                    ${['draft','submitted','review','consultation','revision','finalizing','ready','onchain','done','withdrawn'].map(stage => {
+                                    ${Object.entries(lifecycleConfig).map(([stage, cfg]) => {
                                         const isActive = currentLifecycle === stage;
-                                        const color = lifecycleColors[stage];
-                                        const icon = lifecycleIcons[stage];
                                         const activeCls = isActive
-                                            ? `bg-${color}-600 text-white border-${color}-600`
-                                            : `bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:border-${color}-400 hover:text-${color}-600`;
+                                            ? `bg-${cfg.color}-600 text-white border-${cfg.color}-600`
+                                            : `bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:border-${cfg.color}-400 hover:text-${cfg.color}-600`;
                                         return `<button onclick="window.editorSetLifecycle('${stage}')"
                                             class="flex items-center gap-2 px-3 py-2.5 rounded-xl border text-[10px] font-bold uppercase tracking-wider transition-all ${activeCls}">
-                                            <i data-lucide="${icon}" class="w-3 h-3 flex-shrink-0"></i>
-                                            ${stage}
+                                            <i data-lucide="${cfg.icon}" class="w-3 h-3 flex-shrink-0"></i>
+                                            ${cfg.label}
                                         </button>`;
                                     }).join('')}
                                 </div>
+                            </div>
+
+                            <!-- Status Tags (context-sensitive) -->
+                            <div class="space-y-3">
+                                <p class="text-[9px] font-black uppercase tracking-[0.18em] text-slate-400">Status Tags <span class="text-slate-300 font-normal">(toggles)</span></p>
+                                ${availableStatusTags.length === 0 ? `
+                                <p class="text-[10px] text-slate-400 italic">No status tags available for this stage.</p>
+                                ` : `
+                                <div class="flex flex-wrap gap-2">
+                                    ${availableStatusTags.map(([lbl, cfg]) => {
+                                        const isActive = labels.includes(lbl);
+                                        const activeCls = isActive
+                                            ? `bg-${cfg.color}-600 text-white border-${cfg.color}-600`
+                                            : `bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:border-${cfg.color}-400 hover:text-${cfg.color}-600`;
+                                        return `<button onclick="window.editorToggleStatusTag('${lbl}')"
+                                            class="flex items-center gap-2 px-3 py-2.5 rounded-xl border text-[10px] font-bold uppercase tracking-wider transition-all ${activeCls}">
+                                            <i data-lucide="${cfg.icon}" class="w-3 h-3 flex-shrink-0"></i>
+                                            ${cfg.label}
+                                        </button>`;
+                                    }).join('')}
+                                </div>`}
                             </div>
 
                             <!-- Editor Signals -->
@@ -474,7 +496,8 @@ function getEventDetails(event) {
         extUrl: ''
     };
 
-    const lifecycleLabels = ['draft','submitted','review','consultation','revision','finalizing','ready','onchain','done','withdrawn'];
+    const lifecycleLabels = ['consultation','ready','done','withdrawn'];
+    const statusTagLabels = ['review','revision','finalizing','onchain'];
     const editorSignalLabels = ['editor-ok','editor-concern','editor-suggested'];
 
     switch (type) {
@@ -485,6 +508,11 @@ function getEventDetails(event) {
                 details.color = 'text-blue-600';
                 details.message = `Stage → <span class="font-black text-blue-600 uppercase">${label}</span>`;
                 details.fullDescription = `This proposal was moved to the **"${label}"** stage by **${event.actor?.login || 'unknown'}**.`;
+            } else if (statusTagLabels.includes(label)) {
+                details.icon = 'tag';
+                details.color = 'text-purple-500';
+                details.message = `Status Tag Added: <span class="font-bold text-purple-600 uppercase">${label}</span>`;
+                details.fullDescription = `The status tag **"${label}"** was added by **${event.actor?.login || 'unknown'}**.`;
             } else if (editorSignalLabels.includes(label)) {
                 const sigConf = {
                     'editor-ok':        { icon: 'check-circle', color: 'text-green-600', msg: 'Editor Review: ✅ Approved' },
@@ -512,6 +540,11 @@ function getEventDetails(event) {
                 details.color = 'text-slate-400';
                 details.message = `Stage Label Removed: <span class="font-bold text-slate-500">${label}</span>`;
                 details.fullDescription = `The **"${label}"** stage label was removed by **${event.actor?.login || 'unknown'}**. This typically happens when the proposal is moved to a different stage.`;
+            } else if (statusTagLabels.includes(label)) {
+                details.icon = 'x';
+                details.color = 'text-purple-400';
+                details.message = `Status Tag Removed: <span class="font-bold">${label}</span>`;
+                details.fullDescription = `The status tag **"${label}"** was removed by **${event.actor?.login || 'unknown'}**.`;
             } else if (editorSignalLabels.includes(label)) {
                 details.icon = 'x-circle';
                 details.color = 'text-orange-400';
