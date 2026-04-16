@@ -49,7 +49,7 @@ export function renderRegistry(state) {
                         </button>
                         <button onclick="state.registryView = 'kanban'; updateUI(true)"
                             class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all text-slate-400 hover:text-slate-900 dark:hover:text-white">
-                            <i data-lucide="columns" class="w-3.5 h-3.5"></i> Kanban
+                            <i data-lucide="columns" class="w-3.5 h-3.5"></i> Progress Tracker
                         </button>
                     </div>
                 </div>

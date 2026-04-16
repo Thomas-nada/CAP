@@ -684,11 +684,11 @@ export function renderKanban(state) {
                         <i data-lucide="list" class="w-3.5 h-3.5"></i> List
                     </button>
                     <button class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all bg-slate-900 dark:bg-white text-white dark:text-slate-900">
-                        <i data-lucide="columns" class="w-3.5 h-3.5"></i> Kanban
+                        <i data-lucide="columns" class="w-3.5 h-3.5"></i> Progress Tracker
                     </button>
                 </div>
                 <div class="flex items-center gap-2">
-                    <h2 class="text-lg font-black text-slate-900 dark:text-white tracking-tight">Kanban Board</h2>
+                    <h2 class="text-lg font-black text-slate-900 dark:text-white tracking-tight">Progress Tracker</h2>
                 </div>
             </div>
             <div class="flex items-center gap-2">
