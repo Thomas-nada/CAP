@@ -38,82 +38,21 @@ export function renderLearnHub(state) {
             <!-- Main Grid -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
 
-                <!-- ── GUIDES ── -->
-                <div class="md:col-span-2 bg-white dark:bg-slate-900 rounded-[3rem] border-2 border-amber-200 dark:border-amber-900/40 shadow-sm p-10">
-                    <div class="flex items-center gap-4 mb-6">
-                        <div class="w-12 h-12 bg-amber-500 rounded-2xl flex items-center justify-center text-white shadow-md flex-shrink-0">
-                            <i data-lucide="map" class="w-6 h-6"></i>
-                        </div>
-                        <div>
-                            <h2 class="text-2xl font-black italic tracking-tighter text-slate-900 dark:text-white uppercase">Guides</h2>
-                            <p class="text-slate-500 text-sm">End-to-end walkthroughs for every role in the process</p>
-                        </div>
+                <!-- Editor Guides -->
+                <div class="bg-white dark:bg-slate-900 rounded-[3rem] border border-slate-100 dark:border-slate-800 shadow-sm p-10">
+                    <div class="w-12 h-12 bg-amber-500 rounded-2xl flex items-center justify-center mb-6 text-white">
+                        <i data-lucide="shield" class="w-6 h-6"></i>
                     </div>
+                    <h2 class="text-2xl font-black italic tracking-tighter text-slate-900 dark:text-white uppercase mb-4">Editor Guides</h2>
+                    <p class="text-slate-500 mb-6">Resources for CAP Editors managing the proposal lifecycle</p>
 
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <!-- Editor Guide — live -->
-                        <button onclick="window.openGuide('editor-guide')"
-                            class="group p-6 rounded-2xl bg-amber-50 dark:bg-amber-900/20 border-2 border-amber-200 dark:border-amber-800/40 hover:border-amber-400 dark:hover:border-amber-600 hover:-translate-y-1 transition-all text-left">
-                            <div class="flex items-center gap-3 mb-3">
-                                <div class="w-9 h-9 bg-amber-500 rounded-xl flex items-center justify-center text-white flex-shrink-0 shadow-sm">
-                                    <i data-lucide="shield" class="w-4 h-4"></i>
-                                </div>
-                                <div>
-                                    <p class="text-xs font-black text-amber-600 dark:text-amber-400 uppercase tracking-widest">Complete Guide</p>
-                                    <p class="text-sm font-black text-slate-900 dark:text-white">Editor Guide</p>
-                                </div>
-                            </div>
-                            <p class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">Lifecycle management, status tags, signals, and step-by-step workflows for CAP Editors.</p>
-                            <div class="mt-4 flex items-center gap-1.5 text-amber-600 dark:text-amber-400 text-[10px] font-black uppercase tracking-widest group-hover:gap-2.5 transition-all">
-                                Read guide <i data-lucide="arrow-right" class="w-3 h-3"></i>
-                            </div>
+                    <div class="space-y-3">
+                        <button onclick="window.openGuide('editor-guide')" class="w-full p-4 rounded-2xl border-2 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white text-sm font-bold text-left hover:-translate-y-0.5 transition-all">
+                            🛡️ Complete Editor Guide
                         </button>
-
-                        <!-- Editor Role document — live -->
-                        <button onclick="window.openGuide('editor-role')"
-                            class="group p-6 rounded-2xl bg-amber-50 dark:bg-amber-900/20 border-2 border-amber-200 dark:border-amber-800/40 hover:border-amber-400 dark:hover:border-amber-600 hover:-translate-y-1 transition-all text-left">
-                            <div class="flex items-center gap-3 mb-3">
-                                <div class="w-9 h-9 bg-amber-500 rounded-xl flex items-center justify-center text-white flex-shrink-0 shadow-sm">
-                                    <i data-lucide="scroll-text" class="w-4 h-4"></i>
-                                </div>
-                                <div>
-                                    <p class="text-xs font-black text-amber-600 dark:text-amber-400 uppercase tracking-widest">Official Document</p>
-                                    <p class="text-sm font-black text-slate-900 dark:text-white">Editor Role & Scope</p>
-                                </div>
-                            </div>
-                            <p class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">Formal definition of the editor role: responsibilities, eligibility, governance, ethics and accountability.</p>
-                            <div class="mt-4 flex items-center gap-1.5 text-amber-600 dark:text-amber-400 text-[10px] font-black uppercase tracking-widest group-hover:gap-2.5 transition-all">
-                                Read document <i data-lucide="arrow-right" class="w-3 h-3"></i>
-                            </div>
+                        <button onclick="window.openGuide('editor-role')" class="w-full p-4 rounded-2xl border-2 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white text-sm font-bold text-left hover:-translate-y-0.5 transition-all">
+                            📜 Editor Role & Scope
                         </button>
-
-                        <!-- Author Guide — coming soon -->
-                        <div class="p-6 rounded-2xl border-2 border-dashed border-slate-200 dark:border-slate-800 text-left opacity-60">
-                            <div class="flex items-center gap-3 mb-3">
-                                <div class="w-9 h-9 bg-slate-200 dark:bg-slate-700 rounded-xl flex items-center justify-center flex-shrink-0">
-                                    <i data-lucide="pen-tool" class="w-4 h-4 text-slate-400"></i>
-                                </div>
-                                <div>
-                                    <p class="text-xs font-black text-slate-400 uppercase tracking-widest">Coming Soon</p>
-                                    <p class="text-sm font-black text-slate-500 dark:text-slate-400">Author Guide</p>
-                                </div>
-                            </div>
-                            <p class="text-xs text-slate-400 leading-relaxed">Submitting, editing, and advancing your proposal through the process.</p>
-                        </div>
-
-                        <!-- Community Guide — coming soon -->
-                        <div class="p-6 rounded-2xl border-2 border-dashed border-slate-200 dark:border-slate-800 text-left opacity-60">
-                            <div class="flex items-center gap-3 mb-3">
-                                <div class="w-9 h-9 bg-slate-200 dark:bg-slate-700 rounded-xl flex items-center justify-center flex-shrink-0">
-                                    <i data-lucide="users" class="w-4 h-4 text-slate-400"></i>
-                                </div>
-                                <div>
-                                    <p class="text-xs font-black text-slate-400 uppercase tracking-widest">Coming Soon</p>
-                                    <p class="text-sm font-black text-slate-500 dark:text-slate-400">Community Guide</p>
-                                </div>
-                            </div>
-                            <p class="text-xs text-slate-400 leading-relaxed">How to participate in deliberation, comment effectively, and engage with proposals.</p>
-                        </div>
                     </div>
                 </div>
 
