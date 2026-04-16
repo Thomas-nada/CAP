@@ -98,6 +98,121 @@ window.showToast = (title, message, type = 'info') => {
     };
 };
 
+// --- Bug Report System ---
+const BUG_REPORT_REPO = 'Thomas-nada/cap-tool';
+
+window.openBugReport = () => {
+    // Remove existing modal if any
+    const existing = document.getElementById('bug-report-modal');
+    if (existing) { existing.remove(); return; }
+
+    const modal = document.createElement('div');
+    modal.id = 'bug-report-modal';
+    modal.className = 'fixed inset-0 z-[400] flex items-center justify-center p-4';
+    modal.innerHTML = `
+        <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" onclick="window.closeBugReport()"></div>
+        <div class="relative bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-800 w-full max-w-lg p-8 fade-in">
+            <button onclick="window.closeBugReport()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 dark:hover:text-white">
+                <i data-lucide="x" class="w-5 h-5"></i>
+            </button>
+            <div class="flex items-center gap-3 mb-6">
+                <div class="w-10 h-10 bg-red-50 dark:bg-red-900/20 rounded-xl flex items-center justify-center">
+                    <i data-lucide="bug" class="w-5 h-5 text-red-500"></i>
+                </div>
+                <div>
+                    <h2 class="text-xl font-black tracking-tight text-slate-900 dark:text-white">Report a Bug</h2>
+                    <p class="text-xs text-slate-400 font-bold">Help us improve the CAP Portal</p>
+                </div>
+            </div>
+            <form id="bug-report-form" onsubmit="window.submitBugReport(event)">
+                <label class="block mb-1 text-xs font-black text-slate-500 uppercase tracking-widest">Title</label>
+                <input id="bug-title" type="text" required placeholder="Brief summary of the issue"
+                    class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white text-sm font-medium mb-4 focus:ring-2 focus:ring-red-500 focus:border-transparent outline-none" />
+
+                <label class="block mb-1 text-xs font-black text-slate-500 uppercase tracking-widest">Description</label>
+                <textarea id="bug-description" required rows="5" placeholder="What happened? What did you expect? Steps to reproduce…"
+                    class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white text-sm font-medium mb-4 focus:ring-2 focus:ring-red-500 focus:border-transparent outline-none resize-none"></textarea>
+
+                <p class="text-[10px] text-slate-400 mb-4">Page, browser, and viewport info will be included automatically.</p>
+
+                <div class="flex gap-3">
+                    <button type="button" onclick="window.closeBugReport()"
+                        class="flex-1 py-3 rounded-xl text-sm font-bold text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+                        Cancel
+                    </button>
+                    <button type="submit" id="bug-submit-btn"
+                        class="flex-1 py-3 rounded-xl text-sm font-black text-white bg-red-500 hover:bg-red-600 transition-colors shadow-lg">
+                        Submit Report
+                    </button>
+                </div>
+            </form>
+        </div>`;
+    document.body.appendChild(modal);
+    if (window.lucide) window.lucide.createIcons();
+    document.getElementById('bug-title').focus();
+};
+
+window.closeBugReport = () => {
+    const modal = document.getElementById('bug-report-modal');
+    if (modal) modal.remove();
+};
+
+window.submitBugReport = async (e) => {
+    e.preventDefault();
+    const title = document.getElementById('bug-title').value.trim();
+    const description = document.getElementById('bug-description').value.trim();
+    if (!title || !description) return;
+
+    const btn = document.getElementById('bug-submit-btn');
+    btn.disabled = true;
+    btn.textContent = 'Submitting…';
+
+    // Collect environment metadata
+    const meta = [
+        `**Page:** \`${location.hash || '#/'}\``,
+        `**Viewport:** ${window.innerWidth}×${window.innerHeight}`,
+        `**User-Agent:** \`${navigator.userAgent}\``,
+        `**Logged in:** ${state.ghToken ? 'Yes' : 'No'}`,
+        state.ghUser ? `**User:** @${state.ghUser.login}` : '',
+        `**Timestamp:** ${new Date().toISOString()}`
+    ].filter(Boolean).join('\n');
+
+    const body = `## Bug Report\n\n${description}\n\n---\n\n### Environment\n${meta}`;
+
+    if (state.ghToken) {
+        // Logged-in: submit directly via API
+        try {
+            await ghFetch(`/repos/${BUG_REPORT_REPO}/issues`, state.ghToken, {
+                method: 'POST',
+                body: JSON.stringify({
+                    title: `[Bug] ${title}`,
+                    body,
+                    labels: ['bug']
+                })
+            });
+            window.closeBugReport();
+            window.showToast('Bug Reported', 'Thank you! Your report has been submitted.', 'success');
+        } catch (err) {
+            console.error('Bug report failed:', err);
+            // Fallback to GitHub link
+            window.closeBugReport();
+            const url = `https://github.com/${BUG_REPORT_REPO}/issues/new?` + new URLSearchParams({
+                title: `[Bug] ${title}`, body, labels: 'bug'
+            }).toString();
+            window.open(url, '_blank');
+            window.showToast('Redirected', 'Opening GitHub to complete your report.', 'info');
+        }
+    } else {
+        // Anonymous: open pre-filled GitHub issue
+        window.closeBugReport();
+        const url = `https://github.com/${BUG_REPORT_REPO}/issues/new?` + new URLSearchParams({
+            title: `[Bug] ${title}`, body, labels: 'bug'
+        }).toString();
+        window.open(url, '_blank');
+        window.showToast('Redirected', 'Opening GitHub — log in there to submit.', 'info');
+    }
+};
+
 // Helper functions for action panel
 window.addTextToCAP = () => {
     if (!window.currentSelection || !window.currentSelection.text) {
@@ -351,7 +466,12 @@ window.updateUI = async function(force = false) {
             <main id="main-content" class="${mainCls}">
                 ${renderActiveView()}
             </main>
-        </div>`;
+        </div>
+        <!-- Floating Bug Report Button -->
+        <button onclick="window.openBugReport()" title="Report a Bug"
+            class="fixed bottom-6 right-6 z-[200] w-12 h-12 bg-red-500 hover:bg-red-600 text-white rounded-full shadow-xl hover:shadow-2xl hover:scale-110 transition-all flex items-center justify-center">
+            <i data-lucide="bug" class="w-5 h-5"></i>
+        </button>`;
     if (window.lucide) window.lucide.createIcons();
     if (window.fixPreCode) window.fixPreCode();
     if (isKanban && window.kanbanInitScroll) window.kanbanInitScroll();
