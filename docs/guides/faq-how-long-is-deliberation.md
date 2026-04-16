@@ -21,7 +21,7 @@ These are **minimums**. A proposal may remain in deliberation longer if discussi
 
 ## When does it start?
 
-The deliberation period begins the moment the GitHub Issue is submitted. There is no separate step to open a proposal for deliberation — submission and the start of deliberation are the same event.
+The deliberation period begins the moment the GitHub Issue is submitted. There is no separate step to open a proposal for deliberation — submission and the start of deliberation are the same event. All proposals enter the **Consultation** stage immediately.
 
 The deliberation end date is calculated automatically and recorded in the issue body when the issue is opened.
 
@@ -46,4 +46,9 @@ No. If an author significantly revises a proposal during deliberation, they shou
 
 ## What happens when the period ends?
 
-The period expiring does not automatically advance the proposal. A CAP Editor must actively review it, determine it is complete and ready, and apply the **Proposed** label before it can move forward. See [What happens after deliberation ends?](faq-what-happens-after-30-days) for the next steps.
+The period expiring does not automatically advance the proposal. The next steps require both the author and an editor to actively confirm readiness:
+
+1. The **author signals** they are ready to advance by clicking "Signal Ready for Review Board" in their Author Controls panel on the CAP Portal
+2. The **editor reviews** the proposal and, if satisfied, moves it to the **Ready** stage
+
+Neither party can advance the proposal alone. See [What happens after deliberation ends?](faq-what-happens-after-30-days) for the full detail.

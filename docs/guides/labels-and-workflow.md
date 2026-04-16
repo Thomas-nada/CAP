@@ -15,22 +15,48 @@ These labels identify what kind of proposal an issue is.
 
 ---
 
-## Status Labels
+## Lifecycle Labels
 
-These labels track where a proposal is in the governance lifecycle.
+Exactly one lifecycle label is applied to every proposal at all times. It indicates the current stage in the process.
 
 | Label | Meaning |
 | :--- | :--- |
-| **Draft** | Submitted and open for community discussion. The deliberation period is in progress. |
-| **Proposed** | The deliberation period has ended. The proposal is under formal editorial review. |
-| **Active** | The proposal has been ratified — either via on-chain governance action or editorial consensus for process documents. |
-| **Inactive** | The proposal has been withdrawn, rejected, or superseded by another CAP or CIS. |
+| **consultation** | The proposal is open for community deliberation. This is where discussion happens and editors conduct their review. |
+| **ready** | Deliberation is complete and the proposal is ready for on-chain submission. |
+| **done** | The process is complete. The proposal has been submitted on-chain or otherwise concluded. |
+| **withdrawn** | The author has withdrawn the proposal. |
+
+---
+
+## Status Tags
+
+Status tags give additional context about a proposal's current situation. They are set by editors and are optional. Multiple tags may be active at once. Some are only available at specific lifecycle stages.
+
+| Label | Available when | Meaning |
+| :--- | :--- | :--- |
+| **author-ready** | Consultation or Ready | The author has signalled that they are ready for the proposal to advance to the next stage. This is required before an editor can move the proposal forward. |
+| **review** | Any stage | The proposal is currently under active editorial review. |
+| **revision** | Consultation only | The author is revising the proposal based on feedback. |
+| **finalizing** | Consultation only | The editor is preparing the final version of the proposal. |
+| **onchain** | Ready only | The proposal has been submitted to the Cardano blockchain as a governance action. |
+
+---
+
+## Editor Signal Labels
+
+Editors apply one of these labels to communicate their assessment of a proposal. Only one can be active at a time.
+
+| Label | Meaning |
+| :--- | :--- |
+| **editor-ok** | The editor has reviewed the proposal and it meets the required standards. |
+| **editor-concern** | The editor has identified issues that need to be addressed. |
+| **editor-suggested** | The editor has left suggestions for the author — non-blocking, but recommended. |
 
 ---
 
 ## Category Labels
 
-The category label determines the mandatory minimum deliberation period. It is applied automatically by the bot when an issue is opened, based on the category selected in the submission form.
+The category label determines the mandatory minimum deliberation period. It is applied when an issue is opened, based on the category selected in the submission form.
 
 | Label | Deliberation Period | Typical Use |
 | :--- | :---: | :--- |
@@ -43,51 +69,51 @@ The category label determines the mandatory minimum deliberation period. It is a
 
 ---
 
-## Process Labels
+## Special Handling Labels
 
-These labels are applied by CAP Editors to trigger automated workflows.
+Applied by editors when a proposal requires non-standard treatment.
 
-| Label | Effect |
+| Label | Meaning |
 | :--- | :--- |
-| **Accepted** | Applied by an Editor once the deliberation period has ended and the proposal is ready for publication. Triggers the automation that commits the proposal as a file to the repository under `CAPs/CAP-XXXX/README.md` and posts a confirmation comment on the issue. |
+| **major** | Significant-impact change — requires extra scrutiny |
+| **minor** | Small, contained change — lower scrutiny threshold |
+| **bundle** | Being processed together with related proposals |
+| **fast-track** | Expedited due to urgency |
+| **pause** | Processing temporarily suspended |
 
 ---
 
 ## The Workflow at a Glance
 
 ```
-Issue submitted
-      │
-      ▼
-[Draft] ── deliberation period runs ──────────────────────────────────┐
-      │                                                                │
-      │  Community discussion happens in issue comments               │
-      │                                                                │
-      ▼                                                            (if withdrawn)
-[Proposed] ── Editor reviews ─────────────────────────────► [Inactive]
-      │
-      │  Editor applies [Accepted] label
-      │
-      ▼
-Automation commits proposal to repository
-      │
-      ▼
-[Active]
+Proposal submitted
+        │
+        ▼
+ [consultation] ── community deliberation + editor review ──┐
+        │                                                    │
+        │  Author signals author-ready                       │ (withdrawn by author at any time)
+        │  Editor confirms → moves to ready                  │
+        ▼                                                    ▼
+   [ready] ── ready for on-chain submission            [withdrawn]
+        │
+        │  Author signals author-ready
+        │  Editor confirms → moves to done
+        ▼
+    [done]
 ```
 
 ---
 
 ## Who Applies Labels?
 
+- **Authors:** Can apply and remove the `author-ready` label via the CAP Portal Author Controls panel. This is the only label authors control directly.
+- **CAP Editors:** Apply and remove all lifecycle labels, status tags, editor signals, and special handling labels via the CAP Portal Editor Controls panel.
 - **Bot (GitHub Action):** Applies the type label, category label, and calculates the deliberation end date automatically on submission.
-- **CAP Editors:** Apply the **Proposed**, **Accepted**, **Active**, and **Inactive** status labels manually after human review.
-- **Authors:** Cannot apply or remove labels — label management is reserved for Editors to maintain process integrity.
 
 ---
 
 ## Checking a Proposal's Status
 
-The label(s) on any issue are visible at the top of the issue page. You can also filter all issues by label using the **Labels** dropdown in the [Issues tab](https://github.com/Thomas-nada/CAP/issues).
+The label(s) on any issue are visible at the top of the issue page on GitHub. You can also filter all issues by label using the **Labels** dropdown in the [Issues tab](https://github.com/Thomas-nada/CAP/issues).
 
-For example, to see all proposals currently in deliberation: filter by **Draft**.
-To see all ratified proposals: filter by **Active**.
+In the CAP Portal, the **Registry** list shows the lifecycle stage badge on every card. The **Progress Tracker** groups proposals into columns by lifecycle stage.
