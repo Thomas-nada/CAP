@@ -67,6 +67,7 @@ const NEXT_TRANSITIONS = {
 const STATUS_ACTIONS = {
     'revision':        { icon: 'pencil',         text: 'Under revision',      cls: 'bg-orange-50 text-orange-700 border-orange-200 dark:bg-orange-950/40 dark:text-orange-300 dark:border-orange-800' },
     'on-chain':        { icon: 'link',            text: 'Submitted on-chain',  cls: 'bg-indigo-50 text-indigo-700 border-indigo-200 dark:bg-indigo-950/40 dark:text-indigo-300 dark:border-indigo-800' },
+    'onchain':         { icon: 'link',            text: 'Submitted on-chain',  cls: 'bg-indigo-50 text-indigo-700 border-indigo-200 dark:bg-indigo-950/40 dark:text-indigo-300 dark:border-indigo-800' },
     'needs-feedback':  { icon: 'message-circle', text: 'Awaiting feedback',   cls: 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/40 dark:text-amber-300 dark:border-amber-800' },
     'needs-update':    { icon: 'edit-3',         text: 'Author update needed', cls: 'bg-orange-50 text-orange-700 border-orange-200 dark:bg-orange-950/40 dark:text-orange-300 dark:border-orange-800' },
     'blocked':         { icon: 'alert-triangle', text: 'Blocked',             cls: 'bg-red-50 text-red-700 border-red-200 dark:bg-red-950/40 dark:text-red-300 dark:border-red-800' },
@@ -652,16 +653,21 @@ export function renderKanban(state) {
         );
     }
 
-    // Bucket — only proposals in board-visible stages appear
+    // Bucket — map non-column stages to their nearest visible column
+    const STAGE_FALLBACK = {
+        'draft':       null,          // not shown
+        'submitted':   null,          // not shown
+        'review':      null,          // not shown
+        'finalizing':  null,          // not shown
+        'revision':    'consultation',// tag shown on card
+        'onchain':     'ready',       // tag shown on card
+    };
     const buckets = {};
     LIFECYCLE_COLUMNS.forEach(c => { buckets[c.key] = []; });
     filtered.forEach(p => {
         const stage = getLifecycleStage(p);
-        if (buckets[stage]) {
-            buckets[stage].push(p);
-        }
-        // Proposals in non-column stages (draft, submitted, review, revision,
-        // finalizing, onchain) are intentionally excluded from the board
+        const target = buckets[stage] ? stage : (STAGE_FALLBACK[stage] ?? null);
+        if (target) buckets[target].push(p);
     });
 
     // Apply custom position ordering from cache
