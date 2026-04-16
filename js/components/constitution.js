@@ -355,6 +355,22 @@ function renderSingleView(version) {
     
     // Clean CAP preview metadata before processing
     let cleanedContent = version.content;
+
+    // Extract and remove CIP-120 disclaimer (render separately)
+    let disclaimerHtml = '';
+    const disclaimerMatch = cleanedContent.match(/^\*This is a CIP-120 compliant copy[\s\S]*?https:\/\/[^\s*]+\*/);
+    if (disclaimerMatch) {
+        const urlMatch = disclaimerMatch[0].match(/https:\/\/[^\s*]+/);
+        const url = urlMatch ? urlMatch[0] : '';
+        disclaimerHtml = `
+            <div class="mb-6 px-5 py-3 bg-slate-100 dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-700/50 text-xs text-slate-500 dark:text-slate-400 italic">
+                This is a CIP-120 compliant copy of the Cardano Constitution.
+                The raw, authoritative version can be found at
+                <a href="${url}" target="_blank" rel="noopener" class="text-blue-500 hover:underline break-all">${url}</a>
+            </div>`;
+        cleanedContent = cleanedContent.replace(disclaimerMatch[0], '').trimStart();
+    }
+
     // Remove the CAP preview header comment
     cleanedContent = cleanedContent.replace(/<!--\s*CAP-\d+\s+PREVIEW.*?-->/is, '');
     // Remove the Changes Summary section and footer comment
@@ -403,6 +419,7 @@ function renderSingleView(version) {
     });
 
     return `
+        ${disclaimerHtml}
         <article id="constitution-content" class="bg-white dark:bg-slate-900 p-10 sm:p-20 rounded-[4rem] border border-slate-100 dark:border-slate-800 shadow-sm prose dark:prose-invert max-w-none text-left leading-relaxed selection:bg-blue-600 selection:text-white">
             ${htmlContent}
         </article>`;
