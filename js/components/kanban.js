@@ -1215,8 +1215,8 @@ export function initKanbanHandlers(state) {
             col.classList.remove('drag-expanded');
             const key = col.dataset.colKey;
             const cardCount = parseInt(col.dataset.cardCount, 10) || 0;
-            // Re-collapse if user had it collapsed or if empty
-            if (isUserCollapsed(key) || cardCount === 0) {
+            // Re-collapse only if user had it explicitly collapsed
+            if (isUserCollapsed(key)) {
                 col.classList.add('is-collapsed');
             }
         });
@@ -1407,8 +1407,8 @@ export function initKanbanHandlers(state) {
                 el.style.transition = 'none';
             });
 
-            // Determine collapse: user-cached or empty column
-            if (cache[key] || cardCount === 0) {
+            // Determine collapse: only if user explicitly collapsed
+            if (cache[key]) {
                 col.classList.add('is-collapsed');
             } else {
                 col.classList.remove('is-collapsed');
@@ -1571,13 +1571,6 @@ export function initKanbanHandlers(state) {
                     // Try to flush any OTHER deferred collapses (delayed so next column can claim focus)
                     if (wasFocused) _deferredFlushCheck();
                     return;
-                }
-
-                // Auto-collapse empty columns (not user-collapsed, just empty)
-                if (cardCount === 0 && !isUserCollapsed(key)) {
-                    collapseTimer = setTimeout(() => {
-                        col.classList.add('is-collapsed');
-                    }, 500);
                 }
 
                 // Flush deferred collapses from other columns (delayed)
