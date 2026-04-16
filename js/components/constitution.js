@@ -161,6 +161,13 @@ export function renderConstitution(state) {
                         </select>
                     </div>
 
+                    <!-- Download Button -->
+                    <button onclick="window.downloadConstitution()"
+                        class="w-full px-4 py-3 rounded-xl bg-emerald-50 dark:bg-emerald-900/20 border-2 border-emerald-200 dark:border-emerald-900/30 text-emerald-600 dark:text-emerald-400 font-bold text-sm hover:-translate-y-0.5 transition-all flex items-center justify-center gap-2">
+                        <i data-lucide="download" class="w-4 h-4"></i>
+                        Download (.txt)
+                    </button>
+
                     <!-- Diff Mode Toggle -->
                     <div class="bg-white dark:bg-slate-900 p-6 rounded-[2rem] border border-slate-100 dark:border-slate-800 shadow-sm">
                         <h3 class="text-xs font-black uppercase tracking-[0.2em] text-slate-400 mb-4">Compare Mode</h3>

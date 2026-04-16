@@ -28,7 +28,7 @@ import { renderRegistry } from './components/registry.js?v=5';
 import { renderDetail } from './components/detail.js?v=5';
 import { renderCreate } from './components/create.js?v=2';
 import { renderEdit } from './components/edit.js?v=2';
-import { renderConstitution } from './components/constitution.js?v=5';
+import { renderConstitution } from './components/constitution.js?v=6';
 import { renderWizard } from './components/wizard.js?v=2';
 import { renderLearnHub } from './components/learn.js?v=2';
 import { initKanbanHandlers } from './components/kanban.js?v=9';
@@ -1128,6 +1128,24 @@ window.reloadConstitution = async () => {
 };
 
 // Constitution version management
+window.downloadConstitution = () => {
+    const version = state.constitutionVersions.find(v => v.name === state.constitutionCurrentVersion);
+    if (!version || !version.content) {
+        window.showToast('Download Failed', 'No constitution content available.', 'error');
+        return;
+    }
+    const filename = version.filename || `constitution-${version.name}.txt`;
+    const blob = new Blob([version.content], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+};
+
 window.switchConstitutionVersion = (versionName) => {
     state.constitutionCurrentVersion = versionName;
     const version = state.constitutionVersions.find(v => v.name === versionName);
