@@ -19,7 +19,7 @@ import {
     addLabel,
     removeLabel,
     fetchEditors
-} from './api.js?v=5';
+} from './api.js?v=6';
 
 // Import UI Components
 import { renderNav } from './components/nav.js?v=4';

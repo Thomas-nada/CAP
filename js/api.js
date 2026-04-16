@@ -187,6 +187,48 @@ export async function fetchConstitutionVersions(token) {
 }
 
 /**
+ * Formats text to comply with CIP-120:
+ * - Lines max 80 characters (except headers with long parameter names)
+ * - Preserves paragraph breaks, list indentation, headers
+ */
+function formatCIP120(text) {
+    const lines = text.split('\n');
+    const out = [];
+
+    for (const line of lines) {
+        // Don't wrap: blank lines, headers, list-start lines ≤80
+        if (line.trim() === '' || /^#{1,6}\s/.test(line)) {
+            out.push(line);
+            continue;
+        }
+
+        if (line.length <= 80) {
+            out.push(line);
+            continue;
+        }
+
+        // Detect leading whitespace (for list continuation)
+        const indent = line.match(/^(\s*)/)[1];
+        const content = line.slice(indent.length);
+        const words = content.split(' ');
+        let current = indent;
+
+        for (const w of words) {
+            const test = current + (current.trim() ? ' ' : '') + w;
+            if (test.length <= 80) {
+                current = current.trim() ? test : current + w;
+            } else {
+                if (current.trim()) out.push(current);
+                current = indent + w;
+            }
+        }
+        if (current.trim()) out.push(current);
+    }
+
+    return out.join('\n');
+}
+
+/**
  * Generates a new constitution version based on CAP changes
  * @param {string} currentConstitutionContent - The current constitution text
  * @param {Array} revisions - Array of revision objects with {section, originalText, proposedText}
@@ -329,6 +371,9 @@ ${revisions.map((r, i) => `    ${i + 1}. ${r.section || 'General'}: ${r.original
         }
     });
     
+    // Format to CIP-120 (80-char line wrapping) before adding header
+    newConstitution = formatCIP120(newConstitution);
+
     // Add header at the beginning
     newConstitution = header + newConstitution;
     
